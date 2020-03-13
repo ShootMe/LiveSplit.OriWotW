@@ -3,12 +3,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-namespace LiveSplit.Memory {
+namespace LiveSplit.OriWotW {
     public static class MemoryReader {
         private static Dictionary<int, Module64[]> ModuleCache = new Dictionary<int, Module64[]>();
         public static bool is64Bit;
         public static void Update64Bit(Process program) {
             is64Bit = program.Is64Bit();
+        }
+        public static string PrintList<T>(this List<T> list) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++) {
+                sb.Append(list[i].ToString()).Append(',');
+            }
+            if (list.Count > 0) {
+                sb.Length--;
+            }
+            return sb.ToString();
         }
         public static T Read<T>(this Process targetProcess, IntPtr address, params int[] offsets) where T : struct {
             if (targetProcess == null || address == IntPtr.Zero) { return default(T); }
@@ -89,9 +99,9 @@ namespace LiveSplit.Memory {
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return string.Empty; }
 
-            int length = Read<int>(targetProcess, address + last, 0x4);
+            int length = Read<int>(targetProcess, address + last, 0x10);
             if (length < 0 || length > 2048) { return string.Empty; }
-            return Encoding.Unicode.GetString(Read(targetProcess, address + last + 0x8, 2 * length));
+            return Encoding.Unicode.GetString(Read(targetProcess, address + last + 0x14, 2 * length));
         }
         public static string ReadAscii(this Process targetProcess, IntPtr address) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }

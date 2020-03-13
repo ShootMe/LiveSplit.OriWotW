@@ -1,5 +1,4 @@
-﻿using LiveSplit.Memory;
-namespace LiveSplit.OriWotW {
+﻿namespace LiveSplit.OriWotW {
     public class LogicManager {
         public bool ShouldSplit { get; private set; }
         public bool ShouldReset { get; private set; }
@@ -37,15 +36,15 @@ namespace LiveSplit.OriWotW {
         }
         public void Update(SplitterSettings settings) {
             if (!Running) {
-                ShouldSplit = Memory.OrbCount() > 0;
+                ShouldSplit = Memory.MaxEnergy() > 0;
 
                 Paused = true;
                 if (ShouldSplit) {
                     Running = true;
                 }
             } else {
-                int extraCount = Memory.OrbCount();
-                ShouldSplit = extraCount > 0;
+                float extraCount = Memory.MaxEnergy();
+                ShouldSplit = false;
 
                 Paused = Memory.IsPaused();
 

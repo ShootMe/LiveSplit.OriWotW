@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-namespace LiveSplit.Memory {
+namespace LiveSplit.OriWotW {
     public enum PointerVersion {
         V1
     }
@@ -103,8 +103,18 @@ namespace LiveSplit.Memory {
         private IntPtr GetVersionedFunctionPointer(Process program) {
             if (signatures != null) {
                 MemorySearcher searcher = new MemorySearcher();
+                ulong gameAsmStart = 0, gameAsmEnd = 0;
+                for (int i = 0; i < program.Modules.Count; i++) {
+                    ProcessModule module = program.Modules[i];
+                    if (module.ModuleName.Equals("GameAssembly.dll", StringComparison.OrdinalIgnoreCase)) {
+                        gameAsmStart = (ulong)module.BaseAddress;
+                        gameAsmEnd = gameAsmStart + (ulong)module.ModuleMemorySize;
+                        break;
+                    }
+                }
+
                 searcher.MemoryFilter = delegate (MemInfo info) {
-                    return (info.State & 0x1000) != 0 && (info.Protect & 0x40) != 0 && (info.Protect & 0x100) == 0;
+                    return (ulong)info.BaseAddress >= gameAsmStart && (ulong)info.BaseAddress <= gameAsmEnd && (info.State & 0x1000) != 0 && (info.Protect & 0x20) != 0 && (info.Protect & 0x100) == 0;
                 };
                 for (int i = 0; i < signatures.Length; i++) {
                     ProgramSignature signature = signatures[i];
@@ -112,7 +122,8 @@ namespace LiveSplit.Memory {
                     IntPtr ptr = searcher.FindSignature(program, signature.Signature);
                     if (ptr != IntPtr.Zero) {
                         Version = signature.Version;
-                        return ptr + signature.Offset;
+                        int offset = program.Read<int>(ptr + signature.Offset);
+                        return ptr + signature.Offset + 4 + offset;
                     }
                 }
                 return IntPtr.Zero;
