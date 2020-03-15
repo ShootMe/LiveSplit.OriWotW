@@ -37,7 +37,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>LiveSplit.OriWotW.Component</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Console|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +90,8 @@
     <Compile Include="Memory\ShardType.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
+    <Compile Include="Memory\Vector4.cs" />
+    <Compile Include="Memory\WorldEvent.cs" />
     <Compile Include="Memory\WorldState.cs" />
     <Compile Include="UI\Component.cs" />
     <Compile Include="UI\Factory.cs" />

@@ -16,7 +16,7 @@ namespace LiveSplit.OriWotW {
         private UserSettings userSettings;
         private LogManager log;
         private Thread timerLoop;
-
+        private bool isAutosplitting = false;
         public static void Main(string[] args) {
             Component component = new Component(null);
             Application.Run();
@@ -55,7 +55,7 @@ namespace LiveSplit.OriWotW {
                 try {
                     if (logic.IsHooked()) {
                         logic.Update(userSettings.Settings);
-                        log.Update(logic);
+                        log.Update(logic, userSettings.Settings);
                     }
                     HandleLogic();
                 } catch (Exception ex) {
@@ -75,11 +75,13 @@ namespace LiveSplit.OriWotW {
             if (logic.ShouldReset) {
                 Model.Reset();
             } else if (logic.ShouldSplit) {
+                isAutosplitting = true;
                 if (Model.CurrentState.CurrentPhase == TimerPhase.NotRunning) {
                     Model.Start();
                 } else {
                     Model.Split();
                 }
+                isAutosplitting = false;
             }
         }
         public void OnReset(object sender, TimerPhase e) {
@@ -95,17 +97,23 @@ namespace LiveSplit.OriWotW {
         public void OnStart(object sender, EventArgs e) {
             Model.CurrentState.SetGameTime(TimeSpan.Zero);
             Model.CurrentState.IsGameTimePaused = true;
+            if (!isAutosplitting) {
+                logic.Increment();
+            }
             log.AddEntry(new EventLogEntry("Started Splits"));
         }
         public void OnUndoSplit(object sender, EventArgs e) {
-            logic.Undo();
+            logic.Decrement();
             log.AddEntry(new EventLogEntry("Undo Current Split"));
         }
         public void OnSkipSplit(object sender, EventArgs e) {
-            logic.Skip();
+            logic.Increment();
             log.AddEntry(new EventLogEntry("Skip Current Split"));
         }
         public void OnSplit(object sender, EventArgs e) {
+            if (!isAutosplitting) {
+                logic.Increment();
+            }
             log.AddEntry(new EventLogEntry("Split"));
         }
         public void Update(IInvalidator invalidator, LiveSplitState lvstate, float width, float height, LayoutMode mode) {

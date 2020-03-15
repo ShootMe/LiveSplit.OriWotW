@@ -86,14 +86,14 @@ namespace LiveSplit.OriWotW {
             WinAPI.ReadProcessMemory(targetProcess.Handle, address + last, buffer, numBytes, out bytesRead);
             return buffer;
         }
-        public static string Read(this Process targetProcess, IntPtr address) {
+        public static string ReadString(this Process targetProcess, IntPtr address) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
 
             int length = Read<int>(targetProcess, address, 0x4);
             if (length < 0 || length > 2048) { return string.Empty; }
             return Encoding.Unicode.GetString(Read(targetProcess, address + 0x8, 2 * length));
         }
-        public static string Read(this Process targetProcess, IntPtr address, params int[] offsets) {
+        public static string ReadString(this Process targetProcess, IntPtr address, params int[] offsets) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
 
             int last = OffsetAddress(targetProcess, ref address, offsets);

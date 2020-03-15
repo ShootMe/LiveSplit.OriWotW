@@ -50,7 +50,7 @@ namespace LiveSplit.OriWotW {
         }
         public string Read(Process program, params int[] offsets) {
             GetPointer(program);
-            return program.Read(Pointer, offsets);
+            return program.ReadString(Pointer, offsets);
         }
         public byte[] ReadBytes(Process program, int length, params int[] offsets) {
             GetPointer(program);

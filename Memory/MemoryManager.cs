@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
-        //__mainWisp.Game.Characters.get_Sein
+        //__mainWisp.Game.Characters.SetCurrentCharacter
         private static ProgramPointer Characters = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4));
         //__mainWisp.GameWorld.Awake
         private static ProgramPointer GameWorld = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "4C8BDC55565741544155415641574883EC5049C743A8FEFFFFFF49895B104C8BE933ED", 0xa7));
@@ -17,6 +17,8 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer GameController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45));
         //__mainWisp.SeinWorldState.Awake
         private static ProgramPointer SeinWorldState = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488939BA0E000000488B0D????????E8????????488BD8488B77184885C0", 0x14));
+        //__mainWisp.ScenesManager.Awake
+        private static ProgramPointer ScenesManager = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14));
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
@@ -54,6 +56,66 @@ namespace LiveSplit.OriWotW {
         public Vector2 Position() {
             //Characters.Sein.PlatformBehaviour.PlatformMovement.m_prevPosition
             return Characters.Read<Vector2>(Program, 0xb8, 0x10, 0x98, 0x18, 0xd0);
+        }
+        public string ActiveScene() {
+            Vector4 position = new Vector4(Position(), 0f, 0f, true);
+
+            //Scenes.Manager.ActiveScenes
+            IntPtr scenes = (IntPtr)ScenesManager.Read<ulong>(Program, 0xb8, 0x0, 0x60);
+            //.Count
+            int count = Program.Read<int>(scenes, 0x18);
+            //.Items
+            scenes = (IntPtr)Program.Read<ulong>(scenes, 0x10);
+            IntPtr[] cache = new IntPtr[count];
+            for (int i = 0; i < count; i++) {
+                //.Items[i].MetaData
+                IntPtr runtimeScene = (IntPtr)Program.Read<ulong>(scenes, 0x20 + (i * 0x8), 0x18);
+
+                //.DependantScene
+                bool dependantScene = Program.Read<bool>(runtimeScene, 0x74);
+                if (dependantScene) { continue; }
+                cache[i] = runtimeScene;
+
+                //.SceneBoundaries
+                IntPtr sceneBoundaries = (IntPtr)Program.Read<ulong>(runtimeScene, 0x30);
+                //.SceneBoundaries.Count
+                int boundaryCount = Program.Read<int>(sceneBoundaries, 0x18);
+                //.SceneBoundaries.Items
+                sceneBoundaries = (IntPtr)Program.Read<ulong>(sceneBoundaries, 0x10);
+                for (int j = 0; j < boundaryCount; j++) {
+                    //.SceneBoundaries.Items[j]
+                    Vector4 boundary = Program.Read<Vector4>(sceneBoundaries, 0x20 + (j * 0x8));
+                    boundary.Y += boundary.H;
+                    if (boundary.Intersects(position)) {
+                        //.Scene
+                        return Program.ReadString(runtimeScene, 0x10, 0x0);
+                    }
+                }
+            }
+
+            for (int i = 0; i < count; i++) {
+                //.Items[i].MetaData
+                IntPtr runtimeScene = cache[i];
+                if (runtimeScene == IntPtr.Zero) { continue; }
+
+                //.ScenePaddingBoundaries
+                IntPtr sceneBoundaries = (IntPtr)Program.Read<ulong>(runtimeScene, 0x38);
+                //.ScenePaddingBoundaries.Count
+                int boundaryCount = Program.Read<int>(sceneBoundaries, 0x18);
+                //.ScenePaddingBoundaries.Items
+                sceneBoundaries = (IntPtr)Program.Read<ulong>(sceneBoundaries, 0x10);
+                for (int j = 0; j < boundaryCount; j++) {
+                    //.ScenePaddingBoundaries.Items[j]
+                    Vector4 boundary = Program.Read<Vector4>(sceneBoundaries, 0x20 + (j * 0x8));
+                    boundary.Y += boundary.H;
+                    if (boundary.Intersects(position)) {
+                        //.Scene
+                        return Program.ReadString(runtimeScene, 0x10, 0x0);
+                    }
+                }
+            }
+
+            return string.Empty;
         }
         public List<WorldStateValue> WorldStates() {
             List<WorldStateValue> currentStates = new List<WorldStateValue>();
@@ -136,7 +198,7 @@ namespace LiveSplit.OriWotW {
             IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
-            //.Values
+            //.Items
             shards = (IntPtr)Program.Read<ulong>(shards, 0x10);
             for (int i = 0; i < count; i++) {
                 Shard shard = Program.Read<Shard>(shards, 0x20 + (i * 0x8), 0x10);
@@ -170,7 +232,7 @@ namespace LiveSplit.OriWotW {
             IntPtr inventory = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x10);
             //.Count
             int inventoryCount = Program.Read<int>(inventory, 0x18);
-            //.Values
+            //.Items
             inventory = (IntPtr)Program.Read<ulong>(inventory, 0x10);
             for (int i = 0; i < inventoryCount; i++) {
                 InventoryItem item = Program.Read<InventoryItem>(inventory, 0x20 + (i * 0x8), 0x10);

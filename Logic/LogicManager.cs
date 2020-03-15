@@ -25,10 +25,10 @@
             ShouldSplit = false;
             ShouldReset = false;
         }
-        public void Undo() {
+        public void Decrement() {
             CurrentSplit--;
         }
-        public void Skip() {
+        public void Increment() {
             CurrentSplit++;
         }
         public bool IsHooked() {
@@ -106,6 +106,13 @@
                             }
                             break;
                         }
+                    //case SplitType.Event:
+                    //    WorldEvent worldEvent = Utility.GetEnumValue<WorldEvent>(split.Value);
+                    //    ShouldSplit = area != GameWorldAreaID.None && lastIntValue != (int)area && lastIntValue == (int)splitArea;
+                    //    if (area != GameWorldAreaID.None) {
+                    //        lastIntValue = (int)area;
+                    //    }
+                    //    break;
                     case SplitType.Keystone:
                         int keystones = Memory.Keystones();
                         int splitKeystones = -1;

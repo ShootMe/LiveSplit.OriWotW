@@ -22,7 +22,8 @@ namespace LiveSplit.OriWotW {
         GameState,
         TitleScreen,
         LoadingGame,
-        WorldStates
+        WorldStates,
+        Scene
     }
     public class LogManager {
         public List<ILogEntry> LogEntries = new List<ILogEntry>();
@@ -42,7 +43,7 @@ namespace LiveSplit.OriWotW {
             LogEntries.Add(entry);
             Console.WriteLine(entry.ToString());
         }
-        public void Update(LogicManager logic) {
+        public void Update(LogicManager logic, SplitterSettings settings) {
             DateTime date = DateTime.Now;
             bool isDead = logic.Memory.Dead();
             GameState gameState = logic.Memory.GameState();
@@ -52,7 +53,7 @@ namespace LiveSplit.OriWotW {
 
                 string current = null;
                 switch (key) {
-                    case LogObject.CurrentSplit: current = logic.CurrentSplit.ToString(); break;
+                    case LogObject.CurrentSplit: current = $"{logic.CurrentSplit} ({GetCurrentSplit(logic, settings)})"; break;
                     case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
                     case LogObject.Energy: current = mainMenu ? previous : logic.Memory.MaxEnergy().ToString(); break;
                     case LogObject.EnergyFragments: current = isDead || mainMenu ? previous : logic.Memory.EnergyFragments().ToString(); break;
@@ -70,6 +71,7 @@ namespace LiveSplit.OriWotW {
                     case LogObject.GameState: current = gameState.ToString(); break;
                     case LogObject.TitleScreen: current = logic.Memory.MainMenuScreen().ToString(); break;
                     case LogObject.LoadingGame: current = logic.Memory.IsLoadingGame().ToString(); break;
+                    case LogObject.Scene: current = logic.Memory.ActiveScene().ToString(); break;
                         //case LogObject.GameTime: current = mainMenu ? previous : logic.Memory.ElapsedTime().ToString("0"); break;
                         //case LogObject.Position: Vector2 point = logic.Memory.Position(); current = $"{point.X:0}, {point.Y:0}"; break;
                 }
@@ -79,6 +81,10 @@ namespace LiveSplit.OriWotW {
                     currentValues[key] = current;
                 }
             }
+        }
+        private string GetCurrentSplit(LogicManager logic, SplitterSettings settings) {
+            if (logic.CurrentSplit >= settings.Autosplits.Count) { return "N/A"; }
+            return settings.Autosplits[logic.CurrentSplit].ToString();
         }
     }
     public interface ILogEntry { }

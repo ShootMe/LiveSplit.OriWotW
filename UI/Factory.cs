@@ -1,10 +1,19 @@
 ﻿using LiveSplit.Model;
 using LiveSplit.UI.Components;
 using System;
+using System.Globalization;
 using System.Reflection;
+using System.Threading;
 namespace LiveSplit.OriWotW {
     public class Factory : IComponentFactory {
         public static string AutosplitterName = "Ori Will of the Wisps Autosplitter";
+        static Factory() {
+            CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+        }
         public string ComponentName { get { return $"{AutosplitterName} v{Version.ToString(3)}"; } }
         public string Description { get { return AutosplitterName; } }
         public ComponentCategory Category { get { return ComponentCategory.Control; } }
