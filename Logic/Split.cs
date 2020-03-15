@@ -1,23 +1,29 @@
-﻿namespace LiveSplit.OriWotW {
+﻿using System.ComponentModel;
+namespace LiveSplit.OriWotW {
     public enum SplitType {
+        [Description("Manual Split")]
         ManualSplit,
-        FileSelect,
-        Skill,
+        [Description("Game Start")]
+        GameStart,
         Ability,
-        Health,
-        Energy,
-        AbilityCell,
-        Area,
-        Event
+        Shard,
+        Keystone,
+        [Description("Health Cell")]
+        HealthCell,
+        [Description("Energy Cell")]
+        EnergyCell,
+        [Description("Area (Enter)")]
+        AreaEnter,
+        [Description("Area (Leave)")]
+        AreaLeave
     }
     public class Split {
         public string Name { get; set; }
         public SplitType Type { get; set; }
-        public object Value { get; set; }
+        public string Value { get; set; }
 
         public override string ToString() {
-            string value = Value == null ? string.Empty : Value.ToString();
-            return $"{Type.ToString()}|{value}";
+            return $"{Type}|{Value}";
         }
     }
 }

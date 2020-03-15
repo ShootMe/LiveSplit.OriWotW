@@ -23,49 +23,14 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.gridSplits = new LiveSplit.OriWotW.Grid();
             this.btnLog = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.gridSplits)).BeginInit();
+            this.flowMain = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
-            // 
-            // gridSplits
-            // 
-            this.gridSplits.AllowUserToDeleteRows = false;
-            this.gridSplits.AllowUserToOrderColumns = false;
-            this.gridSplits.AllowUserToResizeColumns = false;
-            this.gridSplits.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridSplits.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
-            this.gridSplits.BackgroundColor = System.Drawing.Color.Gray;
-            this.gridSplits.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.gridSplits.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.LightGray;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSplits.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.gridSplits.ColumnHeadersHeight = 20;
-            this.gridSplits.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.gridSplits.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.gridSplits.EnableHeadersVisualStyles = false;
-            this.gridSplits.Location = new System.Drawing.Point(0, 33);
-            this.gridSplits.MultiSelect = false;
-            this.gridSplits.Name = "gridSplits";
-            this.gridSplits.RowHeadersVisible = false;
-            this.gridSplits.Size = new System.Drawing.Size(452, 591);
-            this.gridSplits.TabIndex = 0;
-            this.gridSplits.DataSourceChanged += new System.EventHandler(this.gridSplits_DataSourceChanged);
-            this.gridSplits.SelectionChanged += new System.EventHandler(this.gridSplits_SelectionChanged);
             // 
             // btnLog
             // 
-            this.btnLog.Location = new System.Drawing.Point(374, 4);
+            this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLog.Location = new System.Drawing.Point(392, 4);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(75, 23);
             this.btnLog.TabIndex = 1;
@@ -73,24 +38,39 @@
             this.btnLog.UseVisualStyleBackColor = true;
             this.btnLog.Click += new System.EventHandler(this.btnLog_Click);
             // 
+            // flowMain
+            // 
+            this.flowMain.AllowDrop = true;
+            this.flowMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowMain.AutoScroll = true;
+            this.flowMain.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowMain.Location = new System.Drawing.Point(0, 33);
+            this.flowMain.Name = "flowMain";
+            this.flowMain.Size = new System.Drawing.Size(470, 591);
+            this.flowMain.TabIndex = 2;
+            this.flowMain.WrapContents = false;
+            this.flowMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.flowMain_DragDrop);
+            this.flowMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.flowMain_DragEnter);
+            this.flowMain.DragOver += new System.Windows.Forms.DragEventHandler(this.flowMain_DragOver);
+            // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.flowMain);
             this.Controls.Add(this.btnLog);
-            this.Controls.Add(this.gridSplits);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "UserSettings";
-            this.Size = new System.Drawing.Size(452, 624);
+            this.Size = new System.Drawing.Size(470, 624);
             this.Load += new System.EventHandler(this.Settings_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.gridSplits)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private Grid gridSplits;
         private System.Windows.Forms.Button btnLog;
+        private System.Windows.Forms.FlowLayoutPanel flowMain;
     }
 }

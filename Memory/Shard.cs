@@ -3,7 +3,7 @@ namespace LiveSplit.OriWotW {
     [StructLayout(LayoutKind.Explicit, Size = 16, Pack = 1)]
     public struct Shard {
         [FieldOffset(0)]
-        public SpiritShardType Type;
+        public ShardType Type;
         [FieldOffset(4)]
         public int Level;
         [FieldOffset(8)]

@@ -24,7 +24,7 @@ namespace LiveSplit.OriWotW {
         public Component(LiveSplitState state) {
             logic = new LogicManager();
             log = new LogManager();
-            userSettings = new UserSettings(state,log);
+            userSettings = new UserSettings(state, log);
 
             if (state != null) {
                 Model = new TimerModel() { CurrentState = state };
@@ -73,11 +73,9 @@ namespace LiveSplit.OriWotW {
             }
 
             if (logic.ShouldReset) {
-                if (logic.CurrentSplit >= 0) {
-                    Model.Reset();
-                }
+                Model.Reset();
             } else if (logic.ShouldSplit) {
-                if (!logic.Running) {
+                if (Model.CurrentState.CurrentPhase == TimerPhase.NotRunning) {
                     Model.Start();
                 } else {
                     Model.Split();
@@ -111,7 +109,7 @@ namespace LiveSplit.OriWotW {
             log.AddEntry(new EventLogEntry("Split"));
         }
         public void Update(IInvalidator invalidator, LiveSplitState lvstate, float width, float height, LayoutMode mode) {
-            
+
         }
         public Control GetSettingsControl(LayoutMode mode) { return userSettings; }
         public void SetSettings(XmlNode document) { userSettings.InitializeSettings(document); }

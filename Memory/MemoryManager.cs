@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
         //__mainWisp.Game.Characters.get_Sein
-        private static ProgramPointer Characters = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "4883EC4848C7442420FEFFFFFF803D????????00754F488B05????????486388C0000000488B05????????33D24889542428488954243048895424384C8D4424288B940114CF01008B8C0110CF0100E8", 0x68));
+        private static ProgramPointer Characters = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4));
         //__mainWisp.GameWorld.Awake
         private static ProgramPointer GameWorld = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "4C8BDC55565741544155415641574883EC5049C743A8FEFFFFFF49895B104C8BE933ED", 0xa7));
         //__mainWisp.Seinlevel.get_PartialHealthContainers
@@ -15,8 +15,8 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer GameStateMachine = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B1D????????488B83B8000000488B004885C00F85C6000000488BCBE8????????488B43604885C074278B08E8", 0x14));
         //__mainWisp.GameController.OnGameAwake
         private static ProgramPointer GameController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45));
-        //__mainWisp.ConfirmChangingDifficulty.Perform
-        private static ProgramPointer DifficultyController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14));
+        //__mainWisp.SeinWorldState.Awake
+        private static ProgramPointer SeinWorldState = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488939BA0E000000488B0D????????E8????????488BD8488B77184885C0", 0x14));
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
@@ -27,16 +27,13 @@ namespace LiveSplit.OriWotW {
         public string SceneManagerPointer() {
             return Characters.GetPointer(Program).ToString("X");
         }
-        public bool IsPaused() {
-            return false;
-        }
-        public float MaxEnergy() {
+        public int MaxEnergy() {
             //Characters.Sein.Energy.m_maxEnergyCached
-            return Characters.Read<float>(Program, 0xb8, 0x10, 0x80, 0x38);
+            return (int)Characters.Read<float>(Program, 0xb8, 0x10, 0x80, 0x38) * 2;
         }
-        public float MaxHealth() {
+        public int MaxHealth() {
             //Characters.Sein.Mortality.Health.m_maxHealthCached
-            return Characters.Read<float>(Program, 0xb8, 0x10, 0x88, 0x18, 0x34);
+            return (int)Characters.Read<float>(Program, 0xb8, 0x10, 0x88, 0x18, 0x34) / 5;
         }
         public int HealthFragments() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_partialHealthContainers
@@ -50,13 +47,39 @@ namespace LiveSplit.OriWotW {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_keystones
             return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x28);
         }
-        public int Difficulty() {
-            //DifficultyController.Instance.Difficulty
-            return DifficultyController.Read<int>(Program, 0xb8, 0x0, 0x20);
+        public int Ore() {
+            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_ore
+            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x34);
         }
         public Vector2 Position() {
             //Characters.Sein.PlatformBehaviour.PlatformMovement.m_prevPosition
             return Characters.Read<Vector2>(Program, 0xb8, 0x10, 0x98, 0x18, 0xd0);
+        }
+        public List<WorldStateValue> WorldStates() {
+            List<WorldStateValue> currentStates = new List<WorldStateValue>();
+            //SeinWorldState.Instance
+            foreach (WorldState key in Enum.GetValues(typeof(WorldState))) {
+                int value = 0;
+                string description = string.Empty;
+                if (key == WorldState.DarknessLifted || key == WorldState.MistLifted || key == WorldState.WaterPurified) {
+                    value = SeinWorldState.Read<byte>(Program, 0xb8, 0x0, 0x8 * (int)key, 0x40);
+                    description = value > 0 ? "Completed" : string.Empty;
+                } else {
+                    value = SeinWorldState.Read<int>(Program, 0xb8, 0x0, 0x8 * (int)key, 0x38);
+                    if (value > 0) {
+                        description = SeinWorldState.Read(Program, 0xb8, 0x0, 0x8 * (int)key, 0x40, 0x10, 0x20 + (value * 0x8), 0x10, 0x0);
+                    }
+                }
+
+                if (value > 0) {
+                    currentStates.Add(new WorldStateValue() { State = key, Value = value, Description = description });
+                }
+            }
+
+            currentStates.Sort(delegate (WorldStateValue one, WorldStateValue two) {
+                return one.State.CompareTo(two.State);
+            });
+            return currentStates;
         }
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
@@ -92,7 +115,7 @@ namespace LiveSplit.OriWotW {
             });
             return currentAbilities;
         }
-        public bool HasShard(SpiritShardType type) {
+        public bool HasShard(ShardType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
@@ -107,8 +130,8 @@ namespace LiveSplit.OriWotW {
             }
             return false;
         }
-        public List<SpiritShardType> PlayerShards() {
-            List<SpiritShardType> currentShards = new List<SpiritShardType>();
+        public List<ShardType> PlayerShards() {
+            List<ShardType> currentShards = new List<ShardType>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
@@ -121,7 +144,7 @@ namespace LiveSplit.OriWotW {
                     currentShards.Add(shard.Type);
                 }
             }
-            currentShards.Sort(delegate (SpiritShardType one, SpiritShardType two) {
+            currentShards.Sort(delegate (ShardType one, ShardType two) {
                 return one.CompareTo(two);
             });
             return currentShards;
@@ -174,9 +197,9 @@ namespace LiveSplit.OriWotW {
             }
             return totalCompletion * 100f / areaCount;
         }
-        public string PlayerArea() {
+        public GameWorldAreaID PlayerArea() {
             //GameWorld.CurrentArea.Area.AreaNameString
-            return GameWorld.Read(Program, 0xb8, 0x0, 0x30, 0x10, 0x38, 0x0);
+            return GameWorld.Read<GameWorldAreaID>(Program, 0xb8, 0x0, 0x30, 0x10, 0x20);
         }
         public double ElapsedTime() {
             //GameController.Instance.Timer.CurrentTime

@@ -77,17 +77,19 @@
   <ItemGroup>
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />
+    <Compile Include="Logic\Utility.cs" />
     <Compile Include="Memory\Ability.cs" />
     <Compile Include="Memory\AbilityType.cs" />
     <Compile Include="Memory\EquipmentType.cs" />
+    <Compile Include="Memory\GameWorldAreaID.cs" />
     <Compile Include="Memory\GameState.cs" />
     <Compile Include="Memory\InventoryItem.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
-    <Compile Include="Memory\SpiritShardType.cs" />
+    <Compile Include="Memory\ShardType.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
-    <Compile Include="Memory\WorldMapIconType.cs" />
+    <Compile Include="Memory\WorldState.cs" />
     <Compile Include="UI\Component.cs" />
     <Compile Include="UI\Factory.cs" />
     <Compile Include="Memory\MemoryManager.cs" />
@@ -107,6 +109,12 @@
     <Compile Include="UI\LogViewer.Designer.cs">
       <DependentUpon>LogViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\UserSplitSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\UserSplitSettings.Designer.cs">
+      <DependentUpon>UserSplitSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\UserSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -119,11 +127,6 @@
   <ItemGroup>
     <Content Include="Components\Updates.xml" />
     <None Include="README.md" />
-    <None Include="Resources\upAdd.png" />
-    <None Include="Resources\up.png" />
-    <None Include="Resources\remove.png" />
-    <None Include="Resources\downAdd.png" />
-    <None Include="Resources\down.png" />
     <None Include="Resources\save.png" />
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +136,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\LogViewer.resx">
       <DependentUpon>LogViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\UserSplitSettings.resx">
+      <DependentUpon>UserSplitSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UserSettings.resx">
       <DependentUpon>UserSettings.cs</DependentUpon>
