@@ -4,6 +4,7 @@ namespace LiveSplit.OriWotW {
     public enum LogObject {
         None,
         CurrentSplit,
+        Pointers,
         Energy,
         EnergyFragments,
         Health,
@@ -52,6 +53,7 @@ namespace LiveSplit.OriWotW {
                 string current = null;
                 switch (key) {
                     case LogObject.CurrentSplit: current = logic.CurrentSplit.ToString(); break;
+                    case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
                     case LogObject.Energy: current = mainMenu ? previous : logic.Memory.MaxEnergy().ToString(); break;
                     case LogObject.EnergyFragments: current = isDead || mainMenu ? previous : logic.Memory.EnergyFragments().ToString(); break;
                     case LogObject.Health: current = mainMenu ? previous : logic.Memory.MaxHealth().ToString(); break;

@@ -25,14 +25,15 @@
         private void InitializeComponent() {
             this.btnLog = new System.Windows.Forms.Button();
             this.flowMain = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnClearLog = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLog.Location = new System.Drawing.Point(392, 4);
+            this.btnLog.Location = new System.Drawing.Point(329, 4);
             this.btnLog.Name = "btnLog";
-            this.btnLog.Size = new System.Drawing.Size(75, 23);
+            this.btnLog.Size = new System.Drawing.Size(69, 23);
             this.btnLog.TabIndex = 1;
             this.btnLog.Text = "Debug Log";
             this.btnLog.UseVisualStyleBackColor = true;
@@ -48,22 +49,34 @@
             this.flowMain.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowMain.Location = new System.Drawing.Point(0, 33);
             this.flowMain.Name = "flowMain";
-            this.flowMain.Size = new System.Drawing.Size(470, 591);
+            this.flowMain.Size = new System.Drawing.Size(470, 300);
             this.flowMain.TabIndex = 2;
             this.flowMain.WrapContents = false;
             this.flowMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.flowMain_DragDrop);
             this.flowMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.flowMain_DragEnter);
             this.flowMain.DragOver += new System.Windows.Forms.DragEventHandler(this.flowMain_DragOver);
             // 
+            // btnClearLog
+            // 
+            this.btnClearLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearLog.Location = new System.Drawing.Point(404, 4);
+            this.btnClearLog.Name = "btnClearLog";
+            this.btnClearLog.Size = new System.Drawing.Size(63, 23);
+            this.btnClearLog.TabIndex = 3;
+            this.btnClearLog.Text = "Clear Log";
+            this.btnClearLog.UseVisualStyleBackColor = true;
+            this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
+            // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnClearLog);
             this.Controls.Add(this.flowMain);
             this.Controls.Add(this.btnLog);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "UserSettings";
-            this.Size = new System.Drawing.Size(470, 624);
+            this.Size = new System.Drawing.Size(470, 333);
             this.Load += new System.EventHandler(this.Settings_Load);
             this.ResumeLayout(false);
 
@@ -72,5 +85,6 @@
         #endregion
         private System.Windows.Forms.Button btnLog;
         private System.Windows.Forms.FlowLayoutPanel flowMain;
+        private System.Windows.Forms.Button btnClearLog;
     }
 }

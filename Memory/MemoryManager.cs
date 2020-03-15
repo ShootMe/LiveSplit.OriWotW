@@ -24,8 +24,8 @@ namespace LiveSplit.OriWotW {
         public MemoryManager() {
             LastHooked = DateTime.MinValue;
         }
-        public string SceneManagerPointer() {
-            return Characters.GetPointer(Program).ToString("X");
+        public string GamePointers() {
+            return $"CHR: {Characters.GetPointer(Program):X} | GW: {GameWorld.GetPointer(Program):X} | PUS: {PlayerUberStateGroup.GetPointer(Program):X} | TSM: {TitleScreenManager.GetPointer(Program):X} | GSM: {GameStateMachine.GetPointer(Program):X} | GC: {GameController.GetPointer(Program):X} | SWS: {SeinWorldState.GetPointer(Program):X}";
         }
         public int MaxEnergy() {
             //Characters.Sein.Energy.m_maxEnergyCached

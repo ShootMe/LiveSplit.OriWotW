@@ -150,5 +150,9 @@ namespace LiveSplit.OriWotW {
                 logViewer.ShowDialog(this);
             }
         }
+        private void btnClearLog_Click(object sender, EventArgs e) {
+            Log.LogEntries.Clear();
+            MessageBox.Show(this, "Debug Log has been cleared.", "Debug Log", MessageBoxButtons.OK, MessageBoxIcon.None);
+        }
     }
 }
