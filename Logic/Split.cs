@@ -8,6 +8,7 @@ namespace LiveSplit.OriWotW {
         Ability,
         Shard,
         Keystone,
+        Ore,
         [Description("Health Cell")]
         HealthCell,
         [Description("Energy Cell")]

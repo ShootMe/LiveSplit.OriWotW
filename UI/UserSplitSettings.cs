@@ -58,7 +58,7 @@ namespace LiveSplit.OriWotW {
                 txtValue.Visible = false;
                 cboValue.Visible = false;
                 UserSplit.Value = string.Empty;
-            } else if (nextControlType == SplitType.HealthCell || nextControlType == SplitType.EnergyCell) {
+            } else if (nextControlType == SplitType.HealthCell || nextControlType == SplitType.EnergyCell || nextControlType == SplitType.Keystone || nextControlType == SplitType.Ore) {
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "1";
                 }

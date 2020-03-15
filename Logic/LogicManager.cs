@@ -109,6 +109,13 @@
                         ShouldSplit = lastIntValue != keystones && keystones == splitKeystones;
                         lastIntValue = keystones;
                         break;
+                    case SplitType.Ore:
+                        int ore = Memory.Ore();
+                        int splitOre = -1;
+                        int.TryParse(split.Value, out splitOre);
+                        ShouldSplit = lastIntValue != ore && ore == splitOre;
+                        lastIntValue = ore;
+                        break;
                     case SplitType.HealthCell:
                         int health = maxHealth + Memory.HealthFragments();
                         int splitHealth = -1;
