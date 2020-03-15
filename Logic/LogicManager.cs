@@ -11,18 +11,19 @@
         private int lastIntValue;
 
         public LogicManager() {
-            Reset();
             Memory = new MemoryManager();
         }
 
-        public void Reset() {
+        public void Reset(SplitterSettings settings) {
             Paused = false;
             Running = false;
             CurrentSplit = 0;
+            if (CurrentSplit < settings.Autosplits.Count) {
+                Split split = settings.Autosplits[CurrentSplit];
+                CheckSplit(split);
+            }
             ShouldSplit = false;
             ShouldReset = false;
-            lastBoolValue = false;
-            lastIntValue = -1;
         }
         public void Undo() {
             CurrentSplit--;
@@ -50,9 +51,12 @@
                 }
 
                 if (ShouldSplit) {
-                    lastBoolValue = false;
-                    lastIntValue = -1;
                     CurrentSplit++;
+                    if (CurrentSplit < settings.Autosplits.Count) {
+                        split = settings.Autosplits[CurrentSplit];
+                        CheckSplit(split);
+                        ShouldSplit = true;
+                    }
                 }
             }
         }

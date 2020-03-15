@@ -83,7 +83,7 @@ namespace LiveSplit.OriWotW {
             }
         }
         public void OnReset(object sender, TimerPhase e) {
-            logic.Reset();
+            logic.Reset(userSettings.Settings);
             log.AddEntry(new EventLogEntry("Reset Splits"));
         }
         public void OnResume(object sender, EventArgs e) {

@@ -82,18 +82,19 @@ namespace LiveSplit.OriWotW {
             Point point = destination.PointToClient(new Point(e.X, e.Y));
             UserSplitSettings newItem = destination.GetChildAtPoint(point) as UserSplitSettings;
             int newIndex = destination.Controls.GetChildIndex(newItem, false);
-            if (newIndex == 0) {
-                e.Effect = DragDropEffects.None;
-            } else {
-                e.Effect = DragDropEffects.Move;
-                int oldIndex = destination.Controls.GetChildIndex(oldItem);
-                if (oldIndex != newIndex) {
-                    string segment = oldItem.lblSegment.Text;
-                    oldItem.lblSegment.Text = newItem.lblSegment.Text;
-                    newItem.lblSegment.Text = segment;
-                    destination.Controls.SetChildIndex(oldItem, newIndex);
-                    destination.Invalidate();
-                }
+            e.Effect = DragDropEffects.Move;
+            int oldIndex = destination.Controls.GetChildIndex(oldItem);
+            if (oldIndex != newIndex) {
+                string segment = oldItem.lblSegment.Text;
+                oldItem.lblSegment.Text = newItem.lblSegment.Text;
+                oldItem.UserSplit.Name = newItem.lblSegment.Text;
+                newItem.lblSegment.Text = segment;
+                newItem.UserSplit.Name = segment;
+                Split split = Settings.Autosplits[oldIndex];
+                Settings.Autosplits[oldIndex] = Settings.Autosplits[newIndex];
+                Settings.Autosplits[newIndex] = split;
+                destination.Controls.SetChildIndex(oldItem, newIndex);
+                destination.Invalidate();
             }
         }
         private void FixSplits() {
