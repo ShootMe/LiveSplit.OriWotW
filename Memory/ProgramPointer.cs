@@ -77,8 +77,8 @@ namespace LiveSplit.OriWotW {
                 lastID = program.Id;
             }
 
-            if (Pointer == IntPtr.Zero && DateTime.Now > lastTry.AddSeconds(1)) {
-                lastTry = DateTime.Now;
+            if (Pointer == IntPtr.Zero && DateTime.Now > lastTry) {
+                lastTry = DateTime.Now.AddSeconds(1);
 
                 Pointer = GetVersionedFunctionPointer(program);
                 if (Pointer != IntPtr.Zero) {

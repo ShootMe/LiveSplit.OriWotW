@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.0.3">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added a bunch of logging info to be able to figure out new splits </change>
+            <change> Improved settings UI </change>
+        </changelog>
+    </update>
     <update version="1.0.2">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

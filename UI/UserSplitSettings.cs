@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 using System.Windows.Forms;
 namespace LiveSplit.OriWotW {
     public partial class UserSplitSettings : UserControl {
@@ -14,7 +12,7 @@ namespace LiveSplit.OriWotW {
         public UserSplitSettings() {
             InitializeComponent();
         }
-        public void UpdateControls(bool updateType = false) {
+        public void UpdateControls(bool updateType = false, bool updateValue = true) {
             if (updateType) {
                 isLoading = true;
                 cboType.DataSource = Utility.GetEnumList<SplitType>();
@@ -25,27 +23,33 @@ namespace LiveSplit.OriWotW {
             }
 
             isLoading = true;
-            switch (UserSplit.Type) {
-                case SplitType.AreaEnter:
-                case SplitType.AreaLeave:
-                    cboValue.DataSource = Utility.GetEnumList<GameWorldAreaID>();
-                    cboValue.SelectedValue = Utility.GetEnumValue<GameWorldAreaID>(UserSplit.Value);
-                    break;
-                //case SplitType.Event:
-                //    cboValue.DataSource = GetEnumList<WorldState>();
-                //    cboValue.SelectedValue = GetEnumValue<WorldState>(UserSplit.Value);
-                //    break;
-                case SplitType.Ability:
-                    cboValue.DataSource = Utility.GetEnumList<AbilityType>();
-                    cboValue.SelectedValue = Utility.GetEnumValue<AbilityType>(UserSplit.Value);
-                    break;
-                case SplitType.Shard:
-                    cboValue.DataSource = Utility.GetEnumList<ShardType>();
-                    cboValue.SelectedValue = Utility.GetEnumValue<ShardType>(UserSplit.Value);
-                    break;
-                default:
-                    txtValue.Text = UserSplit.Value;
-                    break;
+            if (updateValue) {
+                switch (UserSplit.Type) {
+                    case SplitType.AreaEnter:
+                    case SplitType.AreaLeave:
+                        cboValue.DataSource = Utility.GetEnumList<SplitArea>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitArea>(UserSplit.Value);
+                        break;
+                    case SplitType.Ability:
+                        cboValue.DataSource = Utility.GetEnumList<SplitAbility>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitAbility>(UserSplit.Value);
+                        break;
+                    case SplitType.Shard:
+                        cboValue.DataSource = Utility.GetEnumList<SplitShard>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
+                        break;
+                    case SplitType.Wisp:
+                        cboValue.DataSource = Utility.GetEnumList<SplitWisp>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitWisp>(UserSplit.Value);
+                        break;
+                    case SplitType.WorldEvent:
+                        cboValue.DataSource = Utility.GetEnumList<SplitWorldEvent>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitWorldEvent>(UserSplit.Value);
+                        break;
+                    default:
+                        txtValue.Text = UserSplit.Value;
+                        break;
+                }
             }
             lblSegment.Text = UserSplit.Name;
             isLoading = false;
@@ -68,10 +72,11 @@ namespace LiveSplit.OriWotW {
                 if (nextControlType != UserSplit.Type) {
                     switch (nextControlType) {
                         case SplitType.AreaEnter:
-                        case SplitType.AreaLeave: DefaultValue = GameWorldAreaID.InkwaterMarsh; break;
-                        //case SplitType.Event: DefaultValue = WorldState.WatermillQuest; break;
-                        case SplitType.Ability: DefaultValue = AbilityType.DoubleJump; break;
-                        case SplitType.Shard: DefaultValue = ShardType.Magnet; break;
+                        case SplitType.AreaLeave: DefaultValue = SplitArea.InkwaterMarsh; break;
+                        case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
+                        case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
+                        case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;
+                        case SplitType.WorldEvent: DefaultValue = SplitWorldEvent.WaterPurified; break;
                     }
                     UserSplit.Value = DefaultValue.ToString();
                 }

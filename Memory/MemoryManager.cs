@@ -19,23 +19,28 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer SeinWorldState = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488939BA0E000000488B0D????????E8????????488BD8488B77184885C0", 0x14));
         //__mainWisp.ScenesManager.Awake
         private static ProgramPointer ScenesManager = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14));
+        //__uberSerialization.Moon.UberStateController.get_Instance
+        private static ProgramPointer UberStateController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B1D????????F6832701000002741883BBD800000000750F488BCBE8????????488B1D????????488B83B800000048837828000F85", 0x35));
+        //__uberSerialization.Moon.UberStateCollection.GetState
+        private static ProgramPointer UberStateCollection = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14));
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
+        private DateTime lastUpdatedValues = DateTime.MinValue;
 
         public MemoryManager() {
             LastHooked = DateTime.MinValue;
         }
         public string GamePointers() {
-            return $"CHR: {Characters.GetPointer(Program):X} | GW: {GameWorld.GetPointer(Program):X} | PUS: {PlayerUberStateGroup.GetPointer(Program):X} | TSM: {TitleScreenManager.GetPointer(Program):X} | GSM: {GameStateMachine.GetPointer(Program):X} | GC: {GameController.GetPointer(Program):X} | SWS: {SeinWorldState.GetPointer(Program):X}";
+            return $"CHR: {Characters.GetPointer(Program):X} | GW: {GameWorld.GetPointer(Program):X} | PUS: {PlayerUberStateGroup.GetPointer(Program):X} | TSM: {TitleScreenManager.GetPointer(Program):X} | GSM: {GameStateMachine.GetPointer(Program):X} | GC: {GameController.GetPointer(Program):X} | SWS: {SeinWorldState.GetPointer(Program):X} | USC: {UberStateController.GetPointer(Program):X} | USL: {UberStateCollection.GetPointer(Program):X}";
         }
         public int MaxEnergy() {
-            //Characters.Sein.Energy.m_maxEnergyCached
-            return (int)Characters.Read<float>(Program, 0xb8, 0x10, 0x80, 0x38) * 2;
+            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats.m_maxEnergy
+            return (int)PlayerUberStateGroup.Read<float>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x1c) * 2;
         }
         public int MaxHealth() {
-            //Characters.Sein.Mortality.Health.m_maxHealthCached
-            return (int)Characters.Read<float>(Program, 0xb8, 0x10, 0x88, 0x18, 0x34) / 5;
+            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats.m_maxHealth
+            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x14) / 5;
         }
         public int HealthFragments() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_partialHealthContainers
@@ -57,84 +62,17 @@ namespace LiveSplit.OriWotW {
             //Characters.Sein.PlatformBehaviour.PlatformMovement.m_prevPosition
             return Characters.Read<Vector2>(Program, 0xb8, 0x10, 0x98, 0x18, 0xd0);
         }
-        public string ActiveScene() {
-            Vector4 position = new Vector4(Position(), 0f, 0f, true);
-
-            //Scenes.Manager.ActiveScenes
-            IntPtr scenes = (IntPtr)ScenesManager.Read<ulong>(Program, 0xb8, 0x0, 0x60);
-            //.Count
-            int count = Program.Read<int>(scenes, 0x18);
-            //.Items
-            scenes = (IntPtr)Program.Read<ulong>(scenes, 0x10);
-            IntPtr[] cache = new IntPtr[count];
-            for (int i = 0; i < count; i++) {
-                //.Items[i].MetaData
-                IntPtr runtimeScene = (IntPtr)Program.Read<ulong>(scenes, 0x20 + (i * 0x8), 0x18);
-
-                //.DependantScene
-                bool dependantScene = Program.Read<bool>(runtimeScene, 0x74);
-                if (dependantScene) { continue; }
-                cache[i] = runtimeScene;
-
-                //.SceneBoundaries
-                IntPtr sceneBoundaries = (IntPtr)Program.Read<ulong>(runtimeScene, 0x30);
-                //.SceneBoundaries.Count
-                int boundaryCount = Program.Read<int>(sceneBoundaries, 0x18);
-                //.SceneBoundaries.Items
-                sceneBoundaries = (IntPtr)Program.Read<ulong>(sceneBoundaries, 0x10);
-                for (int j = 0; j < boundaryCount; j++) {
-                    //.SceneBoundaries.Items[j]
-                    Vector4 boundary = Program.Read<Vector4>(sceneBoundaries, 0x20 + (j * 0x8));
-                    boundary.Y += boundary.H;
-                    if (boundary.Intersects(position)) {
-                        //.Scene
-                        return Program.ReadString(runtimeScene, 0x10, 0x0);
-                    }
-                }
-            }
-
-            for (int i = 0; i < count; i++) {
-                //.Items[i].MetaData
-                IntPtr runtimeScene = cache[i];
-                if (runtimeScene == IntPtr.Zero) { continue; }
-
-                //.ScenePaddingBoundaries
-                IntPtr sceneBoundaries = (IntPtr)Program.Read<ulong>(runtimeScene, 0x38);
-                //.ScenePaddingBoundaries.Count
-                int boundaryCount = Program.Read<int>(sceneBoundaries, 0x18);
-                //.ScenePaddingBoundaries.Items
-                sceneBoundaries = (IntPtr)Program.Read<ulong>(sceneBoundaries, 0x10);
-                for (int j = 0; j < boundaryCount; j++) {
-                    //.ScenePaddingBoundaries.Items[j]
-                    Vector4 boundary = Program.Read<Vector4>(sceneBoundaries, 0x20 + (j * 0x8));
-                    boundary.Y += boundary.H;
-                    if (boundary.Intersects(position)) {
-                        //.Scene
-                        return Program.ReadString(runtimeScene, 0x10, 0x0);
-                    }
-                }
-            }
-
-            return string.Empty;
+        public string CurrentScene() {
+            //Scenes.Manager.m_currentScene.Scene
+            return ScenesManager.Read(Program, 0xb8, 0x0, 0x180, 0x10, 0x0);
         }
         public List<WorldStateValue> WorldStates() {
             List<WorldStateValue> currentStates = new List<WorldStateValue>();
             //SeinWorldState.Instance
             foreach (WorldState key in Enum.GetValues(typeof(WorldState))) {
-                int value = 0;
-                string description = string.Empty;
-                if (key == WorldState.DarknessLifted || key == WorldState.MistLifted || key == WorldState.WaterPurified) {
-                    value = SeinWorldState.Read<byte>(Program, 0xb8, 0x0, 0x8 * (int)key, 0x40);
-                    description = value > 0 ? "Completed" : string.Empty;
-                } else {
-                    value = SeinWorldState.Read<int>(Program, 0xb8, 0x0, 0x8 * (int)key, 0x38);
-                    if (value > 0) {
-                        description = SeinWorldState.Read(Program, 0xb8, 0x0, 0x8 * (int)key, 0x40, 0x10, 0x20 + (value * 0x8), 0x10, 0x0);
-                    }
-                }
-
-                if (value > 0) {
-                    currentStates.Add(new WorldStateValue() { State = key, Value = value, Description = description });
+                WorldStateValue value = GetWorldState(key, true);
+                if (value != null) {
+                    currentStates.Add(value);
                 }
             }
 
@@ -143,6 +81,195 @@ namespace LiveSplit.OriWotW {
             });
             return currentStates;
         }
+        public WorldStateValue GetWorldState(WorldState worldState, bool readName = false) {
+            int value = 0;
+            string description = string.Empty;
+            if (worldState == WorldState.DarknessLifted || worldState == WorldState.MistLifted || worldState == WorldState.WaterPurified || worldState == WorldState.KwolokDead) {
+                value = SeinWorldState.Read<byte>(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x40);
+                if (readName) {
+                    description = value > 0 ? "Completed" : string.Empty;
+                }
+            } else {
+                value = SeinWorldState.Read<int>(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x38);
+                if (value > 0 && readName) {
+                    description = SeinWorldState.Read(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x40, 0x10, 0x20 + (value * 0x8), 0x10, 0x0);
+                }
+            }
+
+            if (value > 0) {
+                return new WorldStateValue() { State = worldState, Value = value, Description = description };
+            }
+            return null;
+        }
+        private static Dictionary<long, UberState> uberIDLookup = null;
+        private void PopulateUberStates() {
+            uberIDLookup = new Dictionary<long, UberState>();
+            //UberStateCollection.Instance.m_descriptorsArray
+            IntPtr descriptors = (IntPtr)UberStateCollection.Read<ulong>(Program, 0xb8, 0x10, 0x20);
+            //.Count
+            int descriptorsCount = Program.Read<int>(descriptors, 0x18);
+            byte[] data = Program.Read(descriptors + 0x20, descriptorsCount * 0x8);
+            for (int i = 0; i < descriptorsCount; i++) {
+                //.m_descriptorsArray[i]
+                IntPtr descriptor = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
+
+                UberStateType type = UberStateType.SerializedBooleanUberState;
+                Enum.TryParse<UberStateType>(Program.ReadAscii(descriptor, 0x0, 0x10, 0x0), out type);
+
+                int groupOffset = 0x38;
+                switch (type) {
+                    case UberStateType.SerializedByteUberState:
+                    case UberStateType.CountUberState:
+                    case UberStateType.SerializedIntUberState:
+                    case UberStateType.SavePedestalUberState: groupOffset = 0x30; break;
+                    case UberStateType.ConditionUberState: groupOffset = 0x28; break;
+                    case UberStateType.PlayerUberStateDescriptor: groupOffset = 0x40; break;
+                }
+
+                //.m_descriptorsArray[i].ID.m_id
+                int id = Program.Read<int>(descriptor, 0x18, 0x10);
+                //.m_descriptorsArray[i].Name
+                IntPtr namePtr = (IntPtr)Program.Read<ulong>(descriptor, 0x10, 0x48);
+                string name = string.Empty;
+                if (namePtr != IntPtr.Zero) {
+                    name = Program.ReadAscii(namePtr);
+                } else {
+                    name = Program.ReadAscii(descriptor, 0x10, 0x50);
+                }
+
+                //.m_descriptorsArray[i].Group.ID.m_id
+                int groupID = Program.Read<int>(descriptor, groupOffset, 0x18, 0x10);
+                //.m_descriptorsArray[i].Group.Name
+                namePtr = (IntPtr)Program.Read<ulong>(descriptor, groupOffset, 0x10, 0x48);
+                string groupName = string.Empty;
+                if (namePtr != IntPtr.Zero) {
+                    groupName = Program.ReadAscii(namePtr);
+                } else {
+                    groupName = Program.ReadAscii(descriptor, groupOffset, 0x10, 0x50);
+                }
+
+                uberIDLookup.Add(((long)groupID << 32) | (long)id, new UberState() { Type = type, ID = id, Name = name, GroupID = groupID, GroupName = groupName });
+            }
+        }
+        public Dictionary<long, UberState> GetUberStates() {
+            if (uberIDLookup == null) {
+                PopulateUberStates();
+            }
+
+            DateTime date = DateTime.Now;
+            //if (date < lastUpdatedValues) { return uberIDLookup; }
+            lastUpdatedValues = date.AddSeconds(0.33);
+
+            //UbserStateController.m_currentStateValueStore.m_groupMap
+            IntPtr groups = (IntPtr)UberStateController.Read<ulong>(Program, 0xb8, 0x40, 0x18);
+            //.Count
+            int groupCount = Program.Read<int>(groups, 0x20);
+            //.Values
+            groups = (IntPtr)Program.Read<ulong>(groups, 0x18);
+            byte[] groupsData = Program.Read(groups + 0x20, groupCount * 0x18);
+            for (int i = 0; i < groupCount; i++) {
+                //.Values[i].m_id.m_id
+                IntPtr group = (IntPtr)BitConverter.ToUInt64(groupsData, 0x10 + (i * 0x18));
+                byte[] groupData = Program.Read(group + 0x18, 48);
+                long groupID = Program.Read<int>((IntPtr)BitConverter.ToUInt64(groupData, 0), 0x10);
+
+                //.Values[i].m_objectStateMap
+                IntPtr map = (IntPtr)BitConverter.ToUInt64(groupData, 8);
+                //.Values[i].m_objectStateMap.Count
+                int mapCount = Program.Read<int>(map, 0x20);
+                if (mapCount > 0) {
+                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
+                    for (int j = 0; j < mapCount; j++) {
+                        //.Values[i].m_objectStateMap.Keys[j]
+                        long id = BitConverter.ToInt32(data, j * 0x18);
+
+                        UberState uberState = null;
+                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            if (uberState.Name.IndexOf("savePedestal", StringComparison.OrdinalIgnoreCase) >= 0) {
+                                uberState.Value.Byte = Program.Read<byte>((IntPtr)BitConverter.ToUInt64(data, 0x10 + (j * 0x18)), 0x11);
+                            } else {
+                                //playerUberStateDescriptor
+                            }
+                        }
+                    }
+                }
+
+                //.Values[i].m_boolStateMap
+                map = (IntPtr)BitConverter.ToUInt64(groupData, 16);
+                //.Values[i].m_boolStateMap.Count
+                mapCount = Program.Read<int>(map, 0x20);
+                if (mapCount > 0) {
+                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
+                    for (int j = 0; j < mapCount; j++) {
+                        //.Values[i].m_boolStateMap.Keys[j]
+                        long id = BitConverter.ToInt32(data, j * 0x18);
+
+                        UberState uberState = null;
+                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.Value.Bool = data[0x10 + (j * 0x18)] != 0;
+                        }
+                    }
+                }
+
+                //.Values[i].m_floatStateMap
+                map = (IntPtr)BitConverter.ToUInt64(groupData, 24);
+                //.Values[i].m_floatStateMap.Count
+                mapCount = Program.Read<int>(map, 0x20);
+                if (mapCount > 0) {
+                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
+                    for (int j = 0; j < mapCount; j++) {
+                        //.Values[i].m_floatStateMap.Keys[j]
+                        long id = BitConverter.ToInt32(data, j * 0x18);
+
+                        UberState uberState = null;
+                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.Value.Float = BitConverter.ToSingle(data, 0x10 + (j * 0x18));
+                        }
+                    }
+                }
+
+                //.Values[i].m_intStateMap
+                map = (IntPtr)BitConverter.ToUInt64(groupData, 32);
+                //.Values[i].m_intStateMap.Count
+                mapCount = Program.Read<int>(map, 0x20);
+                if (mapCount > 0) {
+                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
+                    for (int j = 0; j < mapCount; j++) {
+                        //.Values[i].m_intStateMap.Keys[j]
+                        long id = BitConverter.ToInt32(data, j * 0x18);
+
+                        UberState uberState = null;
+                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.Value.Int = BitConverter.ToInt32(data, 0x10 + (j * 0x18));
+                        }
+                    }
+                }
+
+                //.Values[i].m_byteStateMap
+                map = (IntPtr)BitConverter.ToUInt64(groupData, 40);
+                //.Values[i].m_byteStateMap.Count
+                mapCount = Program.Read<int>(map, 0x20);
+                if (mapCount > 0) {
+                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
+                    for (int j = 0; j < mapCount; j++) {
+                        //.Values[i].m_byteStateMap.Keys[j]
+                        long id = BitConverter.ToInt32(data, j * 0x18);
+
+                        UberState uberState = null;
+                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.Value.Byte = data[0x10 + (j * 0x18)];
+                        }
+                    }
+                }
+            }
+
+            return uberIDLookup;
+        }
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
             IntPtr abilities = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
@@ -150,31 +277,32 @@ namespace LiveSplit.OriWotW {
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
             abilities = (IntPtr)Program.Read<ulong>(abilities, 0x10);
+            byte[] data = Program.Read(abilities + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
-                Ability ability = Program.Read<Ability>(abilities, 0x20 + (i * 0x8), 0x10);
+                //.Items[i]
+                Ability ability = Program.Read<Ability>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x10);
                 if (ability.Type == type) {
                     return ability.HasAbility == 1;
                 }
             }
             return false;
         }
-        public List<AbilityType> PlayerAbilities() {
-            List<AbilityType> currentAbilities = new List<AbilityType>();
+        public Dictionary<AbilityType, Ability> PlayerAbilities() {
+            Dictionary<AbilityType, Ability> currentAbilities = new Dictionary<AbilityType, Ability>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
             IntPtr abilities = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
             abilities = (IntPtr)Program.Read<ulong>(abilities, 0x10);
+            byte[] data = Program.Read(abilities + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
-                Ability ability = Program.Read<Ability>(abilities, 0x20 + (i * 0x8), 0x10);
-                if (ability.HasAbility == 1) {
-                    currentAbilities.Add(ability.Type);
+                //.Items[i]
+                Ability ability = Program.Read<Ability>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x10);
+                if (Enum.IsDefined(typeof(AbilityType), ability.Type)) {
+                    currentAbilities[ability.Type] = ability;
                 }
             }
-            currentAbilities.Sort(delegate (AbilityType one, AbilityType two) {
-                return one.CompareTo(two);
-            });
             return currentAbilities;
         }
         public bool HasShard(ShardType type) {
@@ -184,84 +312,52 @@ namespace LiveSplit.OriWotW {
             int count = Program.Read<int>(shards, 0x18);
             //.Items
             shards = (IntPtr)Program.Read<ulong>(shards, 0x10);
+            byte[] data = Program.Read(shards + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
-                Shard shard = Program.Read<Shard>(shards, 0x20 + (i * 0x8), 0x10);
+                //.Items[i]
+                Shard shard = Program.Read<Shard>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x10);
                 if (shard.Type == type) {
                     return shard.Gained == 1;
                 }
             }
             return false;
         }
-        public List<ShardType> PlayerShards() {
-            List<ShardType> currentShards = new List<ShardType>();
+        public Dictionary<ShardType, Shard> PlayerShards() {
+            Dictionary<ShardType, Shard> currentShards = new Dictionary<ShardType, Shard>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
             shards = (IntPtr)Program.Read<ulong>(shards, 0x10);
+            byte[] data = Program.Read(shards + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
-                Shard shard = Program.Read<Shard>(shards, 0x20 + (i * 0x8), 0x10);
-                if (shard.Gained == 1) {
-                    currentShards.Add(shard.Type);
+                //.Items[i]
+                Shard shard = Program.Read<Shard>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x10);
+                if (Enum.IsDefined(typeof(ShardType), shard.Type)) {
+                    currentShards[shard.Type] = shard;
                 }
             }
-            currentShards.Sort(delegate (ShardType one, ShardType two) {
-                return one.CompareTo(two);
-            });
             return currentShards;
-
-            //Read from dictionary
-            //List<SpiritShardType> currentShards = new List<SpiritShardType>();
-            ////PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shards
-            //IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x10);
-            ////.Count
-            //int count = Program.Read<int>(shards, 0x20);
-            ////.Values
-            //shards = (IntPtr)Program.Read<ulong>(shards, 0x18);
-            //for (int i = 0; i < count; i++) {
-            //    Shard shard = Program.Read<Shard>(shards, 0x20 + (i * 0x18) + 0x10, 0x10);
-            //    if (shard.Gained == 1) {
-            //        currentShards.Add(shard.Type);
-            //    }
-            //}
-        }
-        public List<EquipmentType> Inventory() {
-            List<EquipmentType> currentInventory = new List<EquipmentType>();
-            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_inventory
-            IntPtr inventory = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x10);
-            //.Count
-            int inventoryCount = Program.Read<int>(inventory, 0x18);
-            //.Items
-            inventory = (IntPtr)Program.Read<ulong>(inventory, 0x10);
-            for (int i = 0; i < inventoryCount; i++) {
-                InventoryItem item = Program.Read<InventoryItem>(inventory, 0x20 + (i * 0x8), 0x10);
-                if (item.Gained == 1) {
-                    currentInventory.Add(item.Type);
-                }
-            }
-            currentInventory.Sort(delegate (EquipmentType one, EquipmentType two) {
-                return one.CompareTo(two);
-            });
-            return currentInventory;
         }
         public float MapCompletion() {
             float totalCompletion = 0;
             //GameWorld.RuntimeAreas
             IntPtr areas = (IntPtr)GameWorld.Read<ulong>(Program, 0xb8, 0x0, 0x28);
             //.Count
-            int areaCount = Program.Read<int>(areas, 0x18);
+            int count = Program.Read<int>(areas, 0x18);
             //.Items
             areas = (IntPtr)Program.Read<ulong>(areas, 0x10);
-            for (int i = 0; i < areaCount; i++) {
+            byte[] data = Program.Read(areas + 0x20, count * 0x8);
+            for (int i = 0; i < count; i++) {
                 //.Items[i].m_completionAmount
-                totalCompletion += Program.Read<float>(areas, 0x20 + (i * 8), 0x34);
+                totalCompletion += Program.Read<float>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x34);
             }
-            return totalCompletion * 100f / areaCount;
+            return totalCompletion * 100f / count;
         }
-        public GameWorldAreaID PlayerArea() {
+        public AreaType PlayerArea() {
             //GameWorld.CurrentArea.Area.AreaNameString
-            return GameWorld.Read<GameWorldAreaID>(Program, 0xb8, 0x0, 0x30, 0x10, 0x20);
+            return GameWorld.Read<AreaType>(Program, 0xb8, 0x0, 0x30, 0x10, 0x20);
         }
         public double ElapsedTime() {
             //GameController.Instance.Timer.CurrentTime
@@ -275,13 +371,13 @@ namespace LiveSplit.OriWotW {
             //GameStateMachine.m_instance.CurrentState
             return (GameState)GameStateMachine.Read<int>(Program, 0xb8, 0x0, 0x10);
         }
-        public Screen MainMenuScreen() {
+        public Screen TitleScreen() {
             //TitleScreenManager.Instance.m_currentScreen
             return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
         public bool IsLoadingGame() {
             //GameController.Instance.m_isLoadingGame
-            return GameController.Read<bool>(Program, 0xb8, 0x0, 0x48, 0xd0, 0x20);
+            return GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
         }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
@@ -292,6 +388,7 @@ namespace LiveSplit.OriWotW {
 
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
+                    uberIDLookup = null;
                     IsHooked = true;
                 }
             }

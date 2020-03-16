@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Text;
 namespace LiveSplit.OriWotW {
     public static class Utility {
         public static List<Tuple<T, string>> GetEnumList<T>() where T : struct {
@@ -27,12 +28,32 @@ namespace LiveSplit.OriWotW {
                 return descriptions[0].Description;
             }
         }
+        public static string[] GetEnumScenes<T>(T value) where T : struct {
+            MemberInfo info = typeof(T).GetMember(value.ToString())[0];
+            SceneAttribute[] scenes = (SceneAttribute[])info.GetCustomAttributes(typeof(SceneAttribute), false);
+
+            if (scenes == null || scenes.Length == 0) {
+                return null;
+            } else {
+                return scenes[0].Names;
+            }
+        }
         public static T GetEnumValue<T>(string valueToFind) where T : struct {
             T value;
             if (Enum.TryParse<T>(valueToFind, true, out value)) {
                 return value;
             }
             return default(T);
+        }
+        public static string PrintList<T>(this List<T> list) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++) {
+                sb.Append(list[i].ToString()).Append(',');
+            }
+            if (list.Count > 0) {
+                sb.Length--;
+            }
+            return sb.ToString();
         }
     }
 }

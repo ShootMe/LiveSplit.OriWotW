@@ -3,20 +3,28 @@ namespace LiveSplit.OriWotW {
     public enum SplitType {
         [Description("Manual Split")]
         ManualSplit,
-        [Description("Game Start")]
-        GameStart,
+        [Description("Ability")]
         Ability,
-        Shard,
-        Keystone,
-        Ore,
-        [Description("Health Cell")]
-        HealthCell,
-        [Description("Energy Cell")]
-        EnergyCell,
         [Description("Area (Enter)")]
         AreaEnter,
         [Description("Area (Leave)")]
-        AreaLeave
+        AreaLeave,
+        [Description("Energy Cell")]
+        EnergyCell,
+        [Description("Game Start")]
+        GameStart,
+        [Description("Health Cell")]
+        HealthCell,
+        [Description("Keystone")]
+        Keystone,
+        [Description("Ore")]
+        Ore,
+        [Description("Shard")]
+        Shard,
+        [Description("Wisp")]
+        Wisp,
+        [Description("World Event")]
+        WorldEvent
     }
     public class Split {
         public string Name { get; set; }

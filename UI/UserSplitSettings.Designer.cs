@@ -105,10 +105,10 @@
 		}
 
 		#endregion
-		public System.Windows.Forms.TextBox txtValue;
-		public System.Windows.Forms.ComboBox cboType;
 		private System.Windows.Forms.PictureBox picHandle;
-        public System.Windows.Forms.ComboBox cboValue;
-        public System.Windows.Forms.Label lblSegment;
+        private System.Windows.Forms.TextBox txtValue;
+        private System.Windows.Forms.ComboBox cboType;
+        private System.Windows.Forms.ComboBox cboValue;
+        private System.Windows.Forms.Label lblSegment;
     }
 }

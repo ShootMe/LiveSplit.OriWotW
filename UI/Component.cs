@@ -22,9 +22,9 @@ namespace LiveSplit.OriWotW {
             Application.Run();
         }
         public Component(LiveSplitState state) {
-            logic = new LogicManager();
             log = new LogManager();
             userSettings = new UserSettings(state, log);
+            logic = new LogicManager(userSettings.Settings);
 
             if (state != null) {
                 Model = new TimerModel() { CurrentState = state };
@@ -54,7 +54,7 @@ namespace LiveSplit.OriWotW {
             while (timerLoop != null) {
                 try {
                     if (logic.IsHooked()) {
-                        logic.Update(userSettings.Settings);
+                        logic.Update();
                         log.Update(logic, userSettings.Settings);
                     }
                     HandleLogic();
@@ -72,21 +72,25 @@ namespace LiveSplit.OriWotW {
                 Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(logic.GameTime));
             }
 
+            isAutosplitting = true;
             if (logic.ShouldReset) {
                 Model.Reset();
             } else if (logic.ShouldSplit) {
-                isAutosplitting = true;
                 if (Model.CurrentState.CurrentPhase == TimerPhase.NotRunning) {
                     Model.Start();
                 } else {
                     Model.Split();
                 }
-                isAutosplitting = false;
             }
+            isAutosplitting = false;
         }
         public void OnReset(object sender, TimerPhase e) {
-            logic.Reset(userSettings.Settings);
-            log.AddEntry(new EventLogEntry("Reset Splits"));
+            logic.Reset();
+            if (!isAutosplitting) {
+                log.AddEntry(new EventLogEntry("Reset Splits Manual"));
+            } else {
+                log.AddEntry(new EventLogEntry("Reset Splits Auto"));
+            }
         }
         public void OnResume(object sender, EventArgs e) {
             log.AddEntry(new EventLogEntry("Resumed Splits"));
@@ -99,22 +103,26 @@ namespace LiveSplit.OriWotW {
             Model.CurrentState.IsGameTimePaused = true;
             if (!isAutosplitting) {
                 logic.Increment();
+                log.AddEntry(new EventLogEntry("Started Splits Manual"));
+            } else {
+                log.AddEntry(new EventLogEntry("Started Splits Auto"));
             }
-            log.AddEntry(new EventLogEntry("Started Splits"));
         }
         public void OnUndoSplit(object sender, EventArgs e) {
             logic.Decrement();
-            log.AddEntry(new EventLogEntry("Undo Current Split"));
+            log.AddEntry(new EventLogEntry($"Undo Current Split {Model.CurrentState.CurrentTime.RealTime.Value}"));
         }
         public void OnSkipSplit(object sender, EventArgs e) {
             logic.Increment();
-            log.AddEntry(new EventLogEntry("Skip Current Split"));
+            log.AddEntry(new EventLogEntry($"Skip Current Split {Model.CurrentState.CurrentTime.RealTime.Value}"));
         }
         public void OnSplit(object sender, EventArgs e) {
             if (!isAutosplitting) {
                 logic.Increment();
+                log.AddEntry(new EventLogEntry($"Split Manual {Model.CurrentState.CurrentTime.RealTime.Value}"));
+            } else {
+                log.AddEntry(new EventLogEntry($"Split Auto {Model.CurrentState.CurrentTime.RealTime.Value}"));
             }
-            log.AddEntry(new EventLogEntry("Split"));
         }
         public void Update(IInvalidator invalidator, LiveSplitState lvstate, float width, float height, LayoutMode mode) {
 

@@ -1,4 +1,5 @@
-﻿namespace LiveSplit.OriWotW {
+﻿using System;
+namespace LiveSplit.OriWotW {
     public class LogicManager {
         public bool ShouldSplit { get; private set; }
         public bool ShouldReset { get; private set; }
@@ -7,29 +8,38 @@
         public bool Paused { get; private set; }
         public float GameTime { get; private set; }
         public MemoryManager Memory { get; private set; }
+        public SplitterSettings Settings { get; private set; }
         private bool lastBoolValue;
         private int lastIntValue;
+        private string lastStrValue;
 
-        public LogicManager() {
+        public LogicManager(SplitterSettings settings) {
             Memory = new MemoryManager();
+            Settings = settings;
         }
 
-        public void Reset(SplitterSettings settings) {
+        public void Reset() {
             Paused = false;
             Running = false;
             CurrentSplit = 0;
-            if (CurrentSplit < settings.Autosplits.Count) {
-                Split split = settings.Autosplits[CurrentSplit];
-                CheckSplit(split);
-            }
+            InitializeSplit();
             ShouldSplit = false;
             ShouldReset = false;
         }
         public void Decrement() {
             CurrentSplit--;
+            InitializeSplit();
         }
         public void Increment() {
             CurrentSplit++;
+            InitializeSplit();
+        }
+        private void InitializeSplit() {
+            if (CurrentSplit < Settings.Autosplits.Count) {
+                bool temp = ShouldSplit;
+                CheckSplit(Settings.Autosplits[CurrentSplit]);
+                ShouldSplit = temp;
+            }
         }
         public bool IsHooked() {
             bool hooked = Memory.HookProcess();
@@ -39,10 +49,9 @@
             GameTime = -1;
             return hooked;
         }
-        public void Update(SplitterSettings settings) {
-            if (CurrentSplit < settings.Autosplits.Count) {
-                Split split = settings.Autosplits[CurrentSplit];
-                CheckSplit(split);
+        public void Update() {
+            if (CurrentSplit < Settings.Autosplits.Count) {
+                CheckSplit(Settings.Autosplits[CurrentSplit]);
                 if (!Running) {
                     Paused = true;
                     if (ShouldSplit) {
@@ -51,27 +60,20 @@
                 }
 
                 if (ShouldSplit) {
-                    CurrentSplit++;
-                    if (CurrentSplit < settings.Autosplits.Count) {
-                        split = settings.Autosplits[CurrentSplit];
-                        CheckSplit(split);
-                        ShouldSplit = true;
-                    }
+                    Increment();
                 }
             }
         }
         private void CheckSplit(Split split) {
             GameState state = Memory.GameState();
             if (split.Type == SplitType.GameStart) {
-                bool isStarted = state == GameState.Game && Memory.MainMenuScreen() == Screen.ProfileSelected;
+                bool isStarted = state == GameState.Game && Memory.TitleScreen() == Screen.ProfileSelected;
                 ShouldSplit = !lastBoolValue && isStarted;
                 lastBoolValue = isStarted;
             } else {
-                float mapCompletion = Memory.MapCompletion();
-                int maxHealth = Memory.MaxHealth();
                 ShouldSplit = false;
-                Paused = state == GameState.Game && (mapCompletion <= 0.001 || maxHealth <= 0);
-                if (state != GameState.Game || Memory.Dead()) {
+                Paused = Memory.IsLoadingGame();
+                if (state != GameState.Game || Memory.Dead() || Paused) {
                     return;
                 }
 
@@ -80,7 +82,7 @@
                         break;
                     case SplitType.Ability:
                         bool hasAbility = Memory.HasAbility(Utility.GetEnumValue<AbilityType>(split.Value));
-                        ShouldSplit = !lastBoolValue && hasAbility;
+                        ShouldSplit = lastBoolValue != hasAbility;
                         lastBoolValue = hasAbility;
                         break;
                     case SplitType.Shard:
@@ -88,31 +90,18 @@
                         ShouldSplit = !lastBoolValue && hasShard;
                         lastBoolValue = hasShard;
                         break;
-                    case SplitType.AreaEnter: {
-                            GameWorldAreaID area = Memory.PlayerArea();
-                            GameWorldAreaID splitArea = Utility.GetEnumValue<GameWorldAreaID>(split.Value);
-                            ShouldSplit = area != GameWorldAreaID.None && lastIntValue != (int)area && area == splitArea;
-                            if (area != GameWorldAreaID.None) {
-                                lastIntValue = (int)area;
-                            }
-                            break;
-                        }
-                    case SplitType.AreaLeave: {
-                            GameWorldAreaID area = Memory.PlayerArea();
-                            GameWorldAreaID splitArea = Utility.GetEnumValue<GameWorldAreaID>(split.Value);
-                            ShouldSplit = area != GameWorldAreaID.None && lastIntValue != (int)area && lastIntValue == (int)splitArea;
-                            if (area != GameWorldAreaID.None) {
-                                lastIntValue = (int)area;
-                            }
-                            break;
-                        }
-                    //case SplitType.Event:
-                    //    WorldEvent worldEvent = Utility.GetEnumValue<WorldEvent>(split.Value);
-                    //    ShouldSplit = area != GameWorldAreaID.None && lastIntValue != (int)area && lastIntValue == (int)splitArea;
-                    //    if (area != GameWorldAreaID.None) {
-                    //        lastIntValue = (int)area;
-                    //    }
-                    //    break;
+                    case SplitType.AreaEnter:
+                        CheckArea(split, true);
+                        break;
+                    case SplitType.AreaLeave:
+                        CheckArea(split, false);
+                        break;
+                    case SplitType.WorldEvent:
+                        CheckWorldEvent(split);
+                        break;
+                    case SplitType.Wisp:
+                        CheckWisp(split);
+                        break;
                     case SplitType.Keystone:
                         int keystones = Memory.Keystones();
                         int splitKeystones = -1;
@@ -128,7 +117,7 @@
                         lastIntValue = ore;
                         break;
                     case SplitType.HealthCell:
-                        int health = maxHealth + Memory.HealthFragments();
+                        int health = Memory.MaxHealth() + Memory.HealthFragments();
                         int splitHealth = -1;
                         int.TryParse(split.Value, out splitHealth);
                         splitHealth += 6;
@@ -144,6 +133,83 @@
                         lastIntValue = energy;
                         break;
                 }
+            }
+        }
+        private void CheckHitbox(Split split) {
+            //Desert Escape End Metal Gear Solid
+            //Vector4 hitbox = new Vector4("1440,-3990,35,10");
+        }
+        private void CheckWorldEvent(Split split) {
+            SplitWorldEvent worldEvent = Utility.GetEnumValue<SplitWorldEvent>(split.Value);
+            WorldStateValue value;
+            switch (worldEvent) {
+                case SplitWorldEvent.FindKu:
+                    bool hasFlap = Memory.HasAbility(AbilityType.Flap);
+                    ShouldSplit = hasFlap && !lastBoolValue;
+                    lastBoolValue = hasFlap;
+                    break;
+                case SplitWorldEvent.LoseKu:
+                    bool lostFlap = !Memory.HasAbility(AbilityType.Flap);
+                    ShouldSplit = lostFlap && !lastBoolValue;
+                    lastBoolValue = lostFlap;
+                    break;
+                case SplitWorldEvent.WaterPurified:
+                    value = Memory.GetWorldState(WorldState.WaterPurified);
+                    ShouldSplit = value.Value == 1 && !lastBoolValue;
+                    lastBoolValue = value.Value == 1;
+                    break;
+                case SplitWorldEvent.WinterForestEscape:
+                    value = Memory.GetWorldState(WorldState.WinterForestWispQuest);
+                    ShouldSplit = value.Value == 3 && !lastBoolValue;
+                    lastBoolValue = value.Value == 3;
+                    break;
+            }
+        }
+        private void CheckWisp(Split split) {
+            SplitWisp wisp = Utility.GetEnumValue<SplitWisp>(split.Value);
+            WorldStateValue value;
+            switch (wisp) {
+                case SplitWisp.VoiceOfTheForest:
+                    value = Memory.GetWorldState(WorldState.KwolokNpc);
+                    ShouldSplit = value.Value == 1 && !lastBoolValue;
+                    lastBoolValue = value.Value == 1;
+                    break;
+            }
+        }
+        private void CheckArea(Split split, bool onEnter) {
+            SplitArea splitArea = Utility.GetEnumValue<SplitArea>(split.Value);
+            switch (splitArea) {
+                case SplitArea.WaterMillSub1:
+                case SplitArea.WaterMillSub2:
+                case SplitArea.WaterMillSub3:
+                case SplitArea.WeepingRidge:
+                    string[] scenesToCheck = Utility.GetEnumScenes<SplitArea>(splitArea);
+                    string scene = Memory.CurrentScene();
+                    if (!string.IsNullOrEmpty(scene)) {
+                        if (!scene.Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
+                            for (int i = 0; i < scenesToCheck.Length; i++) {
+                                if (onEnter) {
+                                    if (scene.Equals(scenesToCheck[i], StringComparison.OrdinalIgnoreCase)) {
+                                        ShouldSplit = true;
+                                        break;
+                                    }
+                                } else if (lastStrValue.Equals(scenesToCheck[i], StringComparison.OrdinalIgnoreCase)) {
+                                    ShouldSplit = true;
+                                    break;
+                                }
+                            }
+                        }
+                        lastStrValue = scene;
+                    }
+                    break;
+                default:
+                    AreaType area = Memory.PlayerArea();
+                    AreaType splitValue = Utility.GetEnumValue<AreaType>(split.Value);
+                    if (area != AreaType.None) {
+                        ShouldSplit = lastIntValue != (int)area && (onEnter ? (int)area : lastIntValue) == (int)splitValue;
+                        lastIntValue = (int)area;
+                    }
+                    break;
             }
         }
     }

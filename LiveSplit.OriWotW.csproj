@@ -76,22 +76,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logic\SplitAbility.cs" />
+    <Compile Include="Logic\SplitArea.cs" />
+    <Compile Include="Logic\SplitShard.cs" />
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />
+    <Compile Include="Logic\SplitWisp.cs" />
     <Compile Include="Logic\Utility.cs" />
     <Compile Include="Memory\Ability.cs" />
-    <Compile Include="Memory\AbilityType.cs" />
-    <Compile Include="Memory\EquipmentType.cs" />
-    <Compile Include="Memory\GameWorldAreaID.cs" />
+    <Compile Include="Memory\AreaType.cs" />
     <Compile Include="Memory\GameState.cs" />
-    <Compile Include="Memory\InventoryItem.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
-    <Compile Include="Memory\ShardType.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
     <Compile Include="Memory\Vector4.cs" />
-    <Compile Include="Memory\WorldEvent.cs" />
+    <Compile Include="Logic\SplitWorldEvent.cs" />
+    <Compile Include="Memory\UberState.cs" />
     <Compile Include="Memory\WorldState.cs" />
     <Compile Include="UI\Component.cs" />
     <Compile Include="UI\Factory.cs" />

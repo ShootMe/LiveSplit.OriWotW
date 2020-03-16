@@ -10,16 +10,6 @@ namespace LiveSplit.OriWotW {
         public static void Update64Bit(Process program) {
             is64Bit = program.Is64Bit();
         }
-        public static string PrintList<T>(this List<T> list) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < list.Count; i++) {
-                sb.Append(list[i].ToString()).Append(',');
-            }
-            if (list.Count > 0) {
-                sb.Length--;
-            }
-            return sb.ToString();
-        }
         public static T Read<T>(this Process targetProcess, IntPtr address, params int[] offsets) where T : struct {
             if (targetProcess == null || address == IntPtr.Zero) { return default(T); }
 
@@ -89,9 +79,9 @@ namespace LiveSplit.OriWotW {
         public static string ReadString(this Process targetProcess, IntPtr address) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
 
-            int length = Read<int>(targetProcess, address, 0x4);
+            int length = Read<int>(targetProcess, address, 0x10);
             if (length < 0 || length > 2048) { return string.Empty; }
-            return Encoding.Unicode.GetString(Read(targetProcess, address + 0x8, 2 * length));
+            return Encoding.Unicode.GetString(Read(targetProcess, address + 0x14, 2 * length));
         }
         public static string ReadString(this Process targetProcess, IntPtr address, params int[] offsets) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
@@ -99,9 +89,7 @@ namespace LiveSplit.OriWotW {
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return string.Empty; }
 
-            int length = Read<int>(targetProcess, address + last, 0x10);
-            if (length < 0 || length > 2048) { return string.Empty; }
-            return Encoding.Unicode.GetString(Read(targetProcess, address + last + 0x14, 2 * length));
+            return ReadString(targetProcess, address + last);
         }
         public static string ReadAscii(this Process targetProcess, IntPtr address) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
@@ -134,6 +122,14 @@ namespace LiveSplit.OriWotW {
             } while (bytesRead > 0);
 
             return invalid ? string.Empty : sb.ToString();
+        }
+        public static string ReadAscii(this Process targetProcess, IntPtr address, params int[] offsets) {
+            if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
+
+            int last = OffsetAddress(targetProcess, ref address, offsets);
+            if (address == IntPtr.Zero) { return string.Empty; }
+
+            return ReadAscii(targetProcess, address + last);
         }
         public static void Write<T>(this Process targetProcess, IntPtr address, T value, params int[] offsets) where T : struct {
             if (targetProcess == null) { return; }

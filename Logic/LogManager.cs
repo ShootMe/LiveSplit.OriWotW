@@ -16,18 +16,21 @@ namespace LiveSplit.OriWotW {
         GameTime,
         Abilities,
         Shards,
-        Inventory,
         Area,
         Dead,
         GameState,
         TitleScreen,
         LoadingGame,
         WorldStates,
-        Scene
+        Scene,
+        UberState
     }
     public class LogManager {
         public List<ILogEntry> LogEntries = new List<ILogEntry>();
         private Dictionary<LogObject, string> currentValues = new Dictionary<LogObject, string>();
+        private Dictionary<AbilityType, Ability> currentAbilities = new Dictionary<AbilityType, Ability>();
+        private Dictionary<ShardType, Shard> currentShards = new Dictionary<ShardType, Shard>();
+        private Dictionary<long, UberState> currentUberStates = new Dictionary<long, UberState>();
 
         public LogManager() {
             Clear();
@@ -46,8 +49,9 @@ namespace LiveSplit.OriWotW {
         public void Update(LogicManager logic, SplitterSettings settings) {
             DateTime date = DateTime.Now;
             bool isDead = logic.Memory.Dead();
+            bool isLoading = logic.Memory.IsLoadingGame();
             GameState gameState = logic.Memory.GameState();
-            bool mainMenu = gameState != GameState.Game;
+            bool dontCheckValue = isDead || isLoading || gameState != GameState.Game;
             foreach (LogObject key in Enum.GetValues(typeof(LogObject))) {
                 string previous = currentValues[key];
 
@@ -55,30 +59,98 @@ namespace LiveSplit.OriWotW {
                 switch (key) {
                     case LogObject.CurrentSplit: current = $"{logic.CurrentSplit} ({GetCurrentSplit(logic, settings)})"; break;
                     case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
-                    case LogObject.Energy: current = mainMenu ? previous : logic.Memory.MaxEnergy().ToString(); break;
-                    case LogObject.EnergyFragments: current = isDead || mainMenu ? previous : logic.Memory.EnergyFragments().ToString(); break;
-                    case LogObject.Health: current = mainMenu ? previous : logic.Memory.MaxHealth().ToString(); break;
-                    case LogObject.HealthFragments: current = isDead || mainMenu ? previous : logic.Memory.HealthFragments().ToString(); break;
-                    case LogObject.Keystones: current = isDead || mainMenu ? previous : logic.Memory.Keystones().ToString(); break;
-                    case LogObject.Ore: current = isDead || mainMenu ? previous : logic.Memory.Ore().ToString(); break;
-                    case LogObject.MapCompletion: current = logic.Memory.MapCompletion().ToString("0.000"); break;
-                    case LogObject.Abilities: current = isDead || mainMenu ? previous : logic.Memory.PlayerAbilities().PrintList(); break;
-                    case LogObject.Shards: current = isDead || mainMenu ? previous : logic.Memory.PlayerShards().PrintList(); break;
-                    case LogObject.Inventory: current = isDead || mainMenu ? previous : logic.Memory.Inventory().PrintList(); break;
-                    case LogObject.WorldStates: current = logic.Memory.WorldStates().PrintList(); break;
-                    case LogObject.Area: current = isDead || mainMenu ? previous : logic.Memory.PlayerArea().ToString(); break;
+                    case LogObject.Energy: current = dontCheckValue ? previous : logic.Memory.MaxEnergy().ToString(); break;
+                    case LogObject.EnergyFragments: current = dontCheckValue ? previous : logic.Memory.EnergyFragments().ToString(); break;
+                    case LogObject.Health: current = dontCheckValue ? previous : logic.Memory.MaxHealth().ToString(); break;
+                    case LogObject.HealthFragments: current = dontCheckValue ? previous : logic.Memory.HealthFragments().ToString(); break;
+                    case LogObject.Keystones: current = dontCheckValue ? previous : logic.Memory.Keystones().ToString(); break;
+                    case LogObject.Ore: current = dontCheckValue ? previous : logic.Memory.Ore().ToString(); break;
+                    case LogObject.MapCompletion: current = dontCheckValue ? previous : logic.Memory.MapCompletion().ToString("0.000"); break;
+                    case LogObject.Abilities: if (!dontCheckValue) { CheckAbilities(logic); } break;
+                    case LogObject.Shards: if (!dontCheckValue) { CheckShards(logic); } break;
+                    case LogObject.WorldStates: current = dontCheckValue ? previous : logic.Memory.WorldStates().PrintList(); break;
+                    case LogObject.Area: current = dontCheckValue ? previous : logic.Memory.PlayerArea().ToString(); break;
                     case LogObject.Dead: current = isDead.ToString(); break;
                     case LogObject.GameState: current = gameState.ToString(); break;
-                    case LogObject.TitleScreen: current = logic.Memory.MainMenuScreen().ToString(); break;
-                    case LogObject.LoadingGame: current = logic.Memory.IsLoadingGame().ToString(); break;
-                    case LogObject.Scene: current = logic.Memory.ActiveScene().ToString(); break;
-                        //case LogObject.GameTime: current = mainMenu ? previous : logic.Memory.ElapsedTime().ToString("0"); break;
+                    case LogObject.TitleScreen: current = logic.Memory.TitleScreen().ToString(); break;
+                    case LogObject.LoadingGame: current = isLoading.ToString(); break;
+                    case LogObject.Scene: current = logic.Memory.CurrentScene().ToString(); break;
+                    case LogObject.UberState: CheckUberStates(logic); break;
+                        //case LogObject.GameTime: current = dontCheckValue ? previous : logic.Memory.ElapsedTime().ToString("0"); break;
                         //case LogObject.Position: Vector2 point = logic.Memory.Position(); current = $"{point.X:0}, {point.Y:0}"; break;
                 }
 
                 if (previous != current) {
                     AddEntry(new ValueLogEntry(date, key, previous, current));
                     currentValues[key] = current;
+                }
+            }
+        }
+        public void CheckAbilities(LogicManager logic) {
+            DateTime date = DateTime.Now;
+            Dictionary<AbilityType, Ability> abilities = logic.Memory.PlayerAbilities();
+            foreach (KeyValuePair<AbilityType, Ability> pair in abilities) {
+                AbilityType key = pair.Key;
+                Ability state = pair.Value;
+
+                Ability oldState;
+                if (currentAbilities.TryGetValue(key, out oldState)) {
+                    byte value = state.HasAbility;
+                    byte oldValue = oldState.HasAbility;
+                    if (value != oldValue) {
+                        AddEntry(new ValueLogEntry(date, LogObject.Abilities, oldState, state));
+                        currentAbilities[key] = state;
+                    }
+                } else {
+                    currentAbilities[key] = state;
+                }
+            }
+        }
+        public void CheckShards(LogicManager logic) {
+            DateTime date = DateTime.Now;
+            Dictionary<ShardType, Shard> shards = logic.Memory.PlayerShards();
+            foreach (KeyValuePair<ShardType, Shard> pair in shards) {
+                ShardType key = pair.Key;
+                Shard state = pair.Value;
+
+                Shard oldState;
+                if (currentShards.TryGetValue(key, out oldState)) {
+                    byte value = state.Gained;
+                    byte oldValue = oldState.Gained;
+                    int valueLevel = state.Level;
+                    int oldValueLevel = oldState.Level;
+                    if (value != oldValue || valueLevel != oldValueLevel) {
+                        AddEntry(new ValueLogEntry(date, LogObject.Abilities, oldState, state));
+                        currentShards[key] = state;
+                    }
+                } else {
+                    currentShards[key] = state;
+                }
+            }
+        }
+        public void CheckUberStates(LogicManager logic) {
+            DateTime date = DateTime.Now;
+            Dictionary<long, UberState> uberStates = logic.Memory.GetUberStates();
+            foreach (KeyValuePair<long, UberState> pair in uberStates) {
+                long key = pair.Key;
+                UberState state = pair.Value;
+
+                switch (state.GroupName) {
+                    case "achievementsGroup":
+                    case "statsUberStateGroup":
+                        continue;
+                }
+
+                UberState oldState = null;
+                if (currentUberStates.TryGetValue(key, out oldState)) {
+                    UberValue value = state.Value;
+                    UberValue oldValue = oldState.Value;
+                    if (value.Int != oldValue.Int) {
+                        AddEntry(new ValueLogEntry(date, LogObject.UberState, oldState, state));
+                        oldState.Value = state.Value;
+                    }
+                } else {
+                    currentUberStates[key] = state.Clone();
                 }
             }
         }
