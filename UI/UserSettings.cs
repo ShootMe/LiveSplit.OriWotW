@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Xml;
 using LiveSplit.Model;
-using LiveSplit.UI;
 namespace LiveSplit.OriWotW {
     public partial class UserSettings : UserControl {
         public SplitterSettings Settings { get; set; }
@@ -20,21 +19,13 @@ namespace LiveSplit.OriWotW {
             Dock = DockStyle.Fill;
         }
 
-        private void UpdateSettings() {
-            XmlDocument document = new XmlDocument();
-            XmlElement autoSplitterSettings = document.CreateElement("AutoSplitterSettings");
-            autoSplitterSettings.InnerXml = UpdateSettings(document).InnerXml;
-            autoSplitterSettings.Attributes.Append(SettingsHelper.ToAttribute(document, "gameName", State.Run.GameName));
-            State.Run.AutoSplitterSettings = autoSplitterSettings;
-        }
-        public void ControlChanged(object sender, EventArgs e) {
-            UpdateSplits();
-        }
-        public void UpdateSplits() {
-
-        }
         public XmlNode UpdateSettings(XmlDocument document) {
             XmlElement xmlSettings = document.CreateElement("Settings");
+
+            XmlElement xmlLog = document.CreateElement("LogInfo");
+            xmlLog.InnerText = chkLog.Checked.ToString();
+            Log.EnableLogging = chkLog.Checked;
+            xmlSettings.AppendChild(xmlLog);
 
             XmlElement xmlSplits = document.CreateElement("Splits");
             xmlSettings.AppendChild(xmlSplits);
@@ -50,6 +41,14 @@ namespace LiveSplit.OriWotW {
         }
         public void InitializeSettings(XmlNode node) {
             Settings.Autosplits.Clear();
+
+            XmlNode logNode = node.SelectSingleNode(".//LogInfo");
+            bool logInfo = true;
+            if (logNode != null) {
+                bool.TryParse(logNode.InnerText, out logInfo);
+            }
+            chkLog.Checked = logInfo;
+            Log.EnableLogging = logInfo;
 
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {
@@ -69,33 +68,6 @@ namespace LiveSplit.OriWotW {
             form.Text = "Will of the Wisps Autosplitter v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
             FixSplits();
-        }
-        private void flowMain_DragDrop(object sender, DragEventArgs e) {
-            UpdateSplits();
-        }
-        private void flowMain_DragEnter(object sender, DragEventArgs e) {
-            e.Effect = DragDropEffects.Move;
-        }
-        private void flowMain_DragOver(object sender, DragEventArgs e) {
-            UserSplitSettings oldItem = (UserSplitSettings)e.Data.GetData(typeof(UserSplitSettings));
-            FlowLayoutPanel destination = (FlowLayoutPanel)sender;
-            Point point = destination.PointToClient(new Point(e.X, e.Y));
-            UserSplitSettings newItem = destination.GetChildAtPoint(point) as UserSplitSettings;
-            int newIndex = destination.Controls.GetChildIndex(newItem, false);
-            e.Effect = DragDropEffects.Move;
-            int oldIndex = destination.Controls.GetChildIndex(oldItem);
-            if (oldIndex != newIndex) {
-                string segment = oldItem.UserSplit.Name;
-                oldItem.UserSplit.Name = newItem.UserSplit.Name;
-                newItem.UserSplit.Name = segment;
-                Split split = Settings.Autosplits[oldIndex];
-                Settings.Autosplits[oldIndex] = Settings.Autosplits[newIndex];
-                Settings.Autosplits[newIndex] = split;
-                oldItem.UpdateControls(false,false);
-                newItem.UpdateControls(false, false);
-                destination.Controls.SetChildIndex(oldItem, newIndex);
-                destination.Invalidate();
-            }
         }
         private void FixSplits() {
             int index = 1;
@@ -154,6 +126,30 @@ namespace LiveSplit.OriWotW {
         private void btnClearLog_Click(object sender, EventArgs e) {
             Log.LogEntries.Clear();
             MessageBox.Show(this, "Debug Log has been cleared.", "Debug Log", MessageBoxButtons.OK, MessageBoxIcon.None);
+        }
+        private void flowMain_DragEnter(object sender, DragEventArgs e) {
+            e.Effect = DragDropEffects.Move;
+        }
+        private void flowMain_DragOver(object sender, DragEventArgs e) {
+            UserSplitSettings oldItem = (UserSplitSettings)e.Data.GetData(typeof(UserSplitSettings));
+            FlowLayoutPanel destination = (FlowLayoutPanel)sender;
+            Point point = destination.PointToClient(new Point(e.X, e.Y));
+            UserSplitSettings newItem = destination.GetChildAtPoint(point) as UserSplitSettings;
+            int newIndex = destination.Controls.GetChildIndex(newItem, false);
+            e.Effect = DragDropEffects.Move;
+            int oldIndex = destination.Controls.GetChildIndex(oldItem);
+            if (oldIndex != newIndex) {
+                string segment = oldItem.UserSplit.Name;
+                oldItem.UserSplit.Name = newItem.UserSplit.Name;
+                newItem.UserSplit.Name = segment;
+                Split split = Settings.Autosplits[oldIndex];
+                Settings.Autosplits[oldIndex] = Settings.Autosplits[newIndex];
+                Settings.Autosplits[newIndex] = split;
+                oldItem.UpdateControls(false, false);
+                newItem.UpdateControls(false, false);
+                destination.Controls.SetChildIndex(oldItem, newIndex);
+                destination.Invalidate();
+            }
         }
     }
 }

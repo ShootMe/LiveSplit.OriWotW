@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.0.4">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Changed Game Start split to be when starting a new file </change>
+            <change> Fixed some logging information </change>
+        </changelog>
+    </update>
     <update version="1.0.3">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

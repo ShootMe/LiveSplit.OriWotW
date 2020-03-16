@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using LiveSplit.Model;
@@ -19,6 +21,7 @@ namespace LiveSplit.OriWotW {
         private bool isAutosplitting = false;
         public static void Main(string[] args) {
             Component component = new Component(null);
+            component.log.EnableLogging = true;
             Application.Run();
         }
         public Component(LiveSplitState state) {
@@ -55,7 +58,11 @@ namespace LiveSplit.OriWotW {
                 try {
                     if (logic.IsHooked()) {
                         logic.Update();
-                        log.Update(logic, userSettings.Settings);
+                        Task.Run(delegate () {
+                            try {
+                                log.Update(logic, userSettings.Settings);
+                            } catch { }
+                        });
                     }
                     HandleLogic();
                 } catch (Exception ex) {
@@ -103,9 +110,9 @@ namespace LiveSplit.OriWotW {
             Model.CurrentState.IsGameTimePaused = true;
             if (!isAutosplitting) {
                 logic.Increment();
-                log.AddEntry(new EventLogEntry("Started Splits Manual"));
+                log.AddEntry(new EventLogEntry("Started Splits Manual " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3)));
             } else {
-                log.AddEntry(new EventLogEntry("Started Splits Auto"));
+                log.AddEntry(new EventLogEntry("Started Splits Auto " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3)));
             }
         }
         public void OnUndoSplit(object sender, EventArgs e) {

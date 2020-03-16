@@ -23,16 +23,37 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer UberStateController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B1D????????F6832701000002741883BBD800000000750F488BCBE8????????488B1D????????488B83B800000048837828000F85", 0x35));
         //__uberSerialization.Moon.UberStateCollection.GetState
         private static ProgramPointer UberStateCollection = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14));
+        //__mainWisp.ConfirmChangingDifficulty.Perform
+        private static ProgramPointer DifficultyController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14));
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
-        private DateTime lastUpdatedValues = DateTime.MinValue;
 
         public MemoryManager() {
             LastHooked = DateTime.MinValue;
         }
         public string GamePointers() {
-            return $"CHR: {Characters.GetPointer(Program):X} | GW: {GameWorld.GetPointer(Program):X} | PUS: {PlayerUberStateGroup.GetPointer(Program):X} | TSM: {TitleScreenManager.GetPointer(Program):X} | GSM: {GameStateMachine.GetPointer(Program):X} | GC: {GameController.GetPointer(Program):X} | SWS: {SeinWorldState.GetPointer(Program):X} | USC: {UberStateController.GetPointer(Program):X} | USL: {UberStateCollection.GetPointer(Program):X}";
+            return string.Concat(
+                $"CHR: {Characters.GetPointer(Program)} ",
+                $"GW: {GameWorld.GetPointer(Program)} ",
+                $"PUS: {PlayerUberStateGroup.GetPointer(Program)} ",
+                $"TSM: {TitleScreenManager.GetPointer(Program)} ",
+                $"GSM: {GameStateMachine.GetPointer(Program)} ",
+                $"GC: {GameController.GetPointer(Program)} ",
+                $"SWS: {SeinWorldState.GetPointer(Program)} ",
+                $"SM: {ScenesManager.GetPointer(Program)} ",
+                $"USC: {UberStateController.GetPointer(Program)} ",
+                $"USL: {UberStateCollection.GetPointer(Program)} ",
+                $"DC: {DifficultyController.GetPointer(Program)} "
+            );
+        }
+        public int Difficulty() {
+            //DifficultyController.Instance.Difficulty
+            return DifficultyController.Read<int>(Program, 0xb8, 0x0, 0x20);
+        }
+        public void SetDifficulty(int difficulty) {
+            //DifficultyController.Instance.Difficulty
+            DifficultyController.Write<int>(Program, difficulty, 0xb8, 0x0, 0x20);
         }
         public int MaxEnergy() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats.m_maxEnergy
@@ -155,10 +176,6 @@ namespace LiveSplit.OriWotW {
             if (uberIDLookup == null) {
                 PopulateUberStates();
             }
-
-            DateTime date = DateTime.Now;
-            //if (date < lastUpdatedValues) { return uberIDLookup; }
-            lastUpdatedValues = date.AddSeconds(0.33);
 
             //UbserStateController.m_currentStateValueStore.m_groupMap
             IntPtr groups = (IntPtr)UberStateController.Read<ulong>(Program, 0xb8, 0x40, 0x18);
@@ -340,7 +357,7 @@ namespace LiveSplit.OriWotW {
             }
             return currentShards;
         }
-        public float MapCompletion() {
+        public float MapCompletion(AreaType areaType = AreaType.None) {
             float totalCompletion = 0;
             //GameWorld.RuntimeAreas
             IntPtr areas = (IntPtr)GameWorld.Read<ulong>(Program, 0xb8, 0x0, 0x28);
@@ -350,13 +367,23 @@ namespace LiveSplit.OriWotW {
             areas = (IntPtr)Program.Read<ulong>(areas, 0x10);
             byte[] data = Program.Read(areas + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
-                //.Items[i].m_completionAmount
-                totalCompletion += Program.Read<float>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x34);
+                IntPtr area = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
+                if (areaType != AreaType.None) {
+                    //.Items[i].Area.WorldMapAreaUniqueID
+                    AreaType type = Program.Read<AreaType>(area, 0x10, 0x20);
+                    if (type == areaType) {
+                        //.Items[i].m_completionAmount
+                        return Program.Read<float>(area, 0x34) * 100f;
+                    }
+                } else {
+                    //.Items[i].m_completionAmount
+                    totalCompletion += Program.Read<float>(area, 0x34);
+                }
             }
             return totalCompletion * 100f / count;
         }
         public AreaType PlayerArea() {
-            //GameWorld.CurrentArea.Area.AreaNameString
+            //GameWorld.CurrentArea.Area.WorldMapAreaUniqueID
             return GameWorld.Read<AreaType>(Program, 0xb8, 0x0, 0x30, 0x10, 0x20);
         }
         public double ElapsedTime() {

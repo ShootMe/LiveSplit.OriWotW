@@ -12,6 +12,7 @@ namespace LiveSplit.OriWotW {
         private bool lastBoolValue;
         private int lastIntValue;
         private string lastStrValue;
+        private Screen lastScreen;
 
         public LogicManager(SplitterSettings settings) {
             Memory = new MemoryManager();
@@ -67,15 +68,19 @@ namespace LiveSplit.OriWotW {
         private void CheckSplit(Split split) {
             GameState state = Memory.GameState();
             if (split.Type == SplitType.GameStart) {
-                bool isStarted = state == GameState.Game && Memory.TitleScreen() == Screen.ProfileSelected;
+                Screen screen = Memory.TitleScreen();
+                int difficulty = Memory.Difficulty();
+                bool isStarted = difficulty != 4 && lastIntValue == 4 && screen == Screen.ProfileSelected;
+                if (screen == Screen.ProfileSelected && lastScreen == Screen.SaveSlots) {
+                    Memory.SetDifficulty(4);
+                }
                 ShouldSplit = !lastBoolValue && isStarted;
                 lastBoolValue = isStarted;
+                lastIntValue = difficulty;
+                lastScreen = screen;
             } else {
                 ShouldSplit = false;
                 Paused = Memory.IsLoadingGame();
-                if (state != GameState.Game || Memory.Dead() || Paused) {
-                    return;
-                }
 
                 switch (split.Type) {
                     case SplitType.ManualSplit:
@@ -132,6 +137,10 @@ namespace LiveSplit.OriWotW {
                         ShouldSplit = lastIntValue != energy && energy == splitEnergy;
                         lastIntValue = energy;
                         break;
+                }
+
+                if (state != GameState.Game || Memory.Dead() || Paused) {
+                    ShouldSplit = false;
                 }
             }
         }
