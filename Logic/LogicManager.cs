@@ -228,7 +228,7 @@ namespace LiveSplit.OriWotW {
                 case SplitArea.WillowsEndBoss:
                     string[] scenesToCheck = Utility.GetEnumScenes<SplitArea>(splitArea);
                     string scene = Memory.CurrentScene();
-                    if (!string.IsNullOrEmpty(scene)) {
+                    if (!string.IsNullOrEmpty(scene) && scenesToCheck != null) {
                         if (!scene.Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
                             for (int i = 0; i < scenesToCheck.Length; i++) {
                                 if (onEnter) {
@@ -236,7 +236,7 @@ namespace LiveSplit.OriWotW {
                                         ShouldSplit = true;
                                         break;
                                     }
-                                } else if (lastStrValue.Equals(scenesToCheck[i], StringComparison.OrdinalIgnoreCase)) {
+                                } else if (scenesToCheck[i].Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
                                     ShouldSplit = true;
                                     break;
                                 }
