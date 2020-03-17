@@ -1,5 +1,7 @@
 ﻿using LiveSplit.OriWotW;
+#if !Console
 using LiveSplit.UI.Components;
+#endif
 using System.Reflection;
 using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LiveSplit.OriWotW")]

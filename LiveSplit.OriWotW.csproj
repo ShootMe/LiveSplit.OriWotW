@@ -44,24 +44,18 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\</OutputPath>
     <OutputType>Exe</OutputType>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Console</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiveSplit.Core">
       <HintPath>..\..\LiveSplit\LiveSplit.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="LiveSplit.Text">
-      <HintPath>..\..\LiveSplit\Components\LiveSplit.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="LiveSplit.View">
-      <HintPath>..\..\LiveSplit\LiveSplit.View.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -69,10 +63,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="UpdateManager, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UpdateManager">
       <HintPath>..\..\LiveSplit\UpdateManager.dll</HintPath>
-      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +99,7 @@
     <Compile Include="UI\Grid.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\LiveSplitFake.cs" />
     <Compile Include="UI\LogViewer.cs">
       <SubType>Form</SubType>
     </Compile>
