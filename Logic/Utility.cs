@@ -28,16 +28,6 @@ namespace LiveSplit.OriWotW {
                 return descriptions[0].Description;
             }
         }
-        public static string[] GetEnumScenes<T>(T value) where T : struct {
-            MemberInfo info = typeof(T).GetMember(value.ToString())[0];
-            SceneAttribute[] scenes = (SceneAttribute[])info.GetCustomAttributes(typeof(SceneAttribute), false);
-
-            if (scenes == null || scenes.Length == 0) {
-                return null;
-            } else {
-                return scenes[0].Names;
-            }
-        }
         public static T GetEnumValue<T>(string valueToFind) where T : struct {
             T value;
             if (Enum.TryParse<T>(valueToFind, true, out value)) {

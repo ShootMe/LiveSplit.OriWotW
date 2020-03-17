@@ -221,30 +221,11 @@ namespace LiveSplit.OriWotW {
         private void CheckArea(Split split, bool onEnter) {
             SplitArea splitArea = Utility.GetEnumValue<SplitArea>(split.Value);
             switch (splitArea) {
-                case SplitArea.WaterMillSub1:
-                case SplitArea.WaterMillSub2:
-                case SplitArea.WaterMillSub3:
-                case SplitArea.WeepingRidge:
-                case SplitArea.WillowsEndBoss:
-                    string[] scenesToCheck = Utility.GetEnumScenes<SplitArea>(splitArea);
-                    string scene = Memory.CurrentScene();
-                    if (!string.IsNullOrEmpty(scene) && scenesToCheck != null) {
-                        if (!scene.Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
-                            for (int i = 0; i < scenesToCheck.Length; i++) {
-                                if (onEnter) {
-                                    if (scene.Equals(scenesToCheck[i], StringComparison.OrdinalIgnoreCase)) {
-                                        ShouldSplit = true;
-                                        break;
-                                    }
-                                } else if (scenesToCheck[i].Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
-                                    ShouldSplit = true;
-                                    break;
-                                }
-                            }
-                        }
-                        lastStrValue = scene;
-                    }
-                    break;
+                case SplitArea.WaterMillSub1: CheckScene(onEnter, "wotwSaveRoomC__clone0__clone1", "waterMillAExit"); break;
+                case SplitArea.WaterMillSub2: CheckScene(onEnter, "waterMillBEntrance"); break;
+                case SplitArea.WaterMillSub3: CheckScene(onEnter, "waterMillCEntrance"); break;
+                case SplitArea.WeepingRidge: CheckScene(onEnter, "weepingRidgeWillowsEndEntrance", "weepingRidgeElevatorFight"); break;
+                case SplitArea.WillowsEndBoss: CheckScene(onEnter, "willowCeremonyIntro"); break;
                 default:
                     AreaType area = Memory.PlayerArea();
                     AreaType splitValue = Utility.GetEnumValue<AreaType>(split.Value);
@@ -253,6 +234,25 @@ namespace LiveSplit.OriWotW {
                         lastIntValue = (int)area;
                     }
                     break;
+            }
+        }
+        private void CheckScene(bool onEnter, params string[] scenesToCheck) {
+            string scene = Memory.CurrentScene();
+            if (!string.IsNullOrEmpty(scene) && scenesToCheck != null) {
+                if (!scene.Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
+                    for (int i = 0; i < scenesToCheck.Length; i++) {
+                        if (onEnter) {
+                            if (scene.Equals(scenesToCheck[i], StringComparison.OrdinalIgnoreCase)) {
+                                ShouldSplit = true;
+                                break;
+                            }
+                        } else if (scenesToCheck[i].Equals(lastStrValue, StringComparison.OrdinalIgnoreCase)) {
+                            ShouldSplit = true;
+                            break;
+                        }
+                    }
+                }
+                lastStrValue = scene;
             }
         }
         private void CheckUberIntValue(UberState value, int currentValue, int lastValue = int.MinValue) {
