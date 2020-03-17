@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.0.9">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added Event Silent Woods Shriek Cutscene (Happens right after entering silent woods) </change>
+            <change> Added exe check for WinStore version (may or may not work) </change>
+        </changelog>
+    </update>
     <update version="1.0.8">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

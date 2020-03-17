@@ -104,11 +104,12 @@ namespace LiveSplit.OriWotW {
             if (signatures != null) {
                 MemorySearcher searcher = new MemorySearcher();
                 ulong gameAsmStart = 0, gameAsmEnd = 0;
-                for (int i = 0; i < program.Modules.Count; i++) {
-                    ProcessModule module = program.Modules[i];
-                    if (module.ModuleName.Equals("GameAssembly.dll", StringComparison.OrdinalIgnoreCase)) {
+                Module64[] modules = program.Modules64();
+                for (int i = 0; i < modules.Length; i++) {
+                    Module64 module = modules[i];
+                    if (module.Name.Equals("GameAssembly.dll", StringComparison.OrdinalIgnoreCase)) {
                         gameAsmStart = (ulong)module.BaseAddress;
-                        gameAsmEnd = gameAsmStart + (ulong)module.ModuleMemorySize;
+                        gameAsmEnd = gameAsmStart + (ulong)module.MemorySize;
                         break;
                     }
                 }

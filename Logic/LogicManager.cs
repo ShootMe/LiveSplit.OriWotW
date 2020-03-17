@@ -206,6 +206,7 @@ namespace LiveSplit.OriWotW {
                 case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
                 case SplitWorldEvent.SoSoggy: CheckUberIntValue(UberStateDefaults.cleanseWellspringQuestUberState, 3); break;
                 case SplitWorldEvent.WeepingRidgeElevatorFight: CheckUberBoolValue(UberStateDefaults.elevatorCompleteState); break;
+                case SplitWorldEvent.SilentWoodsShriekCutscene: CheckUberBoolValue(UberStateDefaults.petrifiedForestNewTransitionOriVignettePlayed); break;
             }
         }
         private void CheckWisp(Split split) {

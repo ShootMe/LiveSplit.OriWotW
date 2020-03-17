@@ -23,8 +23,6 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer UberStateCollection = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14));
         //__mainWisp.ConfirmChangingDifficulty.Perform
         private static ProgramPointer DifficultyController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14));
-        //__mainWisp.SceneLoadingQueue.RemoveTopSceneAndPurge
-        private static ProgramPointer InstantLoadScenesController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "488B05????????488B88B8000000488B014885C00F84????????807840000F85????????FFCB3BDA0F8E????????4863C3448D7B014C8D344049C1E6030F57FF", 0x3));
         //__mainWisp.GameController.OnApplicationFocus
         private static ProgramPointer NoPausePatch = new ProgramPointer(AutoDeref.None, new ProgramSignature(PointerVersion.V1, "4C8BDC565741564883EC5049C743C8FEFFFFFF49895B1049896B18??????488BF14533F6443835????????754B488B05????????4C6380C0000000488B05????????418B8C00????????418B9400????????4D8973D04D8973D84D8973E04D8D43D0E8????????9033C9FF15????????90C605????????0180BE????????000F85????????4084ED0F85????????33C9E8????????4885C00F84????????33D2488BC8E8????????84C07561", 0x1b));
 
@@ -47,8 +45,7 @@ namespace LiveSplit.OriWotW {
                 $"SM: {ScenesManager.GetPointer(Program)} ",
                 $"USC: {UberStateController.GetPointer(Program)} ",
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
-                $"DC: {DifficultyController.GetPointer(Program)} ",
-                $"ILS: {InstantLoadScenesController.GetPointer(Program)} "
+                $"DC: {DifficultyController.GetPointer(Program)} "
             );
         }
         public void PatchNoPause(bool patch) {
@@ -400,8 +397,8 @@ namespace LiveSplit.OriWotW {
             return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
         public bool IsLoadingGame() {
-            //InstantLoadScenesController.Instance.m_isLoading || GameController.Instance.m_isLoadingGame
-            return InstantLoadScenesController.Read<bool>(Program, 0xb8, 0x0, 0x20) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
+            //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
+            return GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
         }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
@@ -410,6 +407,16 @@ namespace LiveSplit.OriWotW {
                 ClearPointers();
                 Process[] processes = Process.GetProcessesByName("OriWotW");
                 Program = processes != null && processes.Length > 0 ? processes[0] : null;
+
+                if (Program == null) {
+                    processes = Process.GetProcessesByName("OriAndTheWillOfTheWisps");
+                    Program = processes != null && processes.Length > 0 ? processes[0] : null;
+                }
+
+                if (Program == null) {
+                    processes = Process.GetProcessesByName("OriAndTheWillOfTheWisps-PC");
+                    Program = processes != null && processes.Length > 0 ? processes[0] : null;
+                }
 
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
@@ -432,7 +439,6 @@ namespace LiveSplit.OriWotW {
             UberStateController.ClearPointer();
             UberStateCollection.ClearPointer();
             DifficultyController.ClearPointer();
-            InstantLoadScenesController.ClearPointer();
             NoPausePatch.ClearPointer();
         }
         public void Dispose() {

@@ -7,6 +7,8 @@ namespace LiveSplit.OriWotW {
         FindKu,
         [Description("Ku Lost")]
         LoseKu,
+        [Description("Silent Woods Shriek Cutscene")]
+        SilentWoodsShriekCutscene,
         [Description("Shriek Defeated")]
         ShriekDefeated,
         [Description("Water Purified (Watermill Escape)")]
