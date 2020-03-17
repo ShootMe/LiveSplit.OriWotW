@@ -1,13 +1,19 @@
 ﻿using System.ComponentModel;
 namespace LiveSplit.OriWotW {
     public enum SplitWorldEvent {
-        [Description("Find Ku (Silent Woods)")]
+        [Description("Howl Fight")]
+        HowlFight,
+        [Description("Ku Obtained")]
         FindKu,
-        [Description("Lose Ku (Silent Woods)")]
+        [Description("Ku Lost")]
         LoseKu,
+        [Description("Shriek Defeated")]
+        ShriekDefeated,
         [Description("Water Purified (Watermill Escape)")]
         WaterPurified,
-        [Description("Winter Forest Escape")]
-        WinterForestEscape
+        [Description("Water Purified (So Soggy)")]
+        SoSoggy,
+        [Description("Weeping Ridge Elevator Fight")]
+        WeepingRidgeElevatorFight
     }
 }

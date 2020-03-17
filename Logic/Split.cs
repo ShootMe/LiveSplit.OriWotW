@@ -9,10 +9,14 @@ namespace LiveSplit.OriWotW {
         AreaEnter,
         [Description("Area (Leave)")]
         AreaLeave,
+        [Description("Creep Heart")]
+        CreepHeart,
         [Description("Energy Cell")]
         EnergyCell,
         [Description("Game Start")]
         GameStart,
+        [Description("Game End")]
+        GameEnd,
         [Description("Health Cell")]
         HealthCell,
         [Description("Keystone")]
@@ -21,6 +25,8 @@ namespace LiveSplit.OriWotW {
         Ore,
         [Description("Shard")]
         Shard,
+        [Description("Spirit Trial")]
+        SpiritTrial,
         [Description("Wisp")]
         Wisp,
         [Description("World Event")]

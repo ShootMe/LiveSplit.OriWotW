@@ -32,6 +32,7 @@ namespace LiveSplit.OriWotW {
             InitializeSplit();
         }
         public void Increment() {
+            Running = true;
             CurrentSplit++;
             InitializeSplit();
         }
@@ -86,9 +87,7 @@ namespace LiveSplit.OriWotW {
                     case SplitType.ManualSplit:
                         break;
                     case SplitType.Ability:
-                        bool hasAbility = Memory.HasAbility(Utility.GetEnumValue<AbilityType>(split.Value));
-                        ShouldSplit = lastBoolValue != hasAbility;
-                        lastBoolValue = hasAbility;
+                        CheckAbility(Utility.GetEnumValue<AbilityType>(split.Value));
                         break;
                     case SplitType.Shard:
                         bool hasShard = Memory.HasShard(Utility.GetEnumValue<ShardType>(split.Value));
@@ -106,6 +105,31 @@ namespace LiveSplit.OriWotW {
                         break;
                     case SplitType.Wisp:
                         CheckWisp(split);
+                        break;
+                    case SplitType.SpiritTrial:
+                        CheckSpiritTrial(split);
+                        break;
+                    case SplitType.GameEnd:
+                        CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
+                        break;
+                    case SplitType.CreepHeart:
+                        Memory.UpdateUberState(UberStateDefaults.vineAClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineBClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineCClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineDClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineEClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineFClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineGClear);
+                        Memory.UpdateUberState(UberStateDefaults.vineHClear);
+                        int creepCount = UberStateDefaults.vineAClear.Value.Int + UberStateDefaults.vineBClear.Value.Int;
+                        creepCount += UberStateDefaults.vineCClear.Value.Int + UberStateDefaults.vineDClear.Value.Int;
+                        creepCount += UberStateDefaults.vineEClear.Value.Int + UberStateDefaults.vineFClear.Value.Int;
+                        creepCount += UberStateDefaults.vineGClear.Value.Int + UberStateDefaults.vineHClear.Value.Int;
+
+                        int splitCreeps = -1;
+                        int.TryParse(split.Value, out splitCreeps);
+                        ShouldSplit = lastIntValue != creepCount && creepCount == splitCreeps;
+                        lastIntValue = creepCount;
                         break;
                     case SplitType.Keystone:
                         int keystones = Memory.Keystones();
@@ -144,45 +168,53 @@ namespace LiveSplit.OriWotW {
                 }
             }
         }
-        private void CheckHitbox(Split split) {
-            //Desert Escape End Metal Gear Solid
-            //Vector4 hitbox = new Vector4("1440,-3990,35,10");
+        private void CheckHitbox(Vector4 hitbox) {
+            Vector4 ori = new Vector4(Memory.Position(), 0f, 0f, true);
+            bool containsOri = hitbox.Intersects(ori);
+            ShouldSplit = containsOri && !lastBoolValue;
+            lastBoolValue = containsOri;
+        }
+        private void CheckSpiritTrial(Split split) {
+            SplitSpiritTrial spiritTrial = Utility.GetEnumValue<SplitSpiritTrial>(split.Value);
+            switch (spiritTrial) {
+                case SplitSpiritTrial.BaursReachActivate: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 1, 0); break;
+                case SplitSpiritTrial.BaursReachComplete: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 2, 1); break;
+                case SplitSpiritTrial.InkwaterMarshActivate: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 1, 0); break;
+                case SplitSpiritTrial.InkwaterMarshComplete: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 2, 1); break;
+                case SplitSpiritTrial.KwoloksHollowActivate: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 1, 0); break;
+                case SplitSpiritTrial.KwoloksHollowComplete: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 2, 1); break;
+                case SplitSpiritTrial.LumaPoolsActivate: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 1, 0); break;
+                case SplitSpiritTrial.LumaPoolsComplete: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 2, 1); break;
+                case SplitSpiritTrial.MouldwoodDepthsActivate: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 1, 0); break;
+                case SplitSpiritTrial.MouldwoodDepthsComplete: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 2, 1); break;
+                case SplitSpiritTrial.SilentWoodsActivate: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 1, 0); break;
+                case SplitSpiritTrial.SilentWoodsComplete: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 2, 1); break;
+                case SplitSpiritTrial.WellspringActivate: CheckUberIntValue(UberStateDefaults.wellspringRace, 1, 0); break;
+                case SplitSpiritTrial.WellspringComplete: CheckUberIntValue(UberStateDefaults.wellspringRace, 2, 1); break;
+                case SplitSpiritTrial.WindsweptWastesActivate: CheckUberIntValue(UberStateDefaults.desertRace, 1, 0); break;
+                case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2, 1); break;
+            }
         }
         private void CheckWorldEvent(Split split) {
             SplitWorldEvent worldEvent = Utility.GetEnumValue<SplitWorldEvent>(split.Value);
-            WorldStateValue value;
             switch (worldEvent) {
-                case SplitWorldEvent.FindKu:
-                    bool hasFlap = Memory.HasAbility(AbilityType.Flap);
-                    ShouldSplit = hasFlap && !lastBoolValue;
-                    lastBoolValue = hasFlap;
-                    break;
-                case SplitWorldEvent.LoseKu:
-                    bool lostFlap = !Memory.HasAbility(AbilityType.Flap);
-                    ShouldSplit = lostFlap && !lastBoolValue;
-                    lastBoolValue = lostFlap;
-                    break;
-                case SplitWorldEvent.WaterPurified:
-                    value = Memory.GetWorldState(WorldState.WaterPurified);
-                    ShouldSplit = value.Value == 1 && !lastBoolValue;
-                    lastBoolValue = value.Value == 1;
-                    break;
-                case SplitWorldEvent.WinterForestEscape:
-                    value = Memory.GetWorldState(WorldState.WinterForestWispQuest);
-                    ShouldSplit = value.Value == 3 && !lastBoolValue;
-                    lastBoolValue = value.Value == 3;
-                    break;
+                case SplitWorldEvent.HowlFight: CheckUberBoolValue(UberStateDefaults.nightCrawlerDefeated); break;
+                case SplitWorldEvent.ShriekDefeated: CheckUberIntValue(UberStateDefaults.petrifiedOwlBossState, 5); break;
+                case SplitWorldEvent.FindKu: CheckAbility(AbilityType.Flap); break;
+                case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
+                case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
+                case SplitWorldEvent.SoSoggy: CheckUberIntValue(UberStateDefaults.cleanseWellspringQuestUberState, 3); break;
+                case SplitWorldEvent.WeepingRidgeElevatorFight: CheckUberBoolValue(UberStateDefaults.elevatorCompleteState); break;
             }
         }
         private void CheckWisp(Split split) {
             SplitWisp wisp = Utility.GetEnumValue<SplitWisp>(split.Value);
-            WorldStateValue value;
             switch (wisp) {
-                case SplitWisp.VoiceOfTheForest:
-                    value = Memory.GetWorldState(WorldState.KwolokNpc);
-                    ShouldSplit = value.Value == 1 && !lastBoolValue;
-                    lastBoolValue = value.Value == 1;
-                    break;
+                case SplitWisp.VoiceOfTheForest: CheckUberIntValue(UberStateDefaults.kwolokNpcState, 1, 0); break;
+                case SplitWisp.EyesOfTheForest: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsWispQuestUberState, 3); break;
+                case SplitWisp.HeartOfTheForest: CheckUberIntValue(UberStateDefaults.desertWispQuestUberState, 3); break;
+                case SplitWisp.MemoryOfTheForest: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 3); break;
+                case SplitWisp.StrengthOfTheForest: CheckUberIntValue(UberStateDefaults.lagoonWispQuestUberState, 3); break;
             }
         }
         private void CheckArea(Split split, bool onEnter) {
@@ -220,6 +252,25 @@ namespace LiveSplit.OriWotW {
                     }
                     break;
             }
+        }
+        private void CheckUberIntValue(UberState value, int currentValue, int lastValue = int.MinValue) {
+            Memory.UpdateUberState(value);
+            if (lastValue == int.MinValue) {
+                ShouldSplit = value.Value.Int == currentValue && lastIntValue != currentValue;
+            } else {
+                ShouldSplit = value.Value.Int == currentValue && lastIntValue == lastValue;
+            }
+            lastIntValue = value.Value.Int;
+        }
+        private void CheckUberBoolValue(UberState value, bool currentValue = true) {
+            Memory.UpdateUberState(value);
+            ShouldSplit = value.Value.Bool == currentValue && lastBoolValue != currentValue;
+            lastBoolValue = value.Value.Bool;
+        }
+        private void CheckAbility(AbilityType value, bool currentValue = true) {
+            bool hasAbility = Memory.HasAbility(value);
+            ShouldSplit = hasAbility == currentValue && lastBoolValue != currentValue;
+            lastBoolValue = hasAbility;
         }
     }
 }

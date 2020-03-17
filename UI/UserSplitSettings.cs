@@ -38,6 +38,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitShard>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
                         break;
+                    case SplitType.SpiritTrial:
+                        cboValue.DataSource = Utility.GetEnumList<SplitSpiritTrial>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitSpiritTrial>(UserSplit.Value);
+                        break;
                     case SplitType.Wisp:
                         cboValue.DataSource = Utility.GetEnumList<SplitWisp>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitWisp>(UserSplit.Value);
@@ -58,11 +62,11 @@ namespace LiveSplit.OriWotW {
             if (cboType.SelectedValue == null || isLoading) { return; }
 
             SplitType nextControlType = (SplitType)cboType.SelectedValue;
-            if (nextControlType == SplitType.ManualSplit || nextControlType == SplitType.GameStart) {
+            if (nextControlType == SplitType.ManualSplit || nextControlType == SplitType.GameStart || nextControlType == SplitType.GameEnd) {
                 txtValue.Visible = false;
                 cboValue.Visible = false;
                 UserSplit.Value = string.Empty;
-            } else if (nextControlType == SplitType.HealthCell || nextControlType == SplitType.EnergyCell || nextControlType == SplitType.Keystone || nextControlType == SplitType.Ore) {
+            } else if (nextControlType == SplitType.HealthCell || nextControlType == SplitType.EnergyCell || nextControlType == SplitType.Keystone || nextControlType == SplitType.Ore || nextControlType == SplitType.CreepHeart) {
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "1";
                 }
@@ -75,6 +79,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.AreaLeave: DefaultValue = SplitArea.InkwaterMarsh; break;
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
                         case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
+                        case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
                         case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;
                         case SplitType.WorldEvent: DefaultValue = SplitWorldEvent.WaterPurified; break;
                     }

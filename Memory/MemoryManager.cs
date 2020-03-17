@@ -15,8 +15,6 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer GameStateMachine = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B1D????????488B83B8000000488B004885C00F85C6000000488BCBE8????????488B43604885C074278B08E8", 0x14));
         //__mainWisp.GameController.OnGameAwake
         private static ProgramPointer GameController = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45));
-        //__mainWisp.SeinWorldState.Awake
-        private static ProgramPointer SeinWorldState = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488939BA0E000000488B0D????????E8????????488BD8488B77184885C0", 0x14));
         //__mainWisp.ScenesManager.Awake
         private static ProgramPointer ScenesManager = new ProgramPointer(AutoDeref.Single, new ProgramSignature(PointerVersion.V1, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14));
         //__uberSerialization.Moon.UberStateController.get_Instance
@@ -40,7 +38,6 @@ namespace LiveSplit.OriWotW {
                 $"TSM: {TitleScreenManager.GetPointer(Program)} ",
                 $"GSM: {GameStateMachine.GetPointer(Program)} ",
                 $"GC: {GameController.GetPointer(Program)} ",
-                $"SWS: {SeinWorldState.GetPointer(Program)} ",
                 $"SM: {ScenesManager.GetPointer(Program)} ",
                 $"USC: {UberStateController.GetPointer(Program)} ",
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
@@ -87,41 +84,6 @@ namespace LiveSplit.OriWotW {
             //Scenes.Manager.m_currentScene.Scene
             return ScenesManager.Read(Program, 0xb8, 0x0, 0x180, 0x10, 0x0);
         }
-        public List<WorldStateValue> WorldStates() {
-            List<WorldStateValue> currentStates = new List<WorldStateValue>();
-            //SeinWorldState.Instance
-            foreach (WorldState key in Enum.GetValues(typeof(WorldState))) {
-                WorldStateValue value = GetWorldState(key, true);
-                if (value != null) {
-                    currentStates.Add(value);
-                }
-            }
-
-            currentStates.Sort(delegate (WorldStateValue one, WorldStateValue two) {
-                return one.State.CompareTo(two.State);
-            });
-            return currentStates;
-        }
-        public WorldStateValue GetWorldState(WorldState worldState, bool readName = false) {
-            int value = 0;
-            string description = string.Empty;
-            if (worldState == WorldState.DarknessLifted || worldState == WorldState.MistLifted || worldState == WorldState.WaterPurified || worldState == WorldState.KwolokDead) {
-                value = SeinWorldState.Read<byte>(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x40);
-                if (readName) {
-                    description = value > 0 ? "Completed" : string.Empty;
-                }
-            } else {
-                value = SeinWorldState.Read<int>(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x38);
-                if (value > 0 && readName) {
-                    description = SeinWorldState.Read(Program, 0xb8, 0x0, 0x8 * (int)worldState, 0x40, 0x10, 0x20 + (value * 0x8), 0x10, 0x0);
-                }
-            }
-
-            if (value > 0) {
-                return new WorldStateValue() { State = worldState, Value = value, Description = description };
-            }
-            return null;
-        }
         private static Dictionary<long, UberState> uberIDLookup = null;
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
@@ -140,11 +102,14 @@ namespace LiveSplit.OriWotW {
                 int groupOffset = 0x38;
                 switch (type) {
                     case UberStateType.SerializedByteUberState:
-                    case UberStateType.CountUberState:
                     case UberStateType.SerializedIntUberState:
                     case UberStateType.SavePedestalUberState: groupOffset = 0x30; break;
-                    case UberStateType.ConditionUberState: groupOffset = 0x28; break;
                     case UberStateType.PlayerUberStateDescriptor: groupOffset = 0x40; break;
+                    case UberStateType.CountUberState:
+                    case UberStateType.BooleanUberState:
+                    case UberStateType.ByteUberState:
+                    case UberStateType.IntUberState:
+                    case UberStateType.ConditionUberState: continue;
                 }
 
                 //.m_descriptorsArray[i].ID.m_id
@@ -168,8 +133,8 @@ namespace LiveSplit.OriWotW {
                 } else {
                     groupName = Program.ReadAscii(descriptor, groupOffset, 0x10, 0x50);
                 }
-
-                uberIDLookup.Add(((long)groupID << 32) | (long)id, new UberState() { Type = type, ID = id, Name = name, GroupID = groupID, GroupName = groupName });
+                UberState uberState = new UberState() { Type = type, ID = id, Name = name, GroupID = groupID, GroupName = groupName };
+                uberIDLookup.Add(((long)groupID << 32) | (long)id, uberState);
             }
         }
         public Dictionary<long, UberState> GetUberStates() {
@@ -177,6 +142,11 @@ namespace LiveSplit.OriWotW {
                 PopulateUberStates();
             }
 
+            UpdateUberState();
+
+            return uberIDLookup;
+        }
+        public void UpdateUberState(UberState uberState = null) {
             //UbserStateController.m_currentStateValueStore.m_groupMap
             IntPtr groups = (IntPtr)UberStateController.Read<ulong>(Program, 0xb8, 0x40, 0x18);
             //.Count
@@ -184,26 +154,31 @@ namespace LiveSplit.OriWotW {
             //.Values
             groups = (IntPtr)Program.Read<ulong>(groups, 0x18);
             byte[] groupsData = Program.Read(groups + 0x20, groupCount * 0x18);
+
+            bool updateAll = uberState == null;
             for (int i = 0; i < groupCount; i++) {
                 //.Values[i].m_id.m_id
                 IntPtr group = (IntPtr)BitConverter.ToUInt64(groupsData, 0x10 + (i * 0x18));
                 byte[] groupData = Program.Read(group + 0x18, 48);
                 long groupID = Program.Read<int>((IntPtr)BitConverter.ToUInt64(groupData, 0), 0x10);
 
+                if (!updateAll && groupID != uberState.GroupID) { continue; }
+
                 //.Values[i].m_objectStateMap
                 IntPtr map = (IntPtr)BitConverter.ToUInt64(groupData, 8);
                 //.Values[i].m_objectStateMap.Count
                 int mapCount = Program.Read<int>(map, 0x20);
-                if (mapCount > 0) {
+                if (mapCount > 0 && (updateAll || uberState.IsObjectType)) {
                     map = (IntPtr)Program.Read<ulong>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_objectStateMap.Keys[j]
                         long id = BitConverter.ToInt32(data, j * 0x18);
 
-                        UberState uberState = null;
-                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
-                            if (uberState.Name.IndexOf("savePedestal", StringComparison.OrdinalIgnoreCase) >= 0) {
+                        if (!updateAll && id != uberState.ID) { continue; }
+
+                        if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            if (uberState.Type == UberStateType.SavePedestalUberState) {
                                 uberState.Value.Byte = Program.Read<byte>((IntPtr)BitConverter.ToUInt64(data, 0x10 + (j * 0x18)), 0x11);
                             } else {
                                 //playerUberStateDescriptor
@@ -216,15 +191,16 @@ namespace LiveSplit.OriWotW {
                 map = (IntPtr)BitConverter.ToUInt64(groupData, 16);
                 //.Values[i].m_boolStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
-                if (mapCount > 0) {
+                if (mapCount > 0 && (updateAll || uberState.IsBoolType)) {
                     map = (IntPtr)Program.Read<ulong>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_boolStateMap.Keys[j]
                         long id = BitConverter.ToInt32(data, j * 0x18);
 
-                        UberState uberState = null;
-                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                        if (!updateAll && id != uberState.ID) { continue; }
+
+                        if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
                             uberState.Value.Bool = data[0x10 + (j * 0x18)] != 0;
                         }
                     }
@@ -234,15 +210,16 @@ namespace LiveSplit.OriWotW {
                 map = (IntPtr)BitConverter.ToUInt64(groupData, 24);
                 //.Values[i].m_floatStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
-                if (mapCount > 0) {
+                if (mapCount > 0 && (updateAll || uberState.IsFloatType)) {
                     map = (IntPtr)Program.Read<ulong>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_floatStateMap.Keys[j]
                         long id = BitConverter.ToInt32(data, j * 0x18);
 
-                        UberState uberState = null;
-                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                        if (!updateAll && id != uberState.ID) { continue; }
+
+                        if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
                             uberState.Value.Float = BitConverter.ToSingle(data, 0x10 + (j * 0x18));
                         }
                     }
@@ -252,15 +229,16 @@ namespace LiveSplit.OriWotW {
                 map = (IntPtr)BitConverter.ToUInt64(groupData, 32);
                 //.Values[i].m_intStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
-                if (mapCount > 0) {
+                if (mapCount > 0 && (updateAll || uberState.IsIntType)) {
                     map = (IntPtr)Program.Read<ulong>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_intStateMap.Keys[j]
                         long id = BitConverter.ToInt32(data, j * 0x18);
 
-                        UberState uberState = null;
-                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                        if (!updateAll && id != uberState.ID) { continue; }
+
+                        if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
                             uberState.Value.Int = BitConverter.ToInt32(data, 0x10 + (j * 0x18));
                         }
                     }
@@ -270,22 +248,21 @@ namespace LiveSplit.OriWotW {
                 map = (IntPtr)BitConverter.ToUInt64(groupData, 40);
                 //.Values[i].m_byteStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
-                if (mapCount > 0) {
+                if (mapCount > 0 && (updateAll || uberState.IsByteType)) {
                     map = (IntPtr)Program.Read<ulong>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_byteStateMap.Keys[j]
                         long id = BitConverter.ToInt32(data, j * 0x18);
 
-                        UberState uberState = null;
-                        if (uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                        if (!updateAll && id != uberState.ID) { continue; }
+
+                        if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
                             uberState.Value.Byte = data[0x10 + (j * 0x18)];
                         }
                     }
                 }
             }
-
-            return uberIDLookup;
         }
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList

@@ -18,7 +18,7 @@ namespace LiveSplit.OriWotW {
         MouldwoodDepths,
         [Description("Riverlands")]
         Riverlands,
-        [Description("Silent Woodland")]
+        [Description("Silent Woods")]
         SilentWoodland,
         [Description("The Wellspring")]
         WaterMill,

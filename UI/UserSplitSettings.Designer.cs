@@ -34,7 +34,7 @@
             // 
             // txtValue
             // 
-            this.txtValue.Location = new System.Drawing.Point(267, 1);
+            this.txtValue.Location = new System.Drawing.Point(256, 1);
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(54, 20);
             this.txtValue.TabIndex = 2;
@@ -46,7 +46,7 @@
             this.cboType.FormattingEnabled = true;
             this.cboType.Location = new System.Drawing.Point(154, 1);
             this.cboType.Name = "cboType";
-            this.cboType.Size = new System.Drawing.Size(110, 21);
+            this.cboType.Size = new System.Drawing.Size(100, 21);
             this.cboType.TabIndex = 1;
             this.cboType.ValueMember = "Item1";
             this.cboType.SelectedIndexChanged += new System.EventHandler(this.cboType_SelectedIndexChanged);
@@ -78,9 +78,9 @@
             // 
             this.cboValue.DisplayMember = "Item2";
             this.cboValue.FormattingEnabled = true;
-            this.cboValue.Location = new System.Drawing.Point(267, 1);
+            this.cboValue.Location = new System.Drawing.Point(256, 1);
             this.cboValue.Name = "cboValue";
-            this.cboValue.Size = new System.Drawing.Size(181, 21);
+            this.cboValue.Size = new System.Drawing.Size(192, 21);
             this.cboValue.TabIndex = 3;
             this.cboValue.ValueMember = "Item1";
             this.cboValue.SelectedIndexChanged += new System.EventHandler(this.cboValue_SelectedIndexChanged);

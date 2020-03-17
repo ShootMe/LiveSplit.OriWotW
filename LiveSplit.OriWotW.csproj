@@ -81,6 +81,7 @@
     <Compile Include="Logic\SplitShard.cs" />
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />
+    <Compile Include="Logic\SplitSpiritTrial.cs" />
     <Compile Include="Logic\SplitWisp.cs" />
     <Compile Include="Logic\Utility.cs" />
     <Compile Include="Memory\Ability.cs" />
@@ -93,7 +94,6 @@
     <Compile Include="Memory\Vector4.cs" />
     <Compile Include="Logic\SplitWorldEvent.cs" />
     <Compile Include="Memory\UberState.cs" />
-    <Compile Include="Memory\WorldState.cs" />
     <Compile Include="UI\Component.cs" />
     <Compile Include="UI\Factory.cs" />
     <Compile Include="Memory\MemoryManager.cs" />

@@ -1,5 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.0.5">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added End Game split </change>
+            <change> Added Spirit Trial splits </change>
+            <change> Added Wisp splits </change>
+            <change> Added more Event splits </change>
+            <change> Added Creep Heart splits </change>
+        </changelog>
+    </update>
     <update version="1.0.4">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

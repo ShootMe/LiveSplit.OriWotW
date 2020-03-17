@@ -66,8 +66,8 @@ namespace LiveSplit.OriWotW {
                 bool dontCheckValue = isDead || isLoading || gameState != GameState.Game;
                 foreach (LogObject key in Enum.GetValues(typeof(LogObject))) {
                     string previous = currentValues[key];
-
                     string current = null;
+
                     switch (key) {
                         case LogObject.CurrentSplit: current = $"{logic.CurrentSplit} ({GetCurrentSplit(logic, settings)})"; break;
                         case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
@@ -80,13 +80,12 @@ namespace LiveSplit.OriWotW {
                         case LogObject.MapCompletion: current = dontCheckValue ? previous : logic.Memory.MapCompletion().ToString("0.000"); break;
                         case LogObject.Abilities: if (!dontCheckValue) { CheckAbilities(logic); } break;
                         case LogObject.Shards: if (!dontCheckValue) { CheckShards(logic); } break;
-                        case LogObject.WorldStates: current = dontCheckValue ? previous : logic.Memory.WorldStates().PrintList(); break;
                         case LogObject.Area: current = dontCheckValue ? previous : logic.Memory.PlayerArea().ToString(); break;
                         case LogObject.Dead: current = isDead.ToString(); break;
                         case LogObject.GameState: current = gameState.ToString(); break;
                         case LogObject.TitleScreen: current = logic.Memory.TitleScreen().ToString(); break;
                         case LogObject.LoadingGame: current = isLoading.ToString(); break;
-                        case LogObject.Scene: current = logic.Memory.CurrentScene().ToString(); break;
+                        case LogObject.Scene: string scene = logic.Memory.CurrentScene(); current = string.IsNullOrEmpty(scene) ? previous : scene; break;
                         case LogObject.UberState: if (!dontCheckValue) { CheckUberStates(logic); } break;
                             //case LogObject.GameTime: current = dontCheckValue ? previous : logic.Memory.ElapsedTime().ToString("0"); break;
                             //case LogObject.Position: Vector2 point = logic.Memory.Position(); current = $"{point.X:0}, {point.Y:0}"; break;
