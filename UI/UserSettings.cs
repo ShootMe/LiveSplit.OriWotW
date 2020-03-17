@@ -27,6 +27,11 @@ namespace LiveSplit.OriWotW {
             Log.EnableLogging = chkLog.Checked;
             xmlSettings.AppendChild(xmlLog);
 
+            XmlElement xmlNoPause = document.CreateElement("NoPause");
+            xmlNoPause.InnerText = chkNoPause.Checked.ToString();
+            Settings.NoPause = chkNoPause.Checked;
+            xmlSettings.AppendChild(xmlNoPause);
+
             XmlElement xmlSplits = document.CreateElement("Splits");
             xmlSettings.AppendChild(xmlSplits);
 
@@ -49,6 +54,14 @@ namespace LiveSplit.OriWotW {
             }
             chkLog.Checked = logInfo;
             Log.EnableLogging = logInfo;
+
+            XmlNode noPauseNode = node.SelectSingleNode(".//NoPause");
+            bool noPause = false;
+            if (noPauseNode != null) {
+                bool.TryParse(noPauseNode.InnerText, out noPause);
+            }
+            chkNoPause.Checked = noPause;
+            Settings.NoPause = noPause;
 
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {

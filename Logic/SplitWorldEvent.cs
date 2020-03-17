@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 namespace LiveSplit.OriWotW {
     public enum SplitWorldEvent {
-        [Description("Howl Fight")]
+        [Description("Howl Defeated")]
         HowlFight,
         [Description("Ku Obtained")]
         FindKu,
@@ -13,7 +13,7 @@ namespace LiveSplit.OriWotW {
         WaterPurified,
         [Description("Water Purified (So Soggy)")]
         SoSoggy,
-        [Description("Weeping Ridge Elevator Fight")]
+        [Description("Weeping Ridge Elevator Finished")]
         WeepingRidgeElevatorFight
     }
 }

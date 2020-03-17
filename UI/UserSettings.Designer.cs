@@ -27,6 +27,7 @@
             this.flowMain = new System.Windows.Forms.FlowLayoutPanel();
             this.btnClearLog = new System.Windows.Forms.Button();
             this.chkLog = new System.Windows.Forms.CheckBox();
+            this.chkNoPause = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnLog
@@ -80,10 +81,21 @@
             this.chkLog.Text = "Log Info";
             this.chkLog.UseVisualStyleBackColor = true;
             // 
+            // chkNoPause
+            // 
+            this.chkNoPause.AutoSize = true;
+            this.chkNoPause.Location = new System.Drawing.Point(3, 8);
+            this.chkNoPause.Name = "chkNoPause";
+            this.chkNoPause.Size = new System.Drawing.Size(73, 17);
+            this.chkNoPause.TabIndex = 0;
+            this.chkNoPause.Text = "No Pause";
+            this.chkNoPause.UseVisualStyleBackColor = true;
+            // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
             this.Controls.Add(this.btnClearLog);
             this.Controls.Add(this.flowMain);
@@ -102,5 +114,6 @@
         private System.Windows.Forms.FlowLayoutPanel flowMain;
         private System.Windows.Forms.Button btnClearLog;
         private System.Windows.Forms.CheckBox chkLog;
+        private System.Windows.Forms.CheckBox chkNoPause;
     }
 }

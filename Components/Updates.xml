@@ -1,5 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.0.6">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added No Pause option in the settings that will allow your game to not pause when not in focus </change>
+            <change> Added Final Boss room area as a split option in Areas (Willows End Boss Room) </change>
+            <change> Improved Load Removal </change>
+        </changelog>
+    </update>
     <update version="1.0.5">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

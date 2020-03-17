@@ -22,6 +22,7 @@ namespace LiveSplit.OriWotW {
         public static void Main(string[] args) {
             Component component = new Component(null);
             component.log.EnableLogging = true;
+            component.userSettings.Settings.NoPause = true;
             Application.Run();
         }
         public Component(LiveSplitState state) {

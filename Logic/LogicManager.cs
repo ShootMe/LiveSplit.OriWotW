@@ -52,6 +52,7 @@ namespace LiveSplit.OriWotW {
             return hooked;
         }
         public void Update() {
+            Memory.PatchNoPause(Settings.NoPause);
             if (CurrentSplit < Settings.Autosplits.Count) {
                 CheckSplit(Settings.Autosplits[CurrentSplit]);
                 if (!Running) {
@@ -224,6 +225,7 @@ namespace LiveSplit.OriWotW {
                 case SplitArea.WaterMillSub2:
                 case SplitArea.WaterMillSub3:
                 case SplitArea.WeepingRidge:
+                case SplitArea.WillowsEndBoss:
                     string[] scenesToCheck = Utility.GetEnumScenes<SplitArea>(splitArea);
                     string scene = Memory.CurrentScene();
                     if (!string.IsNullOrEmpty(scene)) {

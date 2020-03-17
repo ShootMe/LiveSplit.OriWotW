@@ -122,8 +122,11 @@ namespace LiveSplit.OriWotW {
                     IntPtr ptr = searcher.FindSignature(program, signature.Signature);
                     if (ptr != IntPtr.Zero) {
                         Version = signature.Version;
-                        int offset = program.Read<int>(ptr + signature.Offset);
-                        return ptr + signature.Offset + 4 + offset;
+                        int offset = 0;
+                        if (AutoDeref != AutoDeref.None) {
+                            offset = program.Read<int>(ptr + signature.Offset) + 4;
+                        }
+                        return ptr + signature.Offset + offset;
                     }
                 }
                 return IntPtr.Zero;

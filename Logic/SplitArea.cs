@@ -38,6 +38,9 @@ namespace LiveSplit.OriWotW {
         WellspringGlades,
         [Description("Willows End")]
         WillowsEnd,
+        [Description("Willows End (Boss Room)")]
+        [Scene("willowCeremonyIntro")]
+        WillowsEndBoss,
         [Description("Windswept Wastes")]
         WindsweptWastes,
         [Description("Windtorn Ruins")]
