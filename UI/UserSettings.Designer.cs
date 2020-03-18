@@ -28,6 +28,7 @@
             this.btnClearLog = new System.Windows.Forms.Button();
             this.chkLog = new System.Windows.Forms.CheckBox();
             this.chkNoPause = new System.Windows.Forms.CheckBox();
+            this.chkFPSLock = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnLog
@@ -36,7 +37,7 @@
             this.btnLog.Location = new System.Drawing.Point(329, 4);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(69, 23);
-            this.btnLog.TabIndex = 1;
+            this.btnLog.TabIndex = 4;
             this.btnLog.TabStop = false;
             this.btnLog.Text = "Debug Log";
             this.btnLog.UseVisualStyleBackColor = true;
@@ -64,7 +65,7 @@
             this.btnClearLog.Location = new System.Drawing.Point(404, 4);
             this.btnClearLog.Name = "btnClearLog";
             this.btnClearLog.Size = new System.Drawing.Size(63, 23);
-            this.btnClearLog.TabIndex = 3;
+            this.btnClearLog.TabIndex = 5;
             this.btnClearLog.TabStop = false;
             this.btnClearLog.Text = "Clear Log";
             this.btnClearLog.UseVisualStyleBackColor = true;
@@ -77,7 +78,7 @@
             this.chkLog.Location = new System.Drawing.Point(261, 8);
             this.chkLog.Name = "chkLog";
             this.chkLog.Size = new System.Drawing.Size(65, 17);
-            this.chkLog.TabIndex = 1;
+            this.chkLog.TabIndex = 3;
             this.chkLog.Text = "Log Info";
             this.chkLog.UseVisualStyleBackColor = true;
             // 
@@ -87,14 +88,25 @@
             this.chkNoPause.Location = new System.Drawing.Point(3, 8);
             this.chkNoPause.Name = "chkNoPause";
             this.chkNoPause.Size = new System.Drawing.Size(73, 17);
-            this.chkNoPause.TabIndex = 0;
+            this.chkNoPause.TabIndex = 1;
             this.chkNoPause.Text = "No Pause";
             this.chkNoPause.UseVisualStyleBackColor = true;
+            // 
+            // chkFPSLock
+            // 
+            this.chkFPSLock.AutoSize = true;
+            this.chkFPSLock.Location = new System.Drawing.Point(82, 8);
+            this.chkFPSLock.Name = "chkFPSLock";
+            this.chkFPSLock.Size = new System.Drawing.Size(88, 17);
+            this.chkFPSLock.TabIndex = 2;
+            this.chkFPSLock.Text = "60 FPS Lock";
+            this.chkFPSLock.UseVisualStyleBackColor = true;
             // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkFPSLock);
             this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
             this.Controls.Add(this.btnClearLog);
@@ -115,5 +127,6 @@
         private System.Windows.Forms.Button btnClearLog;
         private System.Windows.Forms.CheckBox chkLog;
         private System.Windows.Forms.CheckBox chkNoPause;
+        private System.Windows.Forms.CheckBox chkFPSLock;
     }
 }

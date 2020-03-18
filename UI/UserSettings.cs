@@ -19,18 +19,30 @@ namespace LiveSplit.OriWotW {
             Dock = DockStyle.Fill;
         }
 
+        public void AddXmlItem<T>(XmlDocument document, XmlElement xmlSettings, string name, T value) {
+            XmlElement xmlItem = document.CreateElement(name);
+            xmlItem.InnerText = value.ToString();
+            xmlSettings.AppendChild(xmlItem);
+        }
+        public bool GetXmlBoolItem(XmlNode node, string path, bool defaultValue) {
+            XmlNode item = node.SelectSingleNode(path);
+            bool value = defaultValue;
+            if (item != null) {
+                bool.TryParse(item.InnerText, out value);
+            }
+            return value;
+        }
         public XmlNode UpdateSettings(XmlDocument document) {
             XmlElement xmlSettings = document.CreateElement("Settings");
 
-            XmlElement xmlLog = document.CreateElement("LogInfo");
-            xmlLog.InnerText = chkLog.Checked.ToString();
+            AddXmlItem<bool>(document, xmlSettings, "LogInfo", chkLog.Checked);
             Log.EnableLogging = chkLog.Checked;
-            xmlSettings.AppendChild(xmlLog);
 
-            XmlElement xmlNoPause = document.CreateElement("NoPause");
-            xmlNoPause.InnerText = chkNoPause.Checked.ToString();
+            AddXmlItem<bool>(document, xmlSettings, "NoPause", chkNoPause.Checked);
             Settings.NoPause = chkNoPause.Checked;
-            xmlSettings.AppendChild(xmlNoPause);
+
+            AddXmlItem<bool>(document, xmlSettings, "FPSLock", chkFPSLock.Checked);
+            Settings.FPSLock = chkFPSLock.Checked;
 
             XmlElement xmlSplits = document.CreateElement("Splits");
             xmlSettings.AppendChild(xmlSplits);
@@ -47,21 +59,17 @@ namespace LiveSplit.OriWotW {
         public void InitializeSettings(XmlNode node) {
             Settings.Autosplits.Clear();
 
-            XmlNode logNode = node.SelectSingleNode(".//LogInfo");
-            bool logInfo = true;
-            if (logNode != null) {
-                bool.TryParse(logNode.InnerText, out logInfo);
-            }
+            bool logInfo = GetXmlBoolItem(node, ".//LogInfo", true);
             chkLog.Checked = logInfo;
             Log.EnableLogging = logInfo;
 
-            XmlNode noPauseNode = node.SelectSingleNode(".//NoPause");
-            bool noPause = false;
-            if (noPauseNode != null) {
-                bool.TryParse(noPauseNode.InnerText, out noPause);
-            }
+            bool noPause = GetXmlBoolItem(node, ".//NoPause", false);
             chkNoPause.Checked = noPause;
             Settings.NoPause = noPause;
+
+            bool fpsLock = GetXmlBoolItem(node, ".//FPSLock", false);
+            chkFPSLock.Checked = fpsLock;
+            Settings.FPSLock = fpsLock;
 
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {

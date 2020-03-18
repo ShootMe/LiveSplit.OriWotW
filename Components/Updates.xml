@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.1.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added ability to dynamically read pointers from metadata </change>
+            <change> Added a 60 FPS Lock setting that will lock the game to 60 FPS without the need for any other program </change>
+        </changelog>
+    </update>
     <update version="1.0.9">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

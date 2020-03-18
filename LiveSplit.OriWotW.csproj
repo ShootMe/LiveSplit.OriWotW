@@ -68,6 +68,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Il2Cpp\BinaryStream.cs" />
+    <Compile Include="Il2Cpp\Il2CppData.cs" />
+    <Compile Include="Il2Cpp\Il2CppClass.cs" />
+    <Compile Include="Il2Cpp\Il2CppDecompiler.cs" />
+    <Compile Include="Il2Cpp\Il2CppExecutor.cs" />
+    <Compile Include="Il2Cpp\PE.cs" />
+    <Compile Include="Il2Cpp\Metadata.cs" />
+    <Compile Include="Il2Cpp\MetadataClass.cs" />
+    <Compile Include="Il2Cpp\Il2CppReader.cs" />
+    <Compile Include="Il2Cpp\PlusSearch.cs" />
     <Compile Include="Logic\SplitAbility.cs" />
     <Compile Include="Logic\SplitArea.cs" />
     <Compile Include="Logic\SplitShard.cs" />
