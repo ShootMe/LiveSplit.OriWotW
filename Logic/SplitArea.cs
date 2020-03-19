@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 namespace LiveSplit.OriWotW {
     public enum SplitArea {
         [Description("Baurs Reach")]
@@ -34,7 +33,7 @@ namespace LiveSplit.OriWotW {
         WellspringGlades,
         [Description("Willows End")]
         WillowsEnd,
-        [Description("Willows End (Boss Room)")]
+        [Description("Willows End (Shrieks Room)")]
         WillowsEndBoss,
         [Description("Windswept Wastes")]
         WindsweptWastes,

@@ -5,10 +5,6 @@ namespace LiveSplit.OriWotW {
         None,
         CurrentSplit,
         Pointers,
-        Energy,
-        EnergyFragments,
-        Health,
-        HealthFragments,
         Position,
         Keystones,
         Ore,
@@ -71,10 +67,6 @@ namespace LiveSplit.OriWotW {
                     switch (key) {
                         case LogObject.CurrentSplit: current = $"{logic.CurrentSplit} ({GetCurrentSplit(logic, settings)})"; break;
                         case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
-                        case LogObject.Energy: current = dontCheckValue ? previous : logic.Memory.MaxEnergy().ToString(); break;
-                        case LogObject.EnergyFragments: current = dontCheckValue ? previous : logic.Memory.EnergyFragments().ToString(); break;
-                        case LogObject.Health: current = dontCheckValue ? previous : logic.Memory.MaxHealth().ToString(); break;
-                        case LogObject.HealthFragments: current = dontCheckValue ? previous : logic.Memory.HealthFragments().ToString(); break;
                         case LogObject.Keystones: current = dontCheckValue ? previous : logic.Memory.Keystones().ToString(); break;
                         case LogObject.Ore: current = dontCheckValue ? previous : logic.Memory.Ore().ToString(); break;
                         case LogObject.MapCompletion: current = dontCheckValue ? previous : logic.Memory.MapCompletion().ToString("0.000"); break;
@@ -147,10 +139,8 @@ namespace LiveSplit.OriWotW {
                 long key = pair.Key;
                 UberState state = pair.Value;
 
-                switch (state.GroupName) {
-                    case "achievementsGroup":
-                    case "statsUberStateGroup":
-                        continue;
+                if (state.GroupName == "statsUberStateGroup" || (state.GroupName == "achievementsGroup" && state.Name == "spiritLightGainedCounter")) {
+                    continue;
                 }
 
                 UberState oldState = null;

@@ -34,6 +34,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitAbility>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitAbility>(UserSplit.Value);
                         break;
+                    case SplitType.Boss:
+                        cboValue.DataSource = Utility.GetEnumList<SplitBoss>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitBoss>(UserSplit.Value);
+                        break;
                     case SplitType.Shard:
                         cboValue.DataSource = Utility.GetEnumList<SplitShard>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
@@ -78,6 +82,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.AreaEnter:
                         case SplitType.AreaLeave: DefaultValue = SplitArea.InkwaterMarsh; break;
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
+                        case SplitType.Boss: DefaultValue = SplitBoss.HowlEnd; break;
                         case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
                         case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
                         case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;
@@ -92,7 +97,7 @@ namespace LiveSplit.OriWotW {
 
             UpdateControls();
         }
-        private void cboType_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
+        private void cboType_Validating(object sender, CancelEventArgs e) {
             if (cboType.SelectedIndex < 0 && !isLoading) {
                 cboType.SelectedValue = SplitType.ManualSplit;
             }
@@ -102,7 +107,7 @@ namespace LiveSplit.OriWotW {
                 UserSplit.Value = cboValue.SelectedValue.ToString();
             }
         }
-        private void cboValue_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
+        private void cboValue_Validating(object sender, CancelEventArgs e) {
             if (cboValue.Visible && cboValue.SelectedIndex < 0) {
                 cboValue.SelectedValue = DefaultValue;
             }

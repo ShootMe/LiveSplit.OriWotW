@@ -108,6 +108,9 @@ namespace LiveSplit.OriWotW {
                     case SplitType.Wisp:
                         CheckWisp(split);
                         break;
+                    case SplitType.Boss:
+                        CheckBoss(split);
+                        break;
                     case SplitType.SpiritTrial:
                         CheckSpiritTrial(split);
                         break;
@@ -148,24 +151,38 @@ namespace LiveSplit.OriWotW {
                         lastIntValue = ore;
                         break;
                     case SplitType.HealthCell:
-                        int health = Memory.MaxHealth() + Memory.HealthFragments();
+                        Memory.UpdateUberState(UberStateDefaults.healthContainersCounter);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupKwolok);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupMouldwood);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupWindtorn);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupBaur);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupLagoon);
+                        int health = UberStateDefaults.healthContainersCounter.Value.Int - (UberStateDefaults.wispRewardPickupKwolok.Value.Bool ? 2 : 0);
+                        health -= (UberStateDefaults.wispRewardPickupMouldwood.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupWindtorn.Value.Bool ? 2 : 0);
+                        health -= (UberStateDefaults.wispRewardPickupBaur.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupLagoon.Value.Bool ? 2 : 0);
                         int splitHealth = -1;
                         int.TryParse(split.Value, out splitHealth);
-                        splitHealth += 6;
                         ShouldSplit = lastIntValue != health && health == splitHealth;
                         lastIntValue = health;
                         break;
                     case SplitType.EnergyCell:
-                        int energy = Memory.MaxEnergy() + Memory.EnergyFragments();
+                        Memory.UpdateUberState(UberStateDefaults.healthContainersCounter);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupKwolok);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupMouldwood);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupWindtorn);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupBaur);
+                        Memory.UpdateUberState(UberStateDefaults.wispRewardPickupLagoon);
+                        int energy = UberStateDefaults.healthContainersCounter.Value.Int - (UberStateDefaults.wispRewardPickupKwolok.Value.Bool ? 2 : 0);
+                        energy -= (UberStateDefaults.wispRewardPickupMouldwood.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupWindtorn.Value.Bool ? 2 : 0);
+                        energy -= (UberStateDefaults.wispRewardPickupBaur.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupLagoon.Value.Bool ? 2 : 0);
                         int splitEnergy = -1;
                         int.TryParse(split.Value, out splitEnergy);
-                        splitEnergy += 6;
                         ShouldSplit = lastIntValue != energy && energy == splitEnergy;
                         lastIntValue = energy;
                         break;
                 }
 
-                if (state != GameState.Game || Memory.Dead() || Paused) {
+                if (state != GameState.Game || Memory.Dead() || (Paused && state != GameState.Game)) {
                     ShouldSplit = false;
                 }
             }
@@ -197,27 +214,41 @@ namespace LiveSplit.OriWotW {
                 case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2, 1); break;
             }
         }
+        private void CheckBoss(Split split) {
+            SplitBoss boss = Utility.GetEnumValue<SplitBoss>(split.Value);
+            switch (boss) {
+                case SplitBoss.HowlStart: CheckUberBoolValue(UberStateDefaults.nightCrawlerChaseStarted); break;
+                case SplitBoss.HowlEnd: CheckUberBoolValue(UberStateDefaults.nightCrawlerDefeated); break;
+                case SplitBoss.HornbugStart: CheckUberIntValue(UberStateDefaults.hornBugBossState, 1); break;
+                case SplitBoss.HornbugEnd: CheckUberIntValue(UberStateDefaults.hornBugBossState, 3); break;
+                case SplitBoss.KwolokStart: CheckUberIntValue(UberStateDefaults.kwolokBossState, 1); break;
+                case SplitBoss.KwolokEnd: CheckUberIntValue(UberStateDefaults.kwolokBossState, 7); break;
+                case SplitBoss.MoraStart: CheckUberIntValue(UberStateDefaults.spiderBossState, 1); break;
+                case SplitBoss.MoraEnd: CheckUberIntValue(UberStateDefaults.spiderBossState, 7); break;
+                case SplitBoss.WeepingRidgeElevatorFight: CheckUberBoolValue(UberStateDefaults.elevatorCompleteState); break;
+                case SplitBoss.WillowStoneStart: CheckUberIntValue(UberStateDefaults.laserShooterBossState, 1); break;
+                case SplitBoss.WillowStoneEnd: CheckUberIntValue(UberStateDefaults.laserShooterBossState, 4); break;
+                case SplitBoss.ShriekDefeated: CheckUberIntValue(UberStateDefaults.petrifiedOwlBossState, 5); break;
+            }
+        }
         private void CheckWorldEvent(Split split) {
             SplitWorldEvent worldEvent = Utility.GetEnumValue<SplitWorldEvent>(split.Value);
             switch (worldEvent) {
-                case SplitWorldEvent.HowlFight: CheckUberBoolValue(UberStateDefaults.nightCrawlerDefeated); break;
-                case SplitWorldEvent.ShriekDefeated: CheckUberIntValue(UberStateDefaults.petrifiedOwlBossState, 5); break;
                 case SplitWorldEvent.FindKu: CheckAbility(AbilityType.Flap); break;
                 case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
                 case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
                 case SplitWorldEvent.SoSoggy: CheckUberIntValue(UberStateDefaults.cleanseWellspringQuestUberState, 3); break;
-                case SplitWorldEvent.WeepingRidgeElevatorFight: CheckUberBoolValue(UberStateDefaults.elevatorCompleteState); break;
                 case SplitWorldEvent.SilentWoodsShriekCutscene: CheckUberBoolValue(UberStateDefaults.petrifiedForestNewTransitionOriVignettePlayed); break;
             }
         }
         private void CheckWisp(Split split) {
             SplitWisp wisp = Utility.GetEnumValue<SplitWisp>(split.Value);
             switch (wisp) {
-                case SplitWisp.VoiceOfTheForest: CheckUberIntValue(UberStateDefaults.kwolokNpcState, 1, 0); break;
-                case SplitWisp.EyesOfTheForest: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsWispQuestUberState, 3); break;
-                case SplitWisp.HeartOfTheForest: CheckUberIntValue(UberStateDefaults.desertWispQuestUberState, 3); break;
-                case SplitWisp.MemoryOfTheForest: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 3); break;
-                case SplitWisp.StrengthOfTheForest: CheckUberIntValue(UberStateDefaults.lagoonWispQuestUberState, 3); break;
+                case SplitWisp.VoiceOfTheForest: CheckUberBoolValue(UberStateDefaults.wispRewardPickupKwolok); break;
+                case SplitWisp.EyesOfTheForest: CheckUberBoolValue(UberStateDefaults.wispRewardPickupMouldwood); break;
+                case SplitWisp.HeartOfTheForest: CheckUberBoolValue(UberStateDefaults.wispRewardPickupWindtorn); break;
+                case SplitWisp.MemoryOfTheForest: CheckUberBoolValue(UberStateDefaults.wispRewardPickupBaur); break;
+                case SplitWisp.StrengthOfTheForest: CheckUberBoolValue(UberStateDefaults.wispRewardPickupLagoon); break;
             }
         }
         private void CheckArea(Split split, bool onEnter) {

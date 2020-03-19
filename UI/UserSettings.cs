@@ -77,7 +77,18 @@ namespace LiveSplit.OriWotW {
                 if (splitValues.Length == 2) {
                     SplitType type = SplitType.ManualSplit;
                     if (Enum.TryParse<SplitType>(splitValues[0], out type)) {
-                        Settings.Autosplits.Add(new Split() { Type = type, Value = splitValues[1] });
+                        string value = splitValues[1];
+                        if (type == SplitType.WorldEvent) {
+                            if (value == "HowlFight") {
+                                type = SplitType.Boss;
+                                value = "HowlEnd";
+                            } else if (value == "ShriekDefeated") {
+                                type = SplitType.Boss;
+                            } else if (value == "WeepingRidgeElevatorFight") {
+                                type = SplitType.Boss;
+                            }
+                        }
+                        Settings.Autosplits.Add(new Split() { Type = type, Value = value });
                     }
                 }
             }

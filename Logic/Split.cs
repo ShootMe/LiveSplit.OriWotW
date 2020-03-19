@@ -9,6 +9,8 @@ namespace LiveSplit.OriWotW {
         AreaEnter,
         [Description("Area (Leave)")]
         AreaLeave,
+        [Description("Boss Fight")]
+        Boss,
         [Description("Creep Heart")]
         CreepHeart,
         [Description("Energy Cell")]

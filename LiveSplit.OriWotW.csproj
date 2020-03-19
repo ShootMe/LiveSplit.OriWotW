@@ -80,6 +80,7 @@
     <Compile Include="Il2Cpp\PlusSearch.cs" />
     <Compile Include="Logic\SplitAbility.cs" />
     <Compile Include="Logic\SplitArea.cs" />
+    <Compile Include="Logic\SplitBoss.cs" />
     <Compile Include="Logic\SplitShard.cs" />
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />

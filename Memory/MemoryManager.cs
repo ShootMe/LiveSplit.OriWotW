@@ -110,22 +110,6 @@ namespace LiveSplit.OriWotW {
             //DifficultyController.Instance.Difficulty
             DifficultyController.Write<int>(Program, difficulty, 0xb8, 0x0, 0x20);
         }
-        public int MaxEnergy() {
-            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats.m_maxEnergy
-            return (int)PlayerUberStateGroup.Read<float>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x1c) * 2;
-        }
-        public int MaxHealth() {
-            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats.m_maxHealth
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x14) / 5;
-        }
-        public int HealthFragments() {
-            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_partialHealthContainers
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x38);
-        }
-        public int EnergyFragments() {
-            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_partialEnergyContainers
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x3c);
-        }
         public int Keystones() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_keystones
             return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x28);
@@ -482,6 +466,8 @@ namespace LiveSplit.OriWotW {
             UberStateCollection.ClearPointer();
             DifficultyController.ClearPointer();
             NoPausePatch.ClearPointer();
+            TargetFrameRatePatch.ClearPointer();
+            VSyncPatch.ClearPointer();
         }
         public void Dispose() {
             if (Program != null) {
