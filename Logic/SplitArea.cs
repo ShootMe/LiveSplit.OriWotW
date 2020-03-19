@@ -3,8 +3,6 @@ namespace LiveSplit.OriWotW {
     public enum SplitArea {
         [Description("Baurs Reach")]
         BaursReach,
-        [Description("Gorlek Mines")]
-        GorlekMines,
         [Description("Inkwater Marsh")]
         InkwaterMarsh,
         [Description("Kwoloks Hollow")]
@@ -15,8 +13,6 @@ namespace LiveSplit.OriWotW {
         MidnightBurrow,
         [Description("Mouldwood Depths")]
         MouldwoodDepths,
-        [Description("Riverlands")]
-        Riverlands,
         [Description("Silent Woods")]
         SilentWoodland,
         [Description("The Wellspring")]

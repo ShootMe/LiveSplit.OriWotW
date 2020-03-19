@@ -83,6 +83,7 @@
     <Compile Include="Logic\SplitAbility.cs" />
     <Compile Include="Logic\SplitArea.cs" />
     <Compile Include="Logic\SplitBoss.cs" />
+    <Compile Include="Logic\SplitMap.cs" />
     <Compile Include="Logic\SplitShard.cs" />
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Memory\GameState.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
+    <Compile Include="Memory\Stats.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
     <Compile Include="Memory\Vector4.cs" />

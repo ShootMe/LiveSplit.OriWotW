@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 namespace LiveSplit.OriWotW {
     [StructLayout(LayoutKind.Explicit, Size = 16, Pack = 1)]
     public struct Vector4 {

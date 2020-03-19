@@ -113,6 +113,10 @@ namespace LiveSplit.OriWotW {
             //DifficultyController.Instance.Difficulty
             DifficultyController.Write<int>(Program, difficulty, 0xb8, 0x0, 0x20);
         }
+        public Stats PlayerStats() {
+            //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats
+            return PlayerUberStateGroup.Read<Stats>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x10);
+        }
         public int Keystones() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_keystones
             return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x28);

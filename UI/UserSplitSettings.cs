@@ -42,6 +42,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitShard>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
                         break;
+                    case SplitType.Map:
+                        cboValue.DataSource = Utility.GetEnumList<SplitMap>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitMap>(UserSplit.Value);
+                        break;
                     case SplitType.SpiritTrial:
                         cboValue.DataSource = Utility.GetEnumList<SplitSpiritTrial>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitSpiritTrial>(UserSplit.Value);
@@ -88,6 +92,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
                         case SplitType.Boss: DefaultValue = SplitBoss.HowlEnd; break;
                         case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
+                        case SplitType.Map: DefaultValue = SplitMap.InkwaterMarsh; break;
                         case SplitType.Teleporter: DefaultValue = SplitTeleporter.KwoloksHollowActivated; break;
                         case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
                         case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;

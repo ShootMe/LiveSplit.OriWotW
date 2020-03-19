@@ -116,6 +116,9 @@ namespace LiveSplit.OriWotW {
                     case SplitType.Boss:
                         CheckBoss(split);
                         break;
+                    case SplitType.Map:
+                        CheckMap(split);
+                        break;
                     case SplitType.SpiritTrial:
                         CheckSpiritTrial(split);
                         break;
@@ -327,6 +330,14 @@ namespace LiveSplit.OriWotW {
                     }
                     break;
             }
+        }
+        private void CheckMap(Split split) {
+            SplitMap splitMap = Utility.GetEnumValue<SplitMap>(split.Value);
+            AreaType area = AreaType.None;
+            Enum.TryParse<AreaType>(splitMap.ToString(), true, out area);
+            int completion = (int)Math.Floor(Memory.MapCompletion(area));
+            ShouldSplit = lastIntValue != (int)completion && completion == 100;
+            lastIntValue = completion;
         }
         private void CheckScene(bool onEnter, params string[] scenesToCheck) {
             string scene = Memory.CurrentScene();

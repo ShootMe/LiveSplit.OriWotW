@@ -23,6 +23,8 @@ namespace LiveSplit.OriWotW {
         HealthCell,
         [Description("Keystone")]
         Keystone,
+        [Description("Map %")]
+        Map,
         [Description("Ore")]
         Ore,
         [Description("Shard")]
