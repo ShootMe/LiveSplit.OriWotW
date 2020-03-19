@@ -19,6 +19,8 @@ namespace LiveSplit.OriWotW {
         private LogManager log;
         private Thread timerLoop;
         private bool isAutosplitting = false;
+        private TextComponent infoComponent;
+        private DateTime lastInfoCheck = DateTime.MinValue;
         public static void Main(string[] args) {
             Component component = new Component(null);
             component.log.EnableLogging = true;
@@ -70,7 +72,7 @@ namespace LiveSplit.OriWotW {
                 } catch (Exception ex) {
                     log.AddEntry(new EventLogEntry(ex.ToString()));
                 }
-                Thread.Sleep(8);
+                Thread.Sleep(7);
             }
         }
         private void HandleLogic() {
@@ -134,7 +136,28 @@ namespace LiveSplit.OriWotW {
             }
         }
         public void Update(IInvalidator invalidator, LiveSplitState lvstate, float width, float height, LayoutMode mode) {
+            if (DateTime.Now > lastInfoCheck) {
+                infoComponent = null;
+                IList<ILayoutComponent> components = lvstate.Layout.LayoutComponents;
+                for (int i = components.Count - 1; i >= 0; i--) {
+                    ILayoutComponent component = components[i];
+                    if (component.Component is TextComponent) {
+                        TextComponent text = (TextComponent)component.Component;
+                        if (text.Settings.Text1.IndexOf("FPS", StringComparison.OrdinalIgnoreCase) >= 0) {
+                            infoComponent = text;
+                            break;
+                        }
+                    }
+                }
+                lastInfoCheck = DateTime.Now.AddSeconds(3);
+            }
 
+            if (infoComponent != null) {
+                string fps = logic.Memory.FPS().ToString("0.0");
+                if (fps != infoComponent.Settings.Text2) {
+                    infoComponent.Settings.Text2 = fps;
+                }
+            }
         }
         public Control GetSettingsControl(LayoutMode mode) { return userSettings; }
         public void SetSettings(XmlNode document) { userSettings.InitializeSettings(document); }

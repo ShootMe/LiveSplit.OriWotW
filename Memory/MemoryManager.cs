@@ -53,11 +53,16 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer VSyncPatch = new ProgramPointer("UnityPlayer.dll",
             new FindPointerSignature(PointerVersion.V1, AutoDeref.None, "E8????????4863484C488B4030488D148948C1E2058B4402684883C428C3", -0x4)
         );
+        private static ProgramPointer FrameCounter = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
+            new FindPointerSignature(PointerVersion.V1, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a)
+        );
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
         private bool? noPausePatched = null;
         private bool? targetFrameRatePatched = null;
+        private FPSTimer fpsTimer = new FPSTimer();
 
         public MemoryManager() {
             LastHooked = DateTime.MinValue;
@@ -104,6 +109,12 @@ namespace LiveSplit.OriWotW {
                 }
                 targetFrameRatePatched = patch;
             }
+        }
+        public int FrameCount() {
+            return FrameCounter.Read<int>(Program, 0xb8, 0x0);
+        }
+        public float FPS() {
+            return (float)fpsTimer.FPS;
         }
         public int Difficulty() {
             //DifficultyController.Instance.Difficulty
@@ -459,6 +470,9 @@ namespace LiveSplit.OriWotW {
                 }
             }
 
+            if (IsHooked) {
+                fpsTimer.Update(FrameCount());
+            }
             return IsHooked;
         }
         private void ClearPointers() {

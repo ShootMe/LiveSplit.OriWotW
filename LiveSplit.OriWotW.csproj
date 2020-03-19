@@ -61,6 +61,10 @@
       <HintPath>..\..\LiveSplit\LiveSplit.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="LiveSplit.Text">
+      <HintPath>..\..\LiveSplit\Components\LiveSplit.Text.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -96,6 +100,7 @@
     <Compile Include="Logic\Utility.cs" />
     <Compile Include="Memory\Ability.cs" />
     <Compile Include="Memory\AreaType.cs" />
+    <Compile Include="Memory\FPSTimer.cs" />
     <Compile Include="Memory\GameState.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />

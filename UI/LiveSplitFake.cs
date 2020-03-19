@@ -26,6 +26,19 @@ namespace LiveSplit.OriWotW {
         Vertical = 1
     }
     public interface IInvalidator { }
+    public interface ILayout {
+        IList<ILayoutComponent> LayoutComponents { get; set; }
+    }
+    public interface ILayoutComponent {
+        IComponent Component { get; set; }
+    }
+    public class TextComponentSettings {
+        public string Text1;
+        public string Text2;
+    }
+    public class TextComponent {
+        public TextComponentSettings Settings;
+    }
     public struct Time {
         public TimeSpan? RealTime;
         public TimeSpan? GameTime;
@@ -42,6 +55,7 @@ namespace LiveSplit.OriWotW {
         public TimerPhase CurrentPhase;
         public Time CurrentTime;
         public Run Run;
+        public ILayout Layout;
         public event EventHandler OnPause;
         public event EventHandler OnResume;
         public event EventHandlerT<TimerPhase> OnReset;
