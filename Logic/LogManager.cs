@@ -9,7 +9,6 @@ namespace LiveSplit.OriWotW {
         Keystones,
         Ore,
         MapCompletion,
-        GameTime,
         Abilities,
         Shards,
         Area,
@@ -83,8 +82,7 @@ namespace LiveSplit.OriWotW {
                         case LogObject.UberState: if (!dontCheckValue) { CheckUberStates(logic); } break;
                         case LogObject.Patches: current = logic.Memory.Patches(); break;
                         case LogObject.Stats: current = dontCheckValue ? previous : logic.Memory.PlayerStats().ToString(); break;
-                            //case LogObject.GameTime: current = dontCheckValue ? previous : logic.Memory.ElapsedTime().ToString("0"); break;
-                            //case LogObject.Position: Vector2 point = logic.Memory.Position(); current = $"{point.X:0}, {point.Y:0}"; break;
+                        //case LogObject.Position: Vector2 point = logic.Memory.Position(); current = $"{point.X:0}, {point.Y:0}"; break;
                     }
 
                     if (previous != current) {

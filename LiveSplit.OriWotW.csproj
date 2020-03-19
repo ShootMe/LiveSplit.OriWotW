@@ -53,6 +53,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiveSplit.Core">
       <HintPath>..\..\LiveSplit\LiveSplit.Core.dll</HintPath>
@@ -139,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Components\Updates.xml" />
+    <None Include="Resources\icon.ico" />
     <None Include="README.md" />
     <None Include="Resources\save.png" />
   </ItemGroup>
