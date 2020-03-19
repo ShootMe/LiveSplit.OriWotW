@@ -29,6 +29,8 @@ namespace LiveSplit.OriWotW {
         Shard,
         [Description("Spirit Trial")]
         SpiritTrial,
+        [Description("Teleporter")]
+        Teleporter,
         [Description("Wisp")]
         Wisp,
         [Description("World Event")]

@@ -23,6 +23,8 @@ namespace LiveSplit.OriWotW {
         WillowStoneStart,
         [Description("Willow Stone Defeated")]
         WillowStoneEnd,
+        [Description("Shriek Start")]
+        ShriekStart,
         [Description("Shriek Defeated")]
         ShriekDefeated
     }

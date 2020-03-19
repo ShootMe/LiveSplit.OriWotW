@@ -119,6 +119,9 @@ namespace LiveSplit.OriWotW {
                     case SplitType.SpiritTrial:
                         CheckSpiritTrial(split);
                         break;
+                    case SplitType.Teleporter:
+                        CheckTeleporter(split);
+                        break;
                     case SplitType.GameEnd:
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
                         break;
@@ -204,22 +207,22 @@ namespace LiveSplit.OriWotW {
         private void CheckSpiritTrial(Split split) {
             SplitSpiritTrial spiritTrial = Utility.GetEnumValue<SplitSpiritTrial>(split.Value);
             switch (spiritTrial) {
-                case SplitSpiritTrial.BaursReachActivate: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 1, 0); break;
-                case SplitSpiritTrial.BaursReachComplete: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 2, 1); break;
-                case SplitSpiritTrial.InkwaterMarshActivate: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 1, 0); break;
-                case SplitSpiritTrial.InkwaterMarshComplete: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 2, 1); break;
-                case SplitSpiritTrial.KwoloksHollowActivate: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 1, 0); break;
-                case SplitSpiritTrial.KwoloksHollowComplete: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 2, 1); break;
-                case SplitSpiritTrial.LumaPoolsActivate: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 1, 0); break;
-                case SplitSpiritTrial.LumaPoolsComplete: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 2, 1); break;
-                case SplitSpiritTrial.MouldwoodDepthsActivate: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 1, 0); break;
-                case SplitSpiritTrial.MouldwoodDepthsComplete: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 2, 1); break;
-                case SplitSpiritTrial.SilentWoodsActivate: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 1, 0); break;
-                case SplitSpiritTrial.SilentWoodsComplete: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 2, 1); break;
-                case SplitSpiritTrial.WellspringActivate: CheckUberIntValue(UberStateDefaults.wellspringRace, 1, 0); break;
-                case SplitSpiritTrial.WellspringComplete: CheckUberIntValue(UberStateDefaults.wellspringRace, 2, 1); break;
-                case SplitSpiritTrial.WindsweptWastesActivate: CheckUberIntValue(UberStateDefaults.desertRace, 1, 0); break;
-                case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2, 1); break;
+                case SplitSpiritTrial.BaursReachActivate: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 1); break;
+                case SplitSpiritTrial.BaursReachComplete: CheckUberIntValue(UberStateDefaults.baursReachWindTunnelRace, 2); break;
+                case SplitSpiritTrial.InkwaterMarshActivate: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 1); break;
+                case SplitSpiritTrial.InkwaterMarshComplete: CheckUberIntValue(UberStateDefaults.inkwaterMarshRace, 2); break;
+                case SplitSpiritTrial.KwoloksHollowActivate: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 1); break;
+                case SplitSpiritTrial.KwoloksHollowComplete: CheckUberIntValue(UberStateDefaults.kwolokDropRace, 2); break;
+                case SplitSpiritTrial.LumaPoolsActivate: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 1); break;
+                case SplitSpiritTrial.LumaPoolsComplete: CheckUberIntValue(UberStateDefaults.lumaPoolsRace, 2); break;
+                case SplitSpiritTrial.MouldwoodDepthsActivate: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 1); break;
+                case SplitSpiritTrial.MouldwoodDepthsComplete: CheckUberIntValue(UberStateDefaults.mouldwoodDepthsRace, 2); break;
+                case SplitSpiritTrial.SilentWoodsActivate: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 1); break;
+                case SplitSpiritTrial.SilentWoodsComplete: CheckUberIntValue(UberStateDefaults.silentWoodlandRace, 2); break;
+                case SplitSpiritTrial.WellspringActivate: CheckUberIntValue(UberStateDefaults.wellspringRace, 1); break;
+                case SplitSpiritTrial.WellspringComplete: CheckUberIntValue(UberStateDefaults.wellspringRace, 2); break;
+                case SplitSpiritTrial.WindsweptWastesActivate: CheckUberIntValue(UberStateDefaults.desertRace, 1); break;
+                case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2); break;
             }
         }
         private void CheckBoss(Split split) {
@@ -236,7 +239,47 @@ namespace LiveSplit.OriWotW {
                 case SplitBoss.WeepingRidgeElevatorFight: CheckUberBoolValue(UberStateDefaults.elevatorCompleteState); break;
                 case SplitBoss.WillowStoneStart: CheckUberIntValue(UberStateDefaults.laserShooterBossState, 1); break;
                 case SplitBoss.WillowStoneEnd: CheckUberIntValue(UberStateDefaults.laserShooterBossState, 4); break;
+                case SplitBoss.ShriekStart: CheckUberIntValue(UberStateDefaults.petrifiedOwlBossState, 1); break;
                 case SplitBoss.ShriekDefeated: CheckUberIntValue(UberStateDefaults.petrifiedOwlBossState, 5); break;
+            }
+        }
+        private void CheckTeleporter(Split split) {
+            SplitTeleporter teleporter = Utility.GetEnumValue<SplitTeleporter>(split.Value);
+            switch (teleporter) {
+                case SplitTeleporter.HowlsDenActivated: CheckUberBoolValue(UberStateDefaults.savePedestalHowlsDen); break;
+                case SplitTeleporter.HowlsDenTeleported: CheckScene(true, "howlsDenSaveRoom"); break;
+                case SplitTeleporter.InkwaterMarshActivated: CheckUberBoolValue(UberStateDefaults.savePedestalInkwaterMarsh); break;
+                case SplitTeleporter.InkwaterMarshTeleported: CheckScene(true, "swampIntroTop"); break;
+                case SplitTeleporter.KwoloksHollowActivated: CheckUberBoolValue(UberStateDefaults.savePedestalKwoloksHollow); break;
+                case SplitTeleporter.KwoloksHollowTeleported: CheckScene(true, "kwoloksCavernSaveRoomA"); break;
+                case SplitTeleporter.LumaPoolsAActivated: CheckUberBoolValue(UberStateDefaults.savePedestalLumaPoolsA); break;
+                case SplitTeleporter.LumaPoolsATeleported: CheckScene(true, "lumaPoolsSaveRoom"); break;
+                case SplitTeleporter.LumaPoolsBActivated: CheckUberBoolValue(UberStateDefaults.savePedestalLumaPoolsB); break;
+                case SplitTeleporter.LumaPoolsBTeleported: CheckScene(true, "lumaPoolsSaveRoomB"); break;
+                case SplitTeleporter.MidnightBurrowsActivated: CheckUberBoolValue(UberStateDefaults.savePedestalMidnightBurrows); break;
+                case SplitTeleporter.MidnightBurrowsTeleported: CheckScene(true, "howlsOriginA"); break;
+                case SplitTeleporter.MouldwoodDepthsActivated: CheckUberBoolValue(UberStateDefaults.savePedestalMouldwood); break;
+                case SplitTeleporter.MouldwoodDepthsTeleported: CheckScene(true, "mouldwoodDepthsF"); break;
+                case SplitTeleporter.SilentWoodsAActivated: CheckUberBoolValue(UberStateDefaults.savePedestalSilentWoodsA); break;
+                case SplitTeleporter.SilentWoodsATeleported: CheckScene(true, "petrifiedForestTarBubbleChallenge"); break;
+                case SplitTeleporter.SilentWoodsBActivated: CheckUberBoolValue(UberStateDefaults.savePedestalSilentWoodsB); break;
+                case SplitTeleporter.SilentWoodsBTeleported: CheckScene(true, "petrifiedForestTandemWindChaseA"); break;
+                case SplitTeleporter.WellspringActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWellspring); break;
+                case SplitTeleporter.WellspringTeleported: CheckScene(true, "waterMillCEntrance"); break;
+                case SplitTeleporter.WellspringGladesActivated: CheckUberIntValue(UberStateDefaults.builderProjectSpiritWell, 3); break;
+                case SplitTeleporter.WellspringGladesTeleported: CheckScene(true, "wellspringGladesHub"); break;
+                case SplitTeleporter.WillowsEndActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWillowsEnd); break;
+                case SplitTeleporter.WillowsEndTeleported: CheckScene(true, "willowsEndSaveRoom"); break;
+                case SplitTeleporter.WillowsEndShriekActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWillowsEndShriek); break;
+                case SplitTeleporter.WillowsEndShreikTeleported: CheckScene(true, "willowCeremonyIntro"); break;
+                case SplitTeleporter.WindsweptWastesAActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWindsweptWastesA); break;
+                case SplitTeleporter.WindsweptWastesATeleported: CheckScene(true, "petrifiedOwlFeedingGroundsRevised"); break;
+                case SplitTeleporter.WindsweptWastesBActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWindsweptWastesB); break;
+                case SplitTeleporter.WindsweptWastesBTeleported: CheckScene(true, "e3DesertI__clone0"); break;
+                case SplitTeleporter.WindtornRuinsEntranceActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWindtornRuinsA); break;
+                case SplitTeleporter.WindtornRuinsEntranceTeleported: CheckScene(true, "desertRuinsTowerSaveRoom"); break;
+                case SplitTeleporter.WindtornRuinsBossActivated: CheckUberBoolValue(UberStateDefaults.savePedestalWindtornRuinsB); break;
+                case SplitTeleporter.WindtornRuinsBossTeleported: CheckScene(true, "windtornRuinsC"); break;
             }
         }
         private void CheckWorldEvent(Split split) {

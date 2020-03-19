@@ -76,6 +76,9 @@ namespace LiveSplit.OriWotW {
                 $"DC: {DifficultyController.GetPointer(Program)} "
             );
         }
+        public string Patches() {
+            return "NoPause: " + (!noPausePatched.HasValue ? "No Value" : noPausePatched.ToString()) + " FPS: " + (!targetFrameRatePatched.HasValue ? "No Value" : targetFrameRatePatched.ToString());
+        }
         public void PatchNoPause(bool patch) {
             if (!noPausePatched.HasValue || patch != noPausePatched.Value) {
                 if (NoPausePatch.GetPointer(Program) == IntPtr.Zero) { return; }

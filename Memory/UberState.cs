@@ -49,6 +49,24 @@ namespace LiveSplit.OriWotW {
         public static UberState kwolokBossState = new UberState() { Name = "kwolokBossState", ID = 58403, GroupName = "lagoonStateGroup", GroupID = 945, Type = UberStateType.SerializedByteUberState };
         public static UberState spiderBossState = new UberState() { Name = "spiderBossState", ID = 26713, GroupName = "mouldwoodDepthsGroup", GroupID = 18793, Type = UberStateType.SerializedIntUberState };
         public static UberState laserShooterBossState = new UberState() { Name = "laserShooterBossState", ID = 12971, GroupName = "willowsEndGroup", GroupID = 16155, Type = UberStateType.SerializedIntUberState };
+        public static UberState savePedestalMidnightBurrows = new UberState() { Name = "howlOriginEntranceSavePedestal", ID = 42531, GroupName = "howlsOriginGroup", GroupID = 24922, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalInkwaterMarsh = new UberState() { Name = "savePedestalSwampIntroTop", ID = 10185, GroupName = "swampStateGroup", GroupID = 21786, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalHowlsDen = new UberState() { Name = "savePedestal", ID = 61594, GroupName = "howlsDenGRoup", GroupID = 11666, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalLumaPoolsA = new UberState() { Name = "savePedestalUberState", ID = 58183, GroupName = "lagoonStateGroup", GroupID = 945, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalLumaPoolsB = new UberState() { Name = "savePedestalUberState", ID = 1370, GroupName = "lagoonStateGroup", GroupID = 945, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWellspring = new UberState() { Name = "savePedestalUberState", ID = 18181, GroupName = "wellspringGroupDescriptor", GroupID = 53632, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalBaursReach = new UberState() { Name = "savePedestalUberState", ID = 54235, GroupName = "baursReachGroup", GroupID = 28895, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalKwoloksHollow = new UberState() { Name = "savePedestal", ID = 26601, GroupName = "kwolokGroupDescriptor", GroupID = 937, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalMouldwood = new UberState() { Name = "savePedestalUberState", ID = 38871, GroupName = "mouldwoodDepthsGroup", GroupID = 18793, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWillowsEnd = new UberState() { Name = "savePedestalUberState", ID = 41465, GroupName = "willowsEndGroup", GroupID = 16155, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWillowsEndShriek = new UberState() { Name = "savePedestalUberState", ID = 50867, GroupName = "willowsEndGroup", GroupID = 16155, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalSilentWoodsA = new UberState() { Name = "savePedestalUberState", ID = 7071, GroupName = "_petrifiedForestGroup", GroupID = 58674, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalSilentWoodsB = new UberState() { Name = "savePedestalA", ID = 1965, GroupName = "_petrifiedForestGroup", GroupID = 58674, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWindsweptWastesA = new UberState() { Name = "savePedestalUberState", ID = 10029, GroupName = "_petrifiedForestGroup", GroupID = 58674, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWindsweptWastesB = new UberState() { Name = "savePedestal", ID = 26601, GroupName = "kwolokGroupDescriptor", GroupID = 937, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWindtornRuinsA = new UberState() { Name = "savePedestalUberState", ID = 41398, GroupName = "windsweptWastesGroupDescriptor", GroupID = 20120, Type = UberStateType.SavePedestalUberState };
+        public static UberState savePedestalWindtornRuinsB = new UberState() { Name = "savePedestalUberState", ID = 4928, GroupName = "windtornRuinsGroup", GroupID = 10289, Type = UberStateType.SavePedestalUberState };
+        public static UberState builderProjectSpiritWell = new UberState() { Name = "builderProjectSpiritWell", ID = 16825, GroupName = "hubUberStateGroup", GroupID = 42178, Type = UberStateType.SerializedByteUberState };
     }
     public class UberState {
         public UberStateType Type;
