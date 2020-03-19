@@ -13,13 +13,16 @@ namespace LiveSplit.OriWotW {
         private int lastIntValue;
         private string lastStrValue;
         private Screen lastScreen;
+        private DateTime splitLate;
 
         public LogicManager(SplitterSettings settings) {
             Memory = new MemoryManager();
             Settings = settings;
+            splitLate = DateTime.MaxValue;
         }
 
         public void Reset() {
+            splitLate = DateTime.MaxValue;
             Paused = false;
             Running = false;
             CurrentSplit = 0;
@@ -29,10 +32,12 @@ namespace LiveSplit.OriWotW {
         }
         public void Decrement() {
             CurrentSplit--;
+            splitLate = DateTime.MaxValue;
             InitializeSplit();
         }
         public void Increment() {
             Running = true;
+            splitLate = DateTime.MaxValue;
             CurrentSplit++;
             InitializeSplit();
         }
@@ -184,6 +189,9 @@ namespace LiveSplit.OriWotW {
 
                 if (state != GameState.Game || Memory.Dead() || (Paused && state != GameState.Game)) {
                     ShouldSplit = false;
+                } else if (DateTime.Now > splitLate) {
+                    ShouldSplit = true;
+                    splitLate = DateTime.MaxValue;
                 }
             }
         }
@@ -237,7 +245,15 @@ namespace LiveSplit.OriWotW {
                 case SplitWorldEvent.FindKu: CheckAbility(AbilityType.Flap); break;
                 case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
                 case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
-                case SplitWorldEvent.SoSoggy: CheckUberIntValue(UberStateDefaults.cleanseWellspringQuestUberState, 3); break;
+                case SplitWorldEvent.SoSoggy:
+                    if (splitLate == DateTime.MaxValue) {
+                        CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape);
+                        if (ShouldSplit) {
+                            splitLate = DateTime.Now.AddSeconds(42.2);
+                            ShouldSplit = false;
+                        }
+                    }
+                    break;
                 case SplitWorldEvent.SilentWoodsShriekCutscene: CheckUberBoolValue(UberStateDefaults.petrifiedForestNewTransitionOriVignettePlayed); break;
             }
         }
