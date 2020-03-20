@@ -442,7 +442,7 @@ namespace LiveSplit.OriWotW {
         }
         public bool IsLoadingGame() {
             //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
-            return fpsTimer.FPSShort == 0 || GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
+            return (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0) || GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
         }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
