@@ -62,7 +62,7 @@ namespace LiveSplit.OriWotW {
         public DateTime LastHooked { get; set; }
         private bool? noPausePatched = null;
         private bool? targetFrameRatePatched = null;
-        private FPSTimer fpsTimer = new FPSTimer();
+        private FPSTimer fpsTimer = new FPSTimer(200, 15);
 
         public MemoryManager() {
             LastHooked = DateTime.MinValue;
