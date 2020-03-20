@@ -177,13 +177,13 @@ namespace LiveSplit.OriWotW {
                         lastIntValue = health;
                         break;
                     case SplitType.EnergyCell:
-                        Memory.UpdateUberState(UberStateDefaults.healthContainersCounter);
+                        Memory.UpdateUberState(UberStateDefaults.energyContainersCounter);
                         Memory.UpdateUberState(UberStateDefaults.wispRewardPickupKwolok);
                         Memory.UpdateUberState(UberStateDefaults.wispRewardPickupMouldwood);
                         Memory.UpdateUberState(UberStateDefaults.wispRewardPickupWindtorn);
                         Memory.UpdateUberState(UberStateDefaults.wispRewardPickupBaur);
                         Memory.UpdateUberState(UberStateDefaults.wispRewardPickupLagoon);
-                        int energy = UberStateDefaults.healthContainersCounter.Value.Int - (UberStateDefaults.wispRewardPickupKwolok.Value.Bool ? 2 : 0);
+                        int energy = UberStateDefaults.energyContainersCounter.Value.Int - (UberStateDefaults.wispRewardPickupKwolok.Value.Bool ? 2 : 0);
                         energy -= (UberStateDefaults.wispRewardPickupMouldwood.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupWindtorn.Value.Bool ? 2 : 0);
                         energy -= (UberStateDefaults.wispRewardPickupBaur.Value.Bool ? 2 : 0) + (UberStateDefaults.wispRewardPickupLagoon.Value.Bool ? 2 : 0);
                         int splitEnergy = -1;
