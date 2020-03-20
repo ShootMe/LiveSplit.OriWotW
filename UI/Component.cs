@@ -21,6 +21,7 @@ namespace LiveSplit.OriWotW {
         private bool isAutosplitting = false;
         private TextComponent infoComponent;
         private DateTime lastInfoCheck = DateTime.MinValue;
+#if !Manager
         public static void Main(string[] args) {
             Component component = new Component(null);
             component.log.EnableLogging = true;
@@ -28,6 +29,7 @@ namespace LiveSplit.OriWotW {
             component.userSettings.Settings.FPSLock = false;
             Application.Run();
         }
+#endif
         public Component(LiveSplitState state) {
             log = new LogManager();
             userSettings = new UserSettings(state, log);
