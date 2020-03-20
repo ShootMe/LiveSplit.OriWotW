@@ -5,7 +5,7 @@ namespace LiveSplit.OriWotW {
         private Stopwatch frameTimer = new Stopwatch();
         private int lastFrameCount = 0;
         public void Update(int frameCount) {
-            if (frameCount - lastFrameCount >= 20) {
+            if (frameCount - lastFrameCount >= 30) {
                 frameTimer.Stop();
 
                 FPS = (float)((double)10000000 * (double)(frameCount - lastFrameCount) / (double)frameTimer.ElapsedTicks);
