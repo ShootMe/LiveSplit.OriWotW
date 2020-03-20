@@ -295,7 +295,7 @@ namespace LiveSplit.OriWotW {
                     if (splitLate == DateTime.MaxValue) {
                         CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape);
                         if (ShouldSplit) {
-                            splitLate = DateTime.Now.AddSeconds(42.2);
+                            splitLate = DateTime.Now.AddSeconds(41.3);
                             ShouldSplit = false;
                         }
                     }
