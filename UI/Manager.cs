@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 namespace LiveSplit.OriWotW {
@@ -24,6 +25,7 @@ namespace LiveSplit.OriWotW {
             InitializeComponent();
             Memory = new MemoryManager();
             StartUpdateLoop();
+            Text = "Ori WotW " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
         }
         public void StartUpdateLoop() {
             if (timerLoop != null) { return; }
@@ -69,17 +71,18 @@ namespace LiveSplit.OriWotW {
             lblPos.Text = $"Pos: {position}";
             lblSpeed.Text = $"Speed: {speed} ({!speed:0.00})";
 
-
             if (gameState == GameState.Game) {
                 lblHP.Text = $"HP: {stats.Health:0} / {stats.MaxHealth}";
                 lblEN.Text = $"EN: {stats.Energy:0.0} / {stats.MaxEnergy:0}";
                 lblOre.Text = $"Ore: {Memory.Ore()}";
                 lblKeys.Text = $"Keys: {Memory.Keystones()}";
+                lblSaved.Text = $"Save: {stats}";
             } else {
                 lblHP.Text = "HP: N/A";
                 lblEN.Text = "EN: N/A";
                 lblOre.Text = "Ore: N/A";
                 lblKeys.Text = "Keys: N/A";
+                lblSaved.Text = "Save: N/A";
             }
         }
         private void Manager_KeyDown(object sender, KeyEventArgs e) {

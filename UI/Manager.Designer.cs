@@ -33,6 +33,7 @@
             this.lblPos = new System.Windows.Forms.Label();
             this.lblMap = new System.Windows.Forms.Label();
             this.lblScene = new System.Windows.Forms.Label();
+            this.lblSaved = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblNote
@@ -41,7 +42,7 @@
             this.lblNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNote.Location = new System.Drawing.Point(0, 0);
             this.lblNote.Name = "lblNote";
-            this.lblNote.Size = new System.Drawing.Size(371, 154);
+            this.lblNote.Size = new System.Drawing.Size(371, 173);
             this.lblNote.TabIndex = 15;
             this.lblNote.Text = "Not available";
             this.lblNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -136,13 +137,24 @@
             this.lblScene.TabIndex = 26;
             this.lblScene.Text = "Scene:";
             // 
+            // lblSaved
+            // 
+            this.lblSaved.AutoSize = true;
+            this.lblSaved.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSaved.Location = new System.Drawing.Point(7, 147);
+            this.lblSaved.Name = "lblSaved";
+            this.lblSaved.Size = new System.Drawing.Size(79, 20);
+            this.lblSaved.TabIndex = 27;
+            this.lblSaved.Text = "Save: N/A";
+            // 
             // Manager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(371, 154);
+            this.ClientSize = new System.Drawing.Size(371, 173);
             this.Controls.Add(this.lblNote);
+            this.Controls.Add(this.lblSaved);
             this.Controls.Add(this.lblScene);
             this.Controls.Add(this.lblKeys);
             this.Controls.Add(this.lblSpeed);
@@ -178,5 +190,6 @@
         private System.Windows.Forms.Label lblPos;
         private System.Windows.Forms.Label lblMap;
         private System.Windows.Forms.Label lblScene;
+        private System.Windows.Forms.Label lblSaved;
     }
 }
