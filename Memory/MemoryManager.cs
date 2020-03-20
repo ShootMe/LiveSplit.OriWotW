@@ -78,7 +78,8 @@ namespace LiveSplit.OriWotW {
                 $"SM: {ScenesManager.GetPointer(Program)} ",
                 $"USC: {UberStateController.GetPointer(Program)} ",
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
-                $"DC: {DifficultyController.GetPointer(Program)} "
+                $"DC: {DifficultyController.GetPointer(Program)} ",
+                $"FC: {FrameCounter.GetPointer(Program)} "
             );
         }
         public string Patches() {
@@ -113,8 +114,8 @@ namespace LiveSplit.OriWotW {
         public int FrameCount() {
             return FrameCounter.Read<int>(Program, 0xb8, 0x0);
         }
-        public float FPS() {
-            return (float)fpsTimer.FPS;
+        public string FPS() {
+            return $"{fpsTimer.FPS:0.0}";
         }
         public int Difficulty() {
             //DifficultyController.Instance.Difficulty
@@ -441,7 +442,7 @@ namespace LiveSplit.OriWotW {
         }
         public bool IsLoadingGame() {
             //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
-            return GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
+            return fpsTimer.FPSShort == 0 || GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, 0x103);
         }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
@@ -467,11 +468,14 @@ namespace LiveSplit.OriWotW {
                     noPausePatched = null;
                     targetFrameRatePatched = null;
                     IsHooked = true;
+                    fpsTimer.Reset();
                 }
             }
 
             if (IsHooked) {
                 fpsTimer.Update(FrameCount());
+            } else {
+                fpsTimer.Update(1);
             }
             return IsHooked;
         }

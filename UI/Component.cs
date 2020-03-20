@@ -153,7 +153,7 @@ namespace LiveSplit.OriWotW {
             }
 
             if (infoComponent != null) {
-                string fps = logic.Memory.FPS().ToString("0.0");
+                string fps = logic.Memory.FPS();
                 if (fps != infoComponent.Settings.Text2) {
                     infoComponent.Settings.Text2 = fps;
                 }
