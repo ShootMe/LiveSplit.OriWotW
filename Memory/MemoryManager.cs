@@ -61,6 +61,9 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7a),
             new FindPointerSignature(PointerVersion.V1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C8938488B0D????????F6812701000002740E83B9D8000000007505E8", 0x14)
         );
+        private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e)
+        );
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
@@ -94,6 +97,8 @@ namespace LiveSplit.OriWotW {
             return CheatsHandler.Read<bool>(Program, 0xb8, 0x8);
         }
         public void EnableDebug(bool enable) {
+            DebugControls.Write<bool>(Program, enable, 0xb8, 0x8);
+            CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, 0x20);
             CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
         }
         public string Patches() {
@@ -134,8 +139,8 @@ namespace LiveSplit.OriWotW {
         public int FrameCount() {
             return FrameCounter.Read<int>(Program, 0xb8, 0x0);
         }
-        public string FPS() {
-            return $"{fpsTimer.FPS:0.0}";
+        public float FPS() {
+            return fpsTimer.FPS;
         }
         public int Difficulty() {
             //DifficultyController.Instance.Difficulty

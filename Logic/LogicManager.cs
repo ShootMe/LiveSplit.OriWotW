@@ -44,7 +44,7 @@ namespace LiveSplit.OriWotW {
         private void InitializeSplit() {
             if (CurrentSplit < Settings.Autosplits.Count) {
                 bool temp = ShouldSplit;
-                CheckSplit(Settings.Autosplits[CurrentSplit]);
+                CheckSplit(Settings.Autosplits[CurrentSplit], true);
                 ShouldSplit = temp;
             }
         }
@@ -60,7 +60,7 @@ namespace LiveSplit.OriWotW {
             Memory.PatchNoPause(Settings.NoPause);
             Memory.PatchFPSLock(Settings.FPSLock);
             if (CurrentSplit < Settings.Autosplits.Count) {
-                CheckSplit(Settings.Autosplits[CurrentSplit]);
+                CheckSplit(Settings.Autosplits[CurrentSplit], false);
                 if (!Running) {
                     Paused = true;
                     if (ShouldSplit) {
@@ -73,7 +73,7 @@ namespace LiveSplit.OriWotW {
                 }
             }
         }
-        private void CheckSplit(Split split) {
+        private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
             if (split.Type == SplitType.GameStart) {
                 Screen screen = Memory.TitleScreen();
@@ -89,6 +89,10 @@ namespace LiveSplit.OriWotW {
             } else {
                 ShouldSplit = false;
                 Paused = Memory.IsLoadingGame();
+
+                if (!updateValues && (state != GameState.Game || Memory.Dead() || (Paused && state != GameState.Game))) {
+                    return;
+                }
 
                 switch (split.Type) {
                     case SplitType.ManualSplit:

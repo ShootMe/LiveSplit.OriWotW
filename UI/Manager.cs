@@ -8,9 +8,10 @@ namespace LiveSplit.OriWotW {
         public MemoryManager Memory { get; set; }
         private Thread timerLoop;
         private bool useLivesplitColors = true;
-        private Vector2 lastPosition;
+        private Vector2 lastPosition, lastSpeed;
         private bool noPause = false;
         private bool fpsLock = false;
+        private int lastFrameCount;
 #if Manager
         public static void Main(string[] args) {
             try {
@@ -57,8 +58,15 @@ namespace LiveSplit.OriWotW {
             if (this.InvokeRequired) { this.Invoke((Action)UpdateValues); return; }
 
             GameState gameState = Memory.GameState();
+            float FPS = Memory.FPS();
+            int frameCount = Memory.FrameCount();
             Vector2 position = Memory.Position();
-            Vector2 speed = (position - lastPosition) * 120;
+            Vector2 speed = lastSpeed;
+            if (frameCount != lastFrameCount) {
+                speed = (position - lastPosition) * FPS;
+                lastFrameCount = frameCount;
+                lastSpeed = speed;
+            }
             lastPosition = position;
             Stats stats = Memory.PlayerStats();
             AreaType area = Memory.PlayerArea();
@@ -78,7 +86,7 @@ namespace LiveSplit.OriWotW {
             fpsLock = Memory.FPSLockEnabled();
             string fpsLockEnabled = fpsLock ? "On" : "Off";
             lblExtra.Text = $"Debug: {debugEnabled}  NoPause: {noPuaseEnabled} FPS Lock: {fpsLockEnabled}";
-            lblFPS.Text = $"FPS: {Memory.FPS()}";
+            lblFPS.Text = $"FPS: {FPS:0.0}";
 
             if (gameState == GameState.Game) {
                 lblHP.Text = $"HP: {stats.Health:0} / {stats.MaxHealth}";
