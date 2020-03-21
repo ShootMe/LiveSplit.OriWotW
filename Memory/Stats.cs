@@ -26,7 +26,7 @@ namespace LiveSplit.OriWotW {
         public bool CompletedWithEverything;
 
         public override string ToString() {
-            return $"{Hours:00}:{Minutes:00}:{Seconds} Completion: {Completed} {Completion}%";
+            return $"{Hours:00}:{Minutes:00}:{Seconds} Completion: {Completion}%";
         }
     }
 }
