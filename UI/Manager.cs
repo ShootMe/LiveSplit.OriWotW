@@ -9,6 +9,8 @@ namespace LiveSplit.OriWotW {
         private Thread timerLoop;
         private bool useLivesplitColors = true;
         private Vector2 lastPosition;
+        private bool noPause = false;
+        private bool fpsLock = false;
 #if Manager
         public static void Main(string[] args) {
             try {
@@ -70,6 +72,13 @@ namespace LiveSplit.OriWotW {
             lblScene.Text = $"Scene: {scene}";
             lblPos.Text = $"Pos: {position}";
             lblSpeed.Text = $"Speed: {speed} ({!speed:0.00})";
+            string debugEnabled = Memory.DebugEnabled() ? "On" : "Off";
+            noPause = Memory.NoPauseEnabled();
+            string noPuaseEnabled = noPause ? "On" : "Off";
+            fpsLock = Memory.FPSLockEnabled();
+            string fpsLockEnabled = fpsLock ? "On" : "Off";
+            lblExtra.Text = $"Debug: {debugEnabled}  NoPause: {noPuaseEnabled} FPS Lock: {fpsLockEnabled}";
+            lblFPS.Text = $"FPS: {Memory.FPS()}";
 
             if (gameState == GameState.Game) {
                 lblHP.Text = $"HP: {stats.Health:0} / {stats.MaxHealth}";
@@ -86,7 +95,9 @@ namespace LiveSplit.OriWotW {
             }
         }
         private void Manager_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Control && e.KeyCode == Keys.L) {
+            if (!e.Control) { return; }
+
+            if (e.KeyCode == Keys.L) {
                 useLivesplitColors = !useLivesplitColors;
                 if (useLivesplitColors) {
                     this.BackColor = Color.White;
@@ -95,6 +106,12 @@ namespace LiveSplit.OriWotW {
                     this.BackColor = Color.Black;
                     this.ForeColor = Color.White;
                 }
+            } else if (e.KeyCode == Keys.D) {
+                Memory.EnableDebug(!Memory.DebugEnabled());
+            } else if (e.KeyCode == Keys.F) {
+                Memory.PatchFPSLock(!fpsLock);
+            } else if (e.KeyCode == Keys.N) {
+                Memory.PatchNoPause(!noPause);
             }
         }
     }

@@ -57,6 +57,10 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
             new FindPointerSignature(PointerVersion.V1, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a)
         );
+        private static ProgramPointer CheatsHandler = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7a),
+            new FindPointerSignature(PointerVersion.V1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C8938488B0D????????F6812701000002740E83B9D8000000007505E8", 0x14)
+        );
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
@@ -79,11 +83,21 @@ namespace LiveSplit.OriWotW {
                 $"USC: {UberStateController.GetPointer(Program)} ",
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
                 $"DC: {DifficultyController.GetPointer(Program)} ",
-                $"FC: {FrameCounter.GetPointer(Program)} "
+                $"FC: {FrameCounter.GetPointer(Program)} ",
+                $"CH: {CheatsHandler.GetPointer(Program)} "
             );
+        }
+        public bool DebugEnabled() {
+            return CheatsHandler.Read<bool>(Program, 0xb8, 0x8);
+        }
+        public void EnableDebug(bool enable) {
+            CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
         }
         public string Patches() {
             return "NoPause: " + (!noPausePatched.HasValue ? "No Value" : noPausePatched.ToString()) + " FPS: " + (!targetFrameRatePatched.HasValue ? "No Value" : targetFrameRatePatched.ToString());
+        }
+        public bool NoPauseEnabled() {
+            return NoPausePatch.Read<int>(Program) == 0x4890C5FF;
         }
         public void PatchNoPause(bool patch) {
             if (!noPausePatched.HasValue || patch != noPausePatched.Value) {
@@ -97,7 +111,10 @@ namespace LiveSplit.OriWotW {
                 noPausePatched = patch;
             }
         }
-        public void PatchTargetFrameRate(bool patch) {
+        public bool FPSLockEnabled() {
+            return VSyncPatch.Read<uint>(Program) == 0x90C3C033;
+        }
+        public void PatchFPSLock(bool patch) {
             if (!targetFrameRatePatched.HasValue || patch != targetFrameRatePatched.Value) {
                 if (TargetFrameRatePatch.GetPointer(Program) == IntPtr.Zero) { return; }
 

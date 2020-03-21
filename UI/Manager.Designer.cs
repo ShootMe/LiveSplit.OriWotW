@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.lblNote = new System.Windows.Forms.Label();
             this.lblKeys = new System.Windows.Forms.Label();
             this.lblSpeed = new System.Windows.Forms.Label();
@@ -34,6 +35,9 @@
             this.lblMap = new System.Windows.Forms.Label();
             this.lblScene = new System.Windows.Forms.Label();
             this.lblSaved = new System.Windows.Forms.Label();
+            this.lblFPS = new System.Windows.Forms.Label();
+            this.lblExtra = new System.Windows.Forms.Label();
+            this.tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // lblNote
@@ -42,7 +46,7 @@
             this.lblNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNote.Location = new System.Drawing.Point(0, 0);
             this.lblNote.Name = "lblNote";
-            this.lblNote.Size = new System.Drawing.Size(371, 173);
+            this.lblNote.Size = new System.Drawing.Size(371, 194);
             this.lblNote.TabIndex = 15;
             this.lblNote.Text = "Not available";
             this.lblNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -147,13 +151,36 @@
             this.lblSaved.TabIndex = 27;
             this.lblSaved.Text = "Save: N/A";
             // 
+            // lblFPS
+            // 
+            this.lblFPS.AutoSize = true;
+            this.lblFPS.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFPS.Location = new System.Drawing.Point(281, 7);
+            this.lblFPS.Name = "lblFPS";
+            this.lblFPS.Size = new System.Drawing.Size(70, 20);
+            this.lblFPS.TabIndex = 28;
+            this.lblFPS.Text = "FPS: 0.0";
+            // 
+            // lblExtra
+            // 
+            this.lblExtra.AutoSize = true;
+            this.lblExtra.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblExtra.Location = new System.Drawing.Point(7, 167);
+            this.lblExtra.Name = "lblExtra";
+            this.lblExtra.Size = new System.Drawing.Size(309, 20);
+            this.lblExtra.TabIndex = 29;
+            this.lblExtra.Text = "Debug: Off   No Pause: Off   FPS Lock: Off";
+            this.tooltips.SetToolTip(this.lblExtra, "Ctrl+D Debug\r\nCtrl+N NoPause\r\nCtrl+F Lock FPS");
+            // 
             // Manager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(371, 173);
+            this.ClientSize = new System.Drawing.Size(371, 194);
             this.Controls.Add(this.lblNote);
+            this.Controls.Add(this.lblExtra);
+            this.Controls.Add(this.lblFPS);
             this.Controls.Add(this.lblSaved);
             this.Controls.Add(this.lblScene);
             this.Controls.Add(this.lblKeys);
@@ -191,5 +218,8 @@
         private System.Windows.Forms.Label lblMap;
         private System.Windows.Forms.Label lblScene;
         private System.Windows.Forms.Label lblSaved;
+        private System.Windows.Forms.Label lblFPS;
+        private System.Windows.Forms.Label lblExtra;
+        private System.Windows.Forms.ToolTip tooltips;
     }
 }
