@@ -48,7 +48,7 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.V1, AutoDeref.None, "4C8BDC565741564883EC5049C743C8FEFFFFFF49895B1049896B18??????488BF14533F6443835????????754B488B05????????4C6380C0000000488B05????????418B8C00????????418B9400????????4D8973D04D8973D84D8973E04D8D43D0E8????????9033C9FF15????????90C605????????0180BE????????000F85????????4084ED0F85????????33C9E8????????4885C00F84????????33D2488BC8E8????????84C07561", 0x1b)
         );
         private static ProgramPointer TargetFrameRatePatch = new ProgramPointer("UnityPlayer.dll",
-            new FindPointerSignature(PointerVersion.V1, AutoDeref.None, "660F6EC30F5BC0F30F5EC8EB??8BDE??????????660F6EC80F5BC90F57C00F297424300F2FC1720A", 0xf)
+            new FindPointerSignature(PointerVersion.V1, AutoDeref.None, "660F6EC30F5BC0F30F5EC8????8BDE??????????660F6EC80F5BC90F57C00F297424300F2FC1720A", 0xb)
         );
         private static ProgramPointer VSyncPatch = new ProgramPointer("UnityPlayer.dll",
             new FindPointerSignature(PointerVersion.V1, AutoDeref.None, "E8????????4863484C488B4030488D148948C1E2058B4402684883C428C3", -0x4)
@@ -84,7 +84,10 @@ namespace LiveSplit.OriWotW {
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
                 $"DC: {DifficultyController.GetPointer(Program)} ",
                 $"FC: {FrameCounter.GetPointer(Program)} ",
-                $"CH: {CheatsHandler.GetPointer(Program)} "
+                $"CH: {CheatsHandler.GetPointer(Program)} ",
+                $"TFR: {TargetFrameRatePatch.GetPointer(Program)} ",
+                $"VS: {VSyncPatch.GetPointer(Program)} ",
+                $"NP: {NoPausePatch.GetPointer(Program)} "
             );
         }
         public bool DebugEnabled() {
@@ -119,10 +122,10 @@ namespace LiveSplit.OriWotW {
                 if (TargetFrameRatePatch.GetPointer(Program) == IntPtr.Zero) { return; }
 
                 if (patch) {
-                    TargetFrameRatePatch.Write(Program, new byte[] { 0xB8, 0x3C, 0x00, 0x00, 0x00 });
+                    TargetFrameRatePatch.Write(Program, new byte[] { 0x90, 0x90, 0x8B, 0xDE, 0xB8, 0x3C, 0x00, 0x00, 0x00 });
                     VSyncPatch.Write(Program, new byte[] { 0x33, 0xC0, 0xC3, 0x90 });
                 } else {
-                    TargetFrameRatePatch.Write(Program, new byte[] { 0xE8, 0xE7, 0x1E, 0xFF, 0xFF });
+                    TargetFrameRatePatch.Write(Program, new byte[] { 0xEB, 0x0E, 0x8B, 0xDE, 0xE8, 0xE7, 0x1E, 0xFF, 0xFF });
                     VSyncPatch.Write(Program, new byte[] { 0x48, 0x83, 0xEC, 0x28 });
                 }
                 targetFrameRatePatched = patch;
