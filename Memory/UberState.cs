@@ -14,6 +14,9 @@ namespace LiveSplit.OriWotW {
         PlayerUberStateDescriptor
     }
     public static class UberStateDefaults {
+        public static UberState winterForestWispQuestUberState = new UberState() { Name = "winterForestWispQuestUberState", ID = 8973, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedIntUberState };
+        public static UberState watermillEscapeState = new UberState() { Name = "watermillEscapeState", ID = 10720, GroupName = "waterMillStateGroupDescriptor", GroupID = 37858, Type = UberStateType.SerializedIntUberState };
+        public static UberState desertRuinsEscape = new UberState() { Name = "desertRuinsEscape", ID = 19890, GroupName = "windtornRuinsGroup", GroupID = 10289, Type = UberStateType.SerializedIntUberState };
         public static UberState cleanseWellspringQuestUberState = new UberState() { Name = "cleanseWellspringQuestUberState", ID = 34641, GroupName = "kwolokGroupDescriptor", GroupID = 937, Type = UberStateType.SerializedIntUberState };
         public static UberState finishedWatermillEscape = new UberState() { Name = "finishedWatermillEscape", ID = 12379, GroupName = "waterMillStateGroupDescriptor", GroupID = 37858, Type = UberStateType.SerializedBooleanUberState };
         public static UberState nightCrawlerChaseStarted = new UberState() { Name = "nightCrawlerChaseStarted", ID = 30656, GroupName = "swampStateGroup", GroupID = 21786, Type = UberStateType.SerializedBooleanUberState };

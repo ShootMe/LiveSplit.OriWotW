@@ -290,6 +290,11 @@ namespace LiveSplit.OriWotW {
             switch (worldEvent) {
                 case SplitWorldEvent.FindKu: CheckAbility(AbilityType.Flap); break;
                 case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
+                case SplitWorldEvent.DesertEscapeStart: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 1); break;
+                case SplitWorldEvent.DesertEscapeEnd: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 3); break;
+                case SplitWorldEvent.WinterForestEscapeStart: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 2); break;
+                case SplitWorldEvent.WinterForestEscapeEnd: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 3); break;
+                case SplitWorldEvent.WaterEscapeStart: CheckUberIntValue(UberStateDefaults.watermillEscapeState, 1); break;
                 case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
                 case SplitWorldEvent.SoSoggy:
                     if (splitLate == DateTime.MaxValue) {
