@@ -62,12 +62,12 @@ namespace LiveSplit.OriWotW {
             int frameCount = Memory.FrameCount();
             Vector2 position = Memory.Position();
             Vector2 speed = lastSpeed;
-            if (frameCount != lastFrameCount) {
+            if (frameCount != lastFrameCount || lastPosition != position) {
                 speed = (position - lastPosition) * FPS;
                 lastFrameCount = frameCount;
                 lastSpeed = speed;
+                lastPosition = position;
             }
-            lastPosition = position;
             Stats stats = Memory.PlayerStats();
             AreaType area = Memory.PlayerArea();
             float mapCompletion = Memory.MapCompletion();
