@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 namespace LiveSplit.OriWotW {
     public enum ShardType : byte {
-        Overcharge,
+        Overcharge = 1,
         TripleJump,
         Wingclip,
         Bounty,
