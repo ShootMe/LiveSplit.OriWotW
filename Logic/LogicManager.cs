@@ -75,6 +75,9 @@ namespace LiveSplit.OriWotW {
         }
         private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
+            ShouldSplit = false;
+            Paused = Memory.IsLoadingGame();
+
             if (split.Type == SplitType.GameStart) {
                 Screen screen = Memory.TitleScreen();
                 int difficulty = Memory.Difficulty();
@@ -87,9 +90,6 @@ namespace LiveSplit.OriWotW {
                 lastIntValue = difficulty;
                 lastScreen = screen;
             } else {
-                ShouldSplit = false;
-                Paused = Memory.IsLoadingGame();
-
                 if (!updateValues && (state != GameState.Game || Memory.Dead() || (Paused && state != GameState.Game))) {
                     return;
                 }
@@ -137,6 +137,14 @@ namespace LiveSplit.OriWotW {
                         break;
                     case SplitType.GameEnd:
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
+                        break;
+                    case SplitType.Seed:
+                        Memory.UpdateUberState(UberStateDefaults.gardenerSeedsCollected);
+                        int seedCount = UberStateDefaults.gardenerSeedsCollected.Value.Int;
+                        int splitSeeds = -1;
+                        int.TryParse(split.Value, out splitSeeds);
+                        ShouldSplit = lastIntValue != seedCount && seedCount == splitSeeds;
+                        lastIntValue = seedCount;
                         break;
                     case SplitType.CreepHeart:
                         Memory.UpdateUberState(UberStateDefaults.vineAClear);
@@ -302,8 +310,8 @@ namespace LiveSplit.OriWotW {
                 case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
                 case SplitWorldEvent.DesertEscapeStart: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 1); break;
                 case SplitWorldEvent.DesertEscapeEnd: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 3); break;
-                case SplitWorldEvent.WinterForestEscapeStart: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 2); break;
-                case SplitWorldEvent.WinterForestEscapeEnd: CheckUberIntValue(UberStateDefaults.winterForestWispQuestUberState, 3); break;
+                case SplitWorldEvent.WinterForestEscapeStart: CheckUberIntValue(UberStateDefaults.winterForestWispQuest, 2); break;
+                case SplitWorldEvent.WinterForestEscapeEnd: CheckUberIntValue(UberStateDefaults.winterForestWispQuest, 3); break;
                 case SplitWorldEvent.WaterEscapeStart: CheckUberIntValue(UberStateDefaults.watermillEscapeState, 1); break;
                 case SplitWorldEvent.WaterPurified: CheckUberBoolValue(UberStateDefaults.finishedWatermillEscape); break;
                 case SplitWorldEvent.SoSoggy:
@@ -315,7 +323,7 @@ namespace LiveSplit.OriWotW {
                         }
                     }
                     break;
-                case SplitWorldEvent.SilentWoodsShriekCutscene: CheckUberBoolValue(UberStateDefaults.petrifiedForestNewTransitionOriVignettePlayed); break;
+                case SplitWorldEvent.SilentWoodsShriekCutscene: CheckUberBoolValue(UberStateDefaults.petrifiedForestTransitionPlayed); break;
             }
         }
         private void CheckWisp(Split split) {

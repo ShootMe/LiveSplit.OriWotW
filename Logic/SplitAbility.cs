@@ -7,9 +7,9 @@ namespace LiveSplit.OriWotW {
         Blaze,
         [Description("Burrow")]
         Burrow,
-        [Description("Damage Upgrade 1")]
+        [Description("Damage Upgrade Seed Tree")]
         DamageUpgrade1,
-        [Description("Damage Upgrade 2")]
+        [Description("Damage Upgrade Midnight Burrows")]
         DamageUpgrade2,
         [Description("Dash")]
         Dash,

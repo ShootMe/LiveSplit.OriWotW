@@ -78,7 +78,13 @@ namespace LiveSplit.OriWotW {
                 txtValue.Visible = false;
                 cboValue.Visible = false;
                 UserSplit.Value = string.Empty;
-            } else if (nextControlType == SplitType.HealthCell || nextControlType == SplitType.EnergyCell || nextControlType == SplitType.Keystone || nextControlType == SplitType.Ore || nextControlType == SplitType.CreepHeart) {
+            } else if (nextControlType == SplitType.HealthCell
+                || nextControlType == SplitType.EnergyCell
+                || nextControlType == SplitType.Keystone 
+                || nextControlType == SplitType.Ore 
+                || nextControlType == SplitType.CreepHeart 
+                || nextControlType == SplitType.Seed) {
+
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "1";
                 }

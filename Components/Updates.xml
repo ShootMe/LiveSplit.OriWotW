@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.2.3">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added splits for seeds </change>
+            <change> Updated names for Damage Upgrade splits </change>
+        </changelog>
+    </update>
     <update version="1.2.2">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

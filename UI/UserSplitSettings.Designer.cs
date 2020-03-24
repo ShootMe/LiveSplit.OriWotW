@@ -34,7 +34,7 @@
             // 
             // txtValue
             // 
-            this.txtValue.Location = new System.Drawing.Point(256, 1);
+            this.txtValue.Location = new System.Drawing.Point(247, 1);
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(54, 20);
             this.txtValue.TabIndex = 2;
@@ -44,7 +44,7 @@
             // 
             this.cboType.DisplayMember = "Item2";
             this.cboType.FormattingEnabled = true;
-            this.cboType.Location = new System.Drawing.Point(154, 1);
+            this.cboType.Location = new System.Drawing.Point(145, 1);
             this.cboType.Name = "cboType";
             this.cboType.Size = new System.Drawing.Size(100, 21);
             this.cboType.TabIndex = 1;
@@ -56,7 +56,7 @@
             // 
             this.picHandle.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.picHandle.Image = ((System.Drawing.Image)(resources.GetObject("picHandle.Image")));
-            this.picHandle.Location = new System.Drawing.Point(133, 2);
+            this.picHandle.Location = new System.Drawing.Point(124, 2);
             this.picHandle.Name = "picHandle";
             this.picHandle.Size = new System.Drawing.Size(21, 20);
             this.picHandle.TabIndex = 6;
@@ -69,7 +69,7 @@
             this.lblSegment.AutoEllipsis = true;
             this.lblSegment.Location = new System.Drawing.Point(2, 4);
             this.lblSegment.Name = "lblSegment";
-            this.lblSegment.Size = new System.Drawing.Size(130, 15);
+            this.lblSegment.Size = new System.Drawing.Size(116, 15);
             this.lblSegment.TabIndex = 0;
             this.lblSegment.Text = "This is a really slong split name";
             this.lblSegment.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -78,9 +78,9 @@
             // 
             this.cboValue.DisplayMember = "Item2";
             this.cboValue.FormattingEnabled = true;
-            this.cboValue.Location = new System.Drawing.Point(256, 1);
+            this.cboValue.Location = new System.Drawing.Point(247, 1);
             this.cboValue.Name = "cboValue";
-            this.cboValue.Size = new System.Drawing.Size(192, 21);
+            this.cboValue.Size = new System.Drawing.Size(202, 21);
             this.cboValue.TabIndex = 3;
             this.cboValue.ValueMember = "Item1";
             this.cboValue.SelectedIndexChanged += new System.EventHandler(this.cboValue_SelectedIndexChanged);

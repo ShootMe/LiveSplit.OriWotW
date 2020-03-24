@@ -27,6 +27,8 @@ namespace LiveSplit.OriWotW {
         Map,
         [Description("Ore")]
         Ore,
+        [Description("Seed")]
+        Seed,
         [Description("Shard")]
         Shard,
         [Description("Spirit Trial")]
