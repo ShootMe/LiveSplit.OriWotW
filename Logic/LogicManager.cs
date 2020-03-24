@@ -101,7 +101,13 @@ namespace LiveSplit.OriWotW {
                         CheckAbility(Utility.GetEnumValue<AbilityType>(split.Value));
                         break;
                     case SplitType.Shard:
-                        bool hasShard = Memory.HasShard(Utility.GetEnumValue<ShardType>(split.Value));
+                        ShardType shardType = ShardType.Overcharge;
+                        bool hasShard = false;
+                        if (Enum.TryParse<ShardType>(split.Value, out shardType)) {
+                            hasShard = Memory.HasShard(shardType, 0);
+                        } else if (Enum.TryParse<ShardType>(split.Value.Substring(0, split.Value.Length - 1), out shardType)) {
+                            hasShard = Memory.HasShard(shardType, int.Parse(split.Value.Substring(split.Value.Length - 1)));
+                        }
                         ShouldSplit = !lastBoolValue && hasShard;
                         lastBoolValue = hasShard;
                         break;

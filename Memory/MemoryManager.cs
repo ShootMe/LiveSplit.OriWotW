@@ -385,7 +385,7 @@ namespace LiveSplit.OriWotW {
             }
             return currentAbilities;
         }
-        public bool HasShard(ShardType type) {
+        public bool HasShard(ShardType type, int level) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
@@ -397,7 +397,7 @@ namespace LiveSplit.OriWotW {
                 //.Items[i]
                 Shard shard = Program.Read<Shard>((IntPtr)BitConverter.ToUInt64(data, i * 0x8), 0x10);
                 if (shard.Type == type) {
-                    return shard.Gained == 1;
+                    return shard.Gained == 1 && (level == 0 || shard.Level == level);
                 }
             }
             return false;
@@ -518,6 +518,9 @@ namespace LiveSplit.OriWotW {
             NoPausePatch.ClearPointer();
             TargetFrameRatePatch.ClearPointer();
             VSyncPatch.ClearPointer();
+            FrameCounter.ClearPointer();
+            CheatsHandler.ClearPointer();
+            DebugControls.ClearPointer();
         }
         public void Dispose() {
             if (Program != null) {

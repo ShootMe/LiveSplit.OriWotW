@@ -49,6 +49,10 @@ namespace LiveSplit.OriWotW {
         }
         public void ClearPointer() {
             Pointer = IntPtr.Zero;
+            lastTry = DateTime.Now.AddSeconds(1);
+            for (int i = 0; i < Finders.Length; i++) {
+                Finders[i].Reset();
+            }
         }
         public IntPtr GetPointer(Process program) {
             if (program == null) {
@@ -109,6 +113,7 @@ namespace LiveSplit.OriWotW {
     public interface IFindPointer {
         IntPtr FindPointer(Process program, string asmName);
         bool FoundBaseAddress();
+        void Reset();
         PointerVersion Version { get; }
     }
     //Will only work for version 24.1 PE files. Structures need changed per version in the Il2Cpp files
@@ -167,6 +172,9 @@ namespace LiveSplit.OriWotW {
                 offset = program.Read<int>(BasePtr) + 4;
             }
             return BasePtr + offset;
+        }
+        public void Reset() {
+            BasePtr = IntPtr.Zero;
         }
     }
     public class FindPointerSignature : IFindPointer {
@@ -228,6 +236,9 @@ namespace LiveSplit.OriWotW {
             }
             return IntPtr.Zero;
         }
+        public void Reset() {
+            BasePtr = IntPtr.Zero;
+        }
     }
     public class FindOffset : IFindPointer {
         private int[] Offsets;
@@ -255,5 +266,6 @@ namespace LiveSplit.OriWotW {
                 return (IntPtr)program.Read<uint>(startAddress, Offsets);
             }
         }
+        public void Reset() { }
     }
 }
