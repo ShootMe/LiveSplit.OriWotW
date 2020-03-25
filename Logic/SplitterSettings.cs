@@ -4,6 +4,7 @@ namespace LiveSplit.OriWotW {
         public BindingList<Split> Autosplits = new BindingList<Split>();
         public bool NoPause;
         public bool FPSLock;
+        public bool DisableDebug;
 
         public SplitterSettings() {
             Autosplits.AllowNew = true;

@@ -44,6 +44,9 @@ namespace LiveSplit.OriWotW {
             AddXmlItem<bool>(document, xmlSettings, "FPSLock", chkFPSLock.Checked);
             Settings.FPSLock = chkFPSLock.Checked;
 
+            AddXmlItem<bool>(document, xmlSettings, "DisableDebug", chkDebug.Checked);
+            Settings.DisableDebug = chkDebug.Checked;
+
             XmlElement xmlSplits = document.CreateElement("Splits");
             xmlSettings.AppendChild(xmlSplits);
 
@@ -71,6 +74,10 @@ namespace LiveSplit.OriWotW {
             chkFPSLock.Checked = fpsLock;
             Settings.FPSLock = fpsLock;
 
+            bool disableDebug = GetXmlBoolItem(node, ".//DisableDebug", true);
+            chkDebug.Checked = disableDebug;
+            Settings.DisableDebug = disableDebug;
+
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {
                 string[] splitValues = splitNode.InnerText.Split('|');
@@ -78,16 +85,6 @@ namespace LiveSplit.OriWotW {
                     SplitType type = SplitType.ManualSplit;
                     if (Enum.TryParse<SplitType>(splitValues[0], out type)) {
                         string value = splitValues[1];
-                        if (type == SplitType.WorldEvent) {
-                            if (value == "HowlFight") {
-                                type = SplitType.Boss;
-                                value = "HowlEnd";
-                            } else if (value == "ShriekDefeated") {
-                                type = SplitType.Boss;
-                            } else if (value == "WeepingRidgeElevatorFight") {
-                                type = SplitType.Boss;
-                            }
-                        }
                         Settings.Autosplits.Add(new Split() { Type = type, Value = value });
                     }
                 }

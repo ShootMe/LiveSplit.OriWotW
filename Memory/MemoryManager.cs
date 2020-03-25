@@ -69,6 +69,7 @@ namespace LiveSplit.OriWotW {
         public DateTime LastHooked { get; set; }
         private bool? noPausePatched = null;
         private bool? targetFrameRatePatched = null;
+        private bool? debugEnabled = null;
         private FPSTimer fpsTimer = new FPSTimer(200, 15);
 
         public MemoryManager() {
@@ -86,20 +87,45 @@ namespace LiveSplit.OriWotW {
                 $"USC: {UberStateController.GetPointer(Program)} ",
                 $"USL: {UberStateCollection.GetPointer(Program)} ",
                 $"DC: {DifficultyController.GetPointer(Program)} ",
-                $"FC: {FrameCounter.GetPointer(Program)} ",
-                $"CH: {CheatsHandler.GetPointer(Program)} ",
+                $"NP: {NoPausePatch.GetPointer(Program)} ",
                 $"TFR: {TargetFrameRatePatch.GetPointer(Program)} ",
                 $"VS: {VSyncPatch.GetPointer(Program)} ",
-                $"NP: {NoPausePatch.GetPointer(Program)} "
+                $"FC: {FrameCounter.GetPointer(Program)} ",
+                $"CH: {CheatsHandler.GetPointer(Program)} ",
+                $"DC: {DebugControls.GetPointer(Program)} "
             );
+        }
+        public bool AllPointersFound() {
+            return Characters.GetPointer(Program) != IntPtr.Zero
+                && GameWorld.GetPointer(Program) != IntPtr.Zero
+                && PlayerUberStateGroup.GetPointer(Program) != IntPtr.Zero
+                && TitleScreenManager.GetPointer(Program) != IntPtr.Zero
+                && GameStateMachine.GetPointer(Program) != IntPtr.Zero
+                && GameController.GetPointer(Program) != IntPtr.Zero
+                && ScenesManager.GetPointer(Program) != IntPtr.Zero
+                && UberStateController.GetPointer(Program) != IntPtr.Zero
+                && UberStateCollection.GetPointer(Program) != IntPtr.Zero
+                && DifficultyController.GetPointer(Program) != IntPtr.Zero
+                && NoPausePatch.GetPointer(Program) != IntPtr.Zero
+                && TargetFrameRatePatch.GetPointer(Program) != IntPtr.Zero
+                && VSyncPatch.GetPointer(Program) != IntPtr.Zero
+                && FrameCounter.GetPointer(Program) != IntPtr.Zero
+                && CheatsHandler.GetPointer(Program) != IntPtr.Zero
+                && DebugControls.GetPointer(Program) != IntPtr.Zero;
         }
         public bool DebugEnabled() {
             return CheatsHandler.Read<bool>(Program, 0xb8, 0x8);
         }
         public void EnableDebug(bool enable) {
-            DebugControls.Write<bool>(Program, enable, 0xb8, 0x8);
-            CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, 0x20);
-            CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
+            if (!debugEnabled.HasValue || enable != debugEnabled.Value) {
+                if (CheatsHandler.GetPointer(Program) == IntPtr.Zero) { return; }
+
+                DebugControls.Write<bool>(Program, enable, 0xb8, 0x8);
+                CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, 0x20);
+                CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
+
+                debugEnabled = enable;
+            }
         }
         public string Patches() {
             return "NoPause: " + (!noPausePatched.HasValue ? "No Value" : noPausePatched.ToString()) + " FPS: " + (!targetFrameRatePatched.HasValue ? "No Value" : targetFrameRatePatched.ToString());
@@ -492,6 +518,7 @@ namespace LiveSplit.OriWotW {
                     uberIDLookup = null;
                     noPausePatched = null;
                     targetFrameRatePatched = null;
+                    debugEnabled = null;
                     IsHooked = true;
                     fpsTimer.Reset();
                 }

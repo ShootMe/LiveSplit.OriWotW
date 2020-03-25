@@ -23,12 +23,15 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.btnLog = new System.Windows.Forms.Button();
             this.flowMain = new System.Windows.Forms.FlowLayoutPanel();
             this.btnClearLog = new System.Windows.Forms.Button();
             this.chkLog = new System.Windows.Forms.CheckBox();
             this.chkNoPause = new System.Windows.Forms.CheckBox();
             this.chkFPSLock = new System.Windows.Forms.CheckBox();
+            this.chkDebug = new System.Windows.Forms.CheckBox();
+            this.tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // btnLog
@@ -37,9 +40,10 @@
             this.btnLog.Location = new System.Drawing.Point(329, 4);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(69, 23);
-            this.btnLog.TabIndex = 4;
+            this.btnLog.TabIndex = 5;
             this.btnLog.TabStop = false;
             this.btnLog.Text = "Debug Log";
+            this.tooltips.SetToolTip(this.btnLog, "View all entries in the Log");
             this.btnLog.UseVisualStyleBackColor = true;
             this.btnLog.Click += new System.EventHandler(this.btnLog_Click);
             // 
@@ -65,7 +69,7 @@
             this.btnClearLog.Location = new System.Drawing.Point(404, 4);
             this.btnClearLog.Name = "btnClearLog";
             this.btnClearLog.Size = new System.Drawing.Size(63, 23);
-            this.btnClearLog.TabIndex = 5;
+            this.btnClearLog.TabIndex = 6;
             this.btnClearLog.TabStop = false;
             this.btnClearLog.Text = "Clear Log";
             this.btnClearLog.UseVisualStyleBackColor = true;
@@ -78,8 +82,9 @@
             this.chkLog.Location = new System.Drawing.Point(261, 8);
             this.chkLog.Name = "chkLog";
             this.chkLog.Size = new System.Drawing.Size(65, 17);
-            this.chkLog.TabIndex = 3;
+            this.chkLog.TabIndex = 4;
             this.chkLog.Text = "Log Info";
+            this.tooltips.SetToolTip(this.chkLog, "Will monitor thegames state and write it to the Log for Debug purposes");
             this.chkLog.UseVisualStyleBackColor = true;
             // 
             // chkNoPause
@@ -90,22 +95,37 @@
             this.chkNoPause.Size = new System.Drawing.Size(73, 17);
             this.chkNoPause.TabIndex = 1;
             this.chkNoPause.Text = "No Pause";
+            this.tooltips.SetToolTip(this.chkNoPause, "Will allow the game to run even when it doesn\'t have focus");
             this.chkNoPause.UseVisualStyleBackColor = true;
             // 
             // chkFPSLock
             // 
             this.chkFPSLock.AutoSize = true;
-            this.chkFPSLock.Location = new System.Drawing.Point(82, 8);
+            this.chkFPSLock.Location = new System.Drawing.Point(77, 8);
             this.chkFPSLock.Name = "chkFPSLock";
-            this.chkFPSLock.Size = new System.Drawing.Size(88, 17);
+            this.chkFPSLock.Size = new System.Drawing.Size(73, 17);
             this.chkFPSLock.TabIndex = 2;
-            this.chkFPSLock.Text = "60 FPS Lock";
+            this.chkFPSLock.Text = "FPS Lock";
+            this.tooltips.SetToolTip(this.chkFPSLock, "Trys to cap the max FPS to 60");
             this.chkFPSLock.UseVisualStyleBackColor = true;
+            // 
+            // chkDebug
+            // 
+            this.chkDebug.AutoSize = true;
+            this.chkDebug.Location = new System.Drawing.Point(152, 8);
+            this.chkDebug.Name = "chkDebug";
+            this.chkDebug.Size = new System.Drawing.Size(96, 17);
+            this.chkDebug.TabIndex = 3;
+            this.chkDebug.Text = "Disable Debug";
+            this.tooltips.SetToolTip(this.chkDebug, "Will disable Debug and controls when the timer starts and reactivates it when fin" +
+        "ished");
+            this.chkDebug.UseVisualStyleBackColor = true;
             // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkDebug);
             this.Controls.Add(this.chkFPSLock);
             this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
@@ -128,5 +148,7 @@
         private System.Windows.Forms.CheckBox chkLog;
         private System.Windows.Forms.CheckBox chkNoPause;
         private System.Windows.Forms.CheckBox chkFPSLock;
+        private System.Windows.Forms.CheckBox chkDebug;
+        private System.Windows.Forms.ToolTip tooltips;
     }
 }

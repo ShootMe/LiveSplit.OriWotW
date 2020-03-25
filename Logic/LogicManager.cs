@@ -29,6 +29,9 @@ namespace LiveSplit.OriWotW {
             InitializeSplit();
             ShouldSplit = false;
             ShouldReset = false;
+            if (Settings.DisableDebug) {
+                Memory.EnableDebug(true);
+            }
         }
         public void Decrement() {
             CurrentSplit--;
@@ -59,6 +62,10 @@ namespace LiveSplit.OriWotW {
         public void Update() {
             Memory.PatchNoPause(Settings.NoPause);
             Memory.PatchFPSLock(Settings.FPSLock);
+            if (Settings.DisableDebug && Running) {
+                Memory.EnableDebug(false);
+            }
+
             if (CurrentSplit < Settings.Autosplits.Count) {
                 CheckSplit(Settings.Autosplits[CurrentSplit], false);
                 if (!Running) {
