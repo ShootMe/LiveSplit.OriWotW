@@ -104,6 +104,7 @@
     <Compile Include="Logic\SplitArea.cs" />
     <Compile Include="Logic\SplitBoss.cs" />
     <Compile Include="Logic\SplitMap.cs" />
+    <Compile Include="Logic\SplitSeed.cs" />
     <Compile Include="Logic\SplitShard.cs" />
     <Compile Include="Logic\LogManager.cs" />
     <Compile Include="Logic\LogicManager.cs" />

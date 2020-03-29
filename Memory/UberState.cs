@@ -14,7 +14,12 @@ namespace LiveSplit.OriWotW {
         PlayerUberStateDescriptor
     }
     public static class UberStateDefaults {
-        public static UberState gardenerSeedsCollected = new UberState() { Name = "gardenerSeedsCollectedStatSettingSerializedUberState", ID = 44318, GroupName = "statsUberStateGroup", GroupID = 8246, Type = UberStateType.SerializedIntUberState };
+        public static UberState lumaPoolsSeed = new UberState() { Name = "gardenerSeedGrassCollected", ID = 28662, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
+        public static UberState windsweptWastesSeed = new UberState() { Name = "gardenerSeedFlowersCollected", ID = 20601, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
+        public static UberState mouldwoodDepthsSeed = new UberState() { Name = "gardenerSeedBashCollected", ID = 8192, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
+        public static UberState baursReachSeed = new UberState() { Name = "gardenerSeedSpringCollected", ID = 32376, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
+        public static UberState wellspringSeed = new UberState() { Name = "gardenerSeedGrappleCollected", ID = 24142, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
+        public static UberState silentWoodsSeed = new UberState() { Name = "gardenerSeedTreeCollected", ID = 7470, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
         public static UberState winterForestWispQuest = new UberState() { Name = "winterForestWispQuestUberState", ID = 8973, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedIntUberState };
         public static UberState watermillEscapeState = new UberState() { Name = "watermillEscapeState", ID = 10720, GroupName = "waterMillStateGroupDescriptor", GroupID = 37858, Type = UberStateType.SerializedIntUberState };
         public static UberState desertRuinsEscape = new UberState() { Name = "desertRuinsEscape", ID = 19890, GroupName = "windtornRuinsGroup", GroupID = 10289, Type = UberStateType.SerializedIntUberState };

@@ -164,7 +164,7 @@ namespace LiveSplit.OriWotW {
         public static bool InitializeIl2Cpp(Process program) {
             if (Decompiler == null || lastPID != program.Id) {
                 lock (SyncLock) {
-                    if (Decompiler != null) { return true; }
+                    if (Decompiler != null && lastPID == program.Id) { return true; }
                     lastPID = program.Id;
 
                     string programPath = Path.GetDirectoryName(program.MainModule.FileName);
@@ -214,7 +214,6 @@ namespace LiveSplit.OriWotW {
     }
     public class FindPointerSignature : IFindPointer {
         private int lastPID;
-        private MemorySearcher Searcher = new MemorySearcher();
         public PointerVersion Version { get; private set; }
         private AutoDeref AutoDeref;
         private string Signature;
@@ -239,17 +238,6 @@ namespace LiveSplit.OriWotW {
             if (lastPID != program.Id) {
                 lastPID = program.Id;
                 BasePtr = IntPtr.Zero;
-
-                if (string.IsNullOrEmpty(asmName)) {
-                    Searcher.MemoryFilter = delegate (MemInfo info) {
-                        return (info.State & 0x1000) != 0 && (info.Protect & 0x20) != 0 && (info.Protect & 0x100) == 0;
-                    };
-                } else {
-                    Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
-                    Searcher.MemoryFilter = delegate (MemInfo info) {
-                        return (ulong)info.BaseAddress >= (ulong)range.Item1 && (ulong)info.BaseAddress <= (ulong)range.Item2 && (info.State & 0x1000) != 0 && (info.Protect & 0x20) != 0 && (info.Protect & 0x100) == 0;
-                    };
-                }
             }
 
             if (BasePtr != IntPtr.Zero) {
@@ -258,16 +246,28 @@ namespace LiveSplit.OriWotW {
                     offset = program.Read<int>(BasePtr + Offset) + 4;
                 }
                 return BasePtr + Offset + offset;
+            }
+
+            MemorySearcher Searcher = new MemorySearcher();
+            if (string.IsNullOrEmpty(asmName)) {
+                Searcher.MemoryFilter = delegate (MemInfo info) {
+                    return (info.State & 0x1000) != 0 && (info.Protect & 0x20) != 0 && (info.Protect & 0x100) == 0;
+                };
             } else {
-                IntPtr ptr = Searcher.FindSignature(program, Signature);
-                if (ptr != IntPtr.Zero) {
-                    BasePtr = ptr;
-                    int offset = 0;
-                    if (AutoDeref != AutoDeref.None) {
-                        offset = program.Read<int>(BasePtr + Offset) + 4;
-                    }
-                    return BasePtr + Offset + offset;
+                Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
+                Searcher.MemoryFilter = delegate (MemInfo info) {
+                    return (ulong)info.BaseAddress >= (ulong)range.Item1 && (ulong)info.BaseAddress <= (ulong)range.Item2 && (info.State & 0x1000) != 0 && (info.Protect & 0x20) != 0 && (info.Protect & 0x100) == 0;
+                };
+            }
+
+            IntPtr ptr = Searcher.FindSignature(program, Signature);
+            if (ptr != IntPtr.Zero) {
+                BasePtr = ptr;
+                int offset = 0;
+                if (AutoDeref != AutoDeref.None) {
+                    offset = program.Read<int>(BasePtr + Offset) + 4;
                 }
+                return BasePtr + Offset + offset;
             }
             return IntPtr.Zero;
         }

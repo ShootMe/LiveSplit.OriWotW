@@ -148,12 +148,7 @@ namespace LiveSplit.OriWotW {
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
                         break;
                     case SplitType.Seed:
-                        Memory.UpdateUberState(UberStateDefaults.gardenerSeedsCollected);
-                        int seedCount = UberStateDefaults.gardenerSeedsCollected.Value.Int;
-                        int splitSeeds = -1;
-                        int.TryParse(split.Value, out splitSeeds);
-                        ShouldSplit = lastIntValue != seedCount && seedCount == splitSeeds;
-                        lastIntValue = seedCount;
+                        CheckSeed(split);
                         break;
                     case SplitType.CreepHeart:
                         Memory.UpdateUberState(UberStateDefaults.vineAClear);
@@ -253,6 +248,17 @@ namespace LiveSplit.OriWotW {
                 case SplitSpiritTrial.WellspringComplete: CheckUberIntValue(UberStateDefaults.wellspringRace, 2); break;
                 case SplitSpiritTrial.WindsweptWastesActivate: CheckUberIntValue(UberStateDefaults.desertRace, 1); break;
                 case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2); break;
+            }
+        }
+        private void CheckSeed(Split split) {
+            SplitSeed seed = Utility.GetEnumValue<SplitSeed>(split.Value);
+            switch (seed) {
+                case SplitSeed.BaursReach: CheckUberBoolValue(UberStateDefaults.baursReachSeed); break;
+                case SplitSeed.LumaPools: CheckUberBoolValue(UberStateDefaults.lumaPoolsSeed); break;
+                case SplitSeed.MouldwoodDepths: CheckUberBoolValue(UberStateDefaults.mouldwoodDepthsSeed); break;
+                case SplitSeed.SilentWoods: CheckUberBoolValue(UberStateDefaults.silentWoodsSeed); break;
+                case SplitSeed.Wellspring: CheckUberBoolValue(UberStateDefaults.wellspringSeed); break;
+                case SplitSeed.WindsweptWastes: CheckUberBoolValue(UberStateDefaults.windsweptWastesSeed); break;
             }
         }
         private void CheckBoss(Split split) {
