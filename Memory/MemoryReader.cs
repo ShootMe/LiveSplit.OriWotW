@@ -200,47 +200,49 @@ namespace LiveSplit.OriWotW {
         }
 
         public static Module64[] Modules64(this Process p) {
-            if (ModuleCache.Count > 100) { ModuleCache.Clear(); }
+            lock (ModuleCache) {
+                if (ModuleCache.Count > 100) { ModuleCache.Clear(); }
 
-            IntPtr[] buffer = new IntPtr[1024];
-            uint cb = (uint)(IntPtr.Size * buffer.Length);
-            uint totalModules;
-            if (!WinAPI.EnumProcessModulesEx(p.Handle, buffer, cb, out totalModules, 3u)) {
-                return null;
-            }
-            uint moduleSize = totalModules / (uint)IntPtr.Size;
-            int key = p.StartTime.GetHashCode() + p.Id + (int)moduleSize;
-            if (ModuleCache.ContainsKey(key)) { return ModuleCache[key]; }
+                IntPtr[] buffer = new IntPtr[1024];
+                uint cb = (uint)(IntPtr.Size * buffer.Length);
+                uint totalModules;
+                if (!WinAPI.EnumProcessModulesEx(p.Handle, buffer, cb, out totalModules, 3u)) {
+                    return null;
+                }
+                uint moduleSize = totalModules / (uint)IntPtr.Size;
+                int key = p.StartTime.GetHashCode() + p.Id + (int)moduleSize;
+                if (ModuleCache.ContainsKey(key)) { return ModuleCache[key]; }
 
-            List<Module64> list = new List<Module64>();
-            StringBuilder stringBuilder = new StringBuilder(260);
-            int count = 0;
-            while ((long)count < (long)((ulong)moduleSize)) {
-                stringBuilder.Clear();
-                if (WinAPI.GetModuleFileNameEx(p.Handle, buffer[count], stringBuilder, (uint)stringBuilder.Capacity) == 0u) {
-                    return list.ToArray();
+                List<Module64> list = new List<Module64>();
+                StringBuilder stringBuilder = new StringBuilder(260);
+                int count = 0;
+                while ((long)count < (long)((ulong)moduleSize)) {
+                    stringBuilder.Clear();
+                    if (WinAPI.GetModuleFileNameEx(p.Handle, buffer[count], stringBuilder, (uint)stringBuilder.Capacity) == 0u) {
+                        return list.ToArray();
+                    }
+                    string fileName = stringBuilder.ToString();
+                    stringBuilder.Clear();
+                    if (WinAPI.GetModuleBaseName(p.Handle, buffer[count], stringBuilder, (uint)stringBuilder.Capacity) == 0u) {
+                        return list.ToArray();
+                    }
+                    string moduleName = stringBuilder.ToString();
+                    ModuleInfo modInfo = default(ModuleInfo);
+                    if (!WinAPI.GetModuleInformation(p.Handle, buffer[count], out modInfo, (uint)Marshal.SizeOf(modInfo))) {
+                        return list.ToArray();
+                    }
+                    list.Add(new Module64 {
+                        FileName = fileName,
+                        BaseAddress = modInfo.BaseAddress,
+                        MemorySize = (int)modInfo.ModuleSize,
+                        EntryPointAddress = modInfo.EntryPoint,
+                        Name = moduleName
+                    });
+                    count++;
                 }
-                string fileName = stringBuilder.ToString();
-                stringBuilder.Clear();
-                if (WinAPI.GetModuleBaseName(p.Handle, buffer[count], stringBuilder, (uint)stringBuilder.Capacity) == 0u) {
-                    return list.ToArray();
-                }
-                string moduleName = stringBuilder.ToString();
-                ModuleInfo modInfo = default(ModuleInfo);
-                if (!WinAPI.GetModuleInformation(p.Handle, buffer[count], out modInfo, (uint)Marshal.SizeOf(modInfo))) {
-                    return list.ToArray();
-                }
-                list.Add(new Module64 {
-                    FileName = fileName,
-                    BaseAddress = modInfo.BaseAddress,
-                    MemorySize = (int)modInfo.ModuleSize,
-                    EntryPointAddress = modInfo.EntryPoint,
-                    Name = moduleName
-                });
-                count++;
+                ModuleCache.Add(key, list.ToArray());
+                return list.ToArray();
             }
-            ModuleCache.Add(key, list.ToArray());
-            return list.ToArray();
         }
         private static class WinAPI {
             [DllImport("kernel32.dll", SetLastError = true)]
