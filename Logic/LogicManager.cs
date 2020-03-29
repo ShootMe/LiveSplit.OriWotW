@@ -107,7 +107,12 @@ namespace LiveSplit.OriWotW {
                     case SplitType.ManualSplit:
                         break;
                     case SplitType.Ability:
-                        CheckAbility(Utility.GetEnumValue<AbilityType>(split.Value));
+                        SplitAbility ability = Utility.GetEnumValue<SplitAbility>(split.Value);
+                        if (ability == SplitAbility.FastTravel) {
+                            CheckUberIntValue(UberStateDefaults.fastTravel, 1);
+                        } else {
+                            CheckAbility(Utility.GetEnumValue<AbilityType>(split.Value));
+                        }
                         break;
                     case SplitType.Shard:
                         ShardType shardType = ShardType.Overcharge;

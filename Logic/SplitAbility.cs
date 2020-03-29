@@ -15,6 +15,8 @@ namespace LiveSplit.OriWotW {
         Dash,
         [Description("Double Jump")]
         DoubleJump,
+        [Description("Fast Travel")]
+        FastTravel,
         [Description("Feather")]
         Feather,
         [Description("Flap")]

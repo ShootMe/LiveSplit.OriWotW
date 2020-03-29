@@ -46,6 +46,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitMap>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitMap>(UserSplit.Value);
                         break;
+                    case SplitType.Seed:
+                        cboValue.DataSource = Utility.GetEnumList<SplitSeed>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitSeed>(UserSplit.Value);
+                        break;
                     case SplitType.SpiritTrial:
                         cboValue.DataSource = Utility.GetEnumList<SplitSpiritTrial>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitSpiritTrial>(UserSplit.Value);
@@ -80,10 +84,9 @@ namespace LiveSplit.OriWotW {
                 UserSplit.Value = string.Empty;
             } else if (nextControlType == SplitType.HealthCell
                 || nextControlType == SplitType.EnergyCell
-                || nextControlType == SplitType.Keystone 
-                || nextControlType == SplitType.Ore 
-                || nextControlType == SplitType.CreepHeart 
-                || nextControlType == SplitType.Seed) {
+                || nextControlType == SplitType.Keystone
+                || nextControlType == SplitType.Ore
+                || nextControlType == SplitType.CreepHeart) {
 
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "1";
@@ -98,6 +101,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
                         case SplitType.Boss: DefaultValue = SplitBoss.HowlEnd; break;
                         case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
+                        case SplitType.Seed: DefaultValue = SplitSeed.Wellspring; break;
                         case SplitType.Map: DefaultValue = SplitMap.InkwaterMarsh; break;
                         case SplitType.Teleporter: DefaultValue = SplitTeleporter.KwoloksHollowActivated; break;
                         case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
