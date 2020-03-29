@@ -33,6 +33,7 @@ namespace LiveSplit.OriWotW {
         public void Update(int frameCount) {
             long ticks = frameTimer.ElapsedTicks;
             long ticksDifference = ticks - lastTicks;
+            if (frameCount <= 0) { frameCount = lastFrameCount; }
             int frameDifference = frameCount - lastFrameCount;
             if (lastFrameCount > 0) {
                 updateDisplay += ticksDifference;

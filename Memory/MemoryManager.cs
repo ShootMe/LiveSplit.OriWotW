@@ -518,11 +518,7 @@ namespace LiveSplit.OriWotW {
                 }
             }
 
-            if (IsHooked) {
-                fpsTimer.Update(FrameCount());
-            } else {
-                fpsTimer.Update(1);
-            }
+            fpsTimer.Update(IsHooked ? FrameCount() : 0);
             return IsHooked;
         }
         private void ClearPointers() {
