@@ -10,6 +10,7 @@ namespace LiveSplit.OriWotW {
         public MemoryManager Memory { get; private set; }
         public SplitterSettings Settings { get; private set; }
         private bool lastBoolValue;
+        private bool hadDebug;
         private int lastIntValue;
         private string lastStrValue;
         private Screen lastScreen;
@@ -30,7 +31,7 @@ namespace LiveSplit.OriWotW {
             ShouldSplit = false;
             ShouldReset = false;
             if (Settings.DisableDebug) {
-                Memory.EnableDebug(true);
+                Memory.EnableDebug(hadDebug);
             }
         }
         public void Decrement() {
@@ -63,6 +64,7 @@ namespace LiveSplit.OriWotW {
             Memory.PatchNoPause(Settings.NoPause);
             Memory.PatchFPSLock(Settings.FPSLock);
             if (Settings.DisableDebug && Running) {
+                hadDebug = Memory.DebugEnabled();
                 Memory.EnableDebug(false);
             }
 
