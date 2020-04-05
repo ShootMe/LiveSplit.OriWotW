@@ -49,10 +49,11 @@ namespace LiveSplit.OriWotW.Il2Cpp {
             byte[] bytes = reader.ReadBytes(Marshal.SizeOf(typeof(T)));
 
             GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            T theStructure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-
-            return theStructure;
+            try {
+                return (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+            } finally {
+                handle.Free();
+            }
         }
         public T[] ReadClassArray<T>(long count) where T : struct {
             var t = new T[count];
@@ -65,7 +66,7 @@ namespace LiveSplit.OriWotW.Il2Cpp {
             Position = addr;
             return ReadClassArray<T>(count);
         }
-        
+
         public string ReadStringToNull(ulong addr) {
             Position = addr;
             var bytes = new List<byte>();

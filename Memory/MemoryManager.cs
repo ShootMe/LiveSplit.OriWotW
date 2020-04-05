@@ -50,7 +50,7 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C8938488B0D????????F6812701000002740E83B9D8000000007505E8", 0x14));
         private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e));
-        public static PointerVersion Version { get; set; }
+        public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
@@ -102,7 +102,7 @@ namespace LiveSplit.OriWotW {
                 && DebugControls.GetPointer(Program) != IntPtr.Zero;
         }
         public bool DebugEnabled() {
-            return CheatsHandler.Read<bool>(Program, 0xb8, 0x8);
+            return CheatsHandler.Read<bool>(Program, 0xb8, 0x0, 0x20);
         }
         public void EnableDebug(bool enable) {
             if (!debugEnabled.HasValue || enable != debugEnabled.Value) {
@@ -204,9 +204,7 @@ namespace LiveSplit.OriWotW {
         }
         public Screen TitleScreen() {
             //TitleScreenManager.Instance.m_currentScreen
-            //int m_currentScreen = FindIl2CppOffset.GetOffset(Program, "__mainWisp.TitleScreenManager.m_currentScreen");
-            int m_currentScreen = Version == PointerVersion.All ? 0xb8 : 0xb8;
-            return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, m_currentScreen);
+            return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
         public bool IsLoadingGame() {
             //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
@@ -486,7 +484,7 @@ namespace LiveSplit.OriWotW {
                     totalCompletion += Program.Read<float>(area, 0x34);
                 }
             }
-            return totalCompletion * 100f / count;
+            return totalCompletion * 100f / (count == 0 ? 1 : count);
         }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
@@ -509,6 +507,13 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
+                    Module64 module = Program.Module64("GameAssembly.dll");
+                    MemoryManager.Version = PointerVersion.All;
+                    if (module != null) {
+                        switch (module.MemorySize) {
+                            case 77430784: MemoryManager.Version = PointerVersion.V2; break;
+                        }
+                    }
                     uberIDLookup = null;
                     noPausePatched = null;
                     targetFrameRatePatched = null;

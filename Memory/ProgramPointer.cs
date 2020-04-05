@@ -28,7 +28,7 @@ namespace LiveSplit.OriWotW {
             lastTry = DateTime.MinValue;
         }
 
-        public T Read<T>(Process program, params int[] offsets) where T : struct {
+        public T Read<T>(Process program, params int[] offsets) where T : unmanaged {
             GetPointer(program);
             return program.Read<T>(Pointer, offsets);
         }
@@ -40,7 +40,7 @@ namespace LiveSplit.OriWotW {
             GetPointer(program);
             return program.Read(Pointer, length, offsets);
         }
-        public void Write<T>(Process program, T value, params int[] offsets) where T : struct {
+        public void Write<T>(Process program, T value, params int[] offsets) where T : unmanaged {
             GetPointer(program);
             program.Write<T>(Pointer, value, offsets);
         }
@@ -102,12 +102,9 @@ namespace LiveSplit.OriWotW {
             return pointer;
         }
         public static Tuple<IntPtr, IntPtr> GetAddressRange(Process program, string asmName) {
-            Module64[] modules = program.Modules64();
-            for (int i = 0; i < modules.Length; i++) {
-                Module64 module = modules[i];
-                if (module.Name.Equals(asmName, StringComparison.OrdinalIgnoreCase)) {
-                    return new Tuple<IntPtr, IntPtr>(module.BaseAddress, module.BaseAddress + module.MemorySize);
-                }
+            Module64 module = program.Module64(asmName);
+            if (module != null) {
+                return new Tuple<IntPtr, IntPtr>(module.BaseAddress, module.BaseAddress + module.MemorySize);
             }
             return new Tuple<IntPtr, IntPtr>(IntPtr.Zero, IntPtr.Zero);
         }
@@ -174,10 +171,6 @@ namespace LiveSplit.OriWotW {
 
                     byte[] metaDataBytes = File.ReadAllBytes(metaFile);
                     byte[] il2CppBytes = File.ReadAllBytes(ilFile);
-                    switch (il2CppBytes.Length) {
-                        case 73919488: MemoryManager.Version = PointerVersion.V2; break;
-                        default: MemoryManager.Version = PointerVersion.All; break;
-                    }
                     Metadata metaData;
                     Il2CppData il2Cpp;
                     Il2CppReader.Init(il2CppBytes, metaDataBytes, out metaData, out il2Cpp);

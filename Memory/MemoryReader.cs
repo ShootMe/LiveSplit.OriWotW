@@ -10,50 +10,17 @@ namespace LiveSplit.OriWotW {
         public static void Update64Bit(Process program) {
             is64Bit = program.Is64Bit();
         }
-        public static T Read<T>(this Process targetProcess, IntPtr address, params int[] offsets) where T : struct {
+        public static T Read<T>(this Process targetProcess, IntPtr address, params int[] offsets) where T : unmanaged {
             if (targetProcess == null || address == IntPtr.Zero) { return default(T); }
 
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return default(T); }
 
-            Type type = typeof(T);
-            type = (type.IsEnum ? Enum.GetUnderlyingType(type) : type);
-
-            int count = (type == typeof(bool)) ? 1 : Marshal.SizeOf(type);
-            byte[] buffer = Read(targetProcess, address + last, count);
-
-            object obj = ResolveToType(buffer, type);
-            return (T)((object)obj);
-        }
-        private static object ResolveToType(byte[] bytes, Type type) {
-            if (type == typeof(int)) {
-                return BitConverter.ToInt32(bytes, 0);
-            } else if (type == typeof(uint)) {
-                return BitConverter.ToUInt32(bytes, 0);
-            } else if (type == typeof(float)) {
-                return BitConverter.ToSingle(bytes, 0);
-            } else if (type == typeof(double)) {
-                return BitConverter.ToDouble(bytes, 0);
-            } else if (type == typeof(byte)) {
-                return bytes[0];
-            } else if (type == typeof(sbyte)) {
-                return (sbyte)bytes[0];
-            } else if (type == typeof(bool)) {
-                return bytes != null && bytes[0] > 0;
-            } else if (type == typeof(short)) {
-                return BitConverter.ToInt16(bytes, 0);
-            } else if (type == typeof(ushort)) {
-                return BitConverter.ToUInt16(bytes, 0);
-            } else if (type == typeof(long)) {
-                return BitConverter.ToInt64(bytes, 0);
-            } else if (type == typeof(ulong)) {
-                return BitConverter.ToUInt64(bytes, 0);
-            } else {
-                GCHandle gCHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-                try {
-                    return Marshal.PtrToStructure(gCHandle.AddrOfPinnedObject(), type);
-                } finally {
-                    gCHandle.Free();
+            unsafe {
+                int size = sizeof(T);
+                byte[] buffer = Read(targetProcess, address + last, size);
+                fixed (byte* ptr = buffer) {
+                    return *(T*)ptr;
                 }
             }
         }
@@ -131,37 +98,19 @@ namespace LiveSplit.OriWotW {
 
             return ReadAscii(targetProcess, address + last);
         }
-        public static void Write<T>(this Process targetProcess, IntPtr address, T value, params int[] offsets) where T : struct {
+        public static void Write<T>(this Process targetProcess, IntPtr address, T value, params int[] offsets) where T : unmanaged {
             if (targetProcess == null) { return; }
 
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return; }
 
-            byte[] buffer = null;
-            if (typeof(T) == typeof(bool)) {
-                buffer = BitConverter.GetBytes(Convert.ToBoolean(value));
-            } else if (typeof(T) == typeof(byte)) {
-                buffer = BitConverter.GetBytes(Convert.ToByte(value));
-            } else if (typeof(T) == typeof(sbyte)) {
-                buffer = BitConverter.GetBytes(Convert.ToSByte(value));
-            } else if (typeof(T) == typeof(int)) {
-                buffer = BitConverter.GetBytes(Convert.ToInt32(value));
-            } else if (typeof(T) == typeof(uint)) {
-                buffer = BitConverter.GetBytes(Convert.ToUInt32(value));
-            } else if (typeof(T) == typeof(short)) {
-                buffer = BitConverter.GetBytes(Convert.ToInt16(value));
-            } else if (typeof(T) == typeof(ushort)) {
-                buffer = BitConverter.GetBytes(Convert.ToUInt16(value));
-            } else if (typeof(T) == typeof(long)) {
-                buffer = BitConverter.GetBytes(Convert.ToInt64(value));
-            } else if (typeof(T) == typeof(ulong)) {
-                buffer = BitConverter.GetBytes(Convert.ToUInt64(value));
-            } else if (typeof(T) == typeof(float)) {
-                buffer = BitConverter.GetBytes(Convert.ToSingle(value));
-            } else if (typeof(T) == typeof(double)) {
-                buffer = BitConverter.GetBytes(Convert.ToDouble(value));
+            byte[] buffer;
+            unsafe {
+                buffer = new byte[sizeof(T)];
+                fixed (byte* bufferPtr = buffer) {
+                    Buffer.MemoryCopy(&value, bufferPtr, sizeof(T), sizeof(T));
+                }
             }
-
             int bytesWritten;
             WinAPI.WriteProcessMemory(targetProcess.Handle, address + last, buffer, buffer.Length, out bytesWritten);
         }
@@ -198,7 +147,18 @@ namespace LiveSplit.OriWotW {
             Module64[] modules = p.Modules64();
             return modules == null || modules.Length == 0 ? null : modules[0];
         }
-
+        public static Module64 Module64(this Process p, string moduleName) {
+            Module64[] modules = p.Modules64();
+            if (modules != null) {
+                for (int i = 0; i < modules.Length; i++) {
+                    Module64 module = modules[i];
+                    if (module.Name.Equals(moduleName, StringComparison.OrdinalIgnoreCase)) {
+                        return module;
+                    }
+                }
+            }
+            return null;
+        }
         public static Module64[] Modules64(this Process p) {
             lock (ModuleCache) {
                 if (ModuleCache.Count > 100) { ModuleCache.Clear(); }

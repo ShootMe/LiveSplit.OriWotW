@@ -140,7 +140,7 @@ namespace LiveSplit.OriWotW {
         public void Update(IInvalidator invalidator, LiveSplitState lvstate, float width, float height, LayoutMode mode) {
             if (DateTime.Now > lastInfoCheck) {
                 infoComponent = null;
-                IList<ILayoutComponent> components = lvstate.Layout.LayoutComponents;
+                IList<ILayoutComponent> components = Model.CurrentState.Layout.LayoutComponents;
                 for (int i = components.Count - 1; i >= 0; i--) {
                     ILayoutComponent component = components[i];
                     if (component.Component is TextComponent) {
