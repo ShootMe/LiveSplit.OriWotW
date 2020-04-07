@@ -511,7 +511,7 @@ namespace LiveSplit.OriWotW {
                     MemoryManager.Version = PointerVersion.All;
                     if (module != null) {
                         switch (module.MemorySize) {
-                            case 77430784: MemoryManager.Version = PointerVersion.V2; break;
+                            case 77447168: MemoryManager.Version = PointerVersion.V2; break;
                         }
                     }
                     uberIDLookup = null;
