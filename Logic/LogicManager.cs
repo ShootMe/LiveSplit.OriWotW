@@ -85,7 +85,7 @@ namespace LiveSplit.OriWotW {
         private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
             ShouldSplit = false;
-            Paused = Memory.IsLoadingGame();
+            Paused = Memory.IsLoadingGame(state);
 
             if (split.Type == SplitType.GameStart) {
                 Screen screen = Memory.TitleScreen();

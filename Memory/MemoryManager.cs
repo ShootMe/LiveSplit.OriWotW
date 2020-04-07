@@ -206,11 +206,18 @@ namespace LiveSplit.OriWotW {
             //TitleScreenManager.Instance.m_currentScreen
             return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
-        public bool IsLoadingGame() {
-            //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
+        public bool IsLoadingGame(GameState state) {
+            if (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0) {
+                return true;
+            }
             //int m_isLoadingGame = FindIl2CppOffset.GetOffset(Program, "__mainWisp.GameController.m_isLoadingGame");
             int m_isLoadingGame = Version == PointerVersion.All ? 0x103 : 0x10b;
-            return (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0) || GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame);
+            //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
+            if (GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame)) {
+                return true;
+            }
+            string scene = CurrentScene();
+            return state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway");
         }
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
