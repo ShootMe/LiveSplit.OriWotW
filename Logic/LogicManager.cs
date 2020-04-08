@@ -326,8 +326,8 @@ namespace LiveSplit.OriWotW {
         private void CheckWorldEvent(Split split) {
             SplitWorldEvent worldEvent = Utility.GetEnumValue<SplitWorldEvent>(split.Value);
             switch (worldEvent) {
-                case SplitWorldEvent.FindKu: CheckAbility(AbilityType.Flap); break;
-                case SplitWorldEvent.LoseKu: CheckAbility(AbilityType.Flap, false); break;
+                case SplitWorldEvent.FindKu: CheckUberBoolValue(UberStateDefaults.playerOnTandem); break;
+                case SplitWorldEvent.LoseKu: CheckUberBoolValue(UberStateDefaults.playerOnTandem, false); break;
                 case SplitWorldEvent.DesertEscapeStart: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 1); break;
                 case SplitWorldEvent.DesertEscapeEnd: CheckUberIntValue(UberStateDefaults.desertRuinsEscape, 3); break;
                 case SplitWorldEvent.WinterForestEscapeStart: CheckUberIntValue(UberStateDefaults.winterForestWispQuest, 2); break;

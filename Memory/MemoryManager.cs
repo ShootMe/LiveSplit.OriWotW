@@ -222,7 +222,7 @@ namespace LiveSplit.OriWotW {
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
             //UberStateCollection.Instance.m_descriptorsArray
-            IntPtr descriptors = (IntPtr)UberStateCollection.Read<ulong>(Program, 0xb8, 0x10, 0x20);
+            IntPtr descriptors = UberStateCollection.Read<IntPtr>(Program, 0xb8, 0x10, 0x20);
             //.Count
             int descriptorsCount = Program.Read<int>(descriptors, 0x18);
             byte[] data = Program.Read(descriptors + 0x20, descriptorsCount * 0x8);
@@ -249,7 +249,7 @@ namespace LiveSplit.OriWotW {
                 //.m_descriptorsArray[i].ID.m_id
                 int id = Program.Read<int>(descriptor, 0x18, 0x10);
                 //.m_descriptorsArray[i].Name
-                IntPtr namePtr = (IntPtr)Program.Read<ulong>(descriptor, 0x10, 0x48);
+                IntPtr namePtr = Program.Read<IntPtr>(descriptor, 0x10, 0x48);
                 string name = string.Empty;
                 if (namePtr != IntPtr.Zero) {
                     name = Program.ReadAscii(namePtr);
@@ -260,7 +260,7 @@ namespace LiveSplit.OriWotW {
                 //.m_descriptorsArray[i].Group.ID.m_id
                 int groupID = Program.Read<int>(descriptor, groupOffset, 0x18, 0x10);
                 //.m_descriptorsArray[i].Group.Name
-                namePtr = (IntPtr)Program.Read<ulong>(descriptor, groupOffset, 0x10, 0x48);
+                namePtr = Program.Read<IntPtr>(descriptor, groupOffset, 0x10, 0x48);
                 string groupName = string.Empty;
                 if (namePtr != IntPtr.Zero) {
                     groupName = Program.ReadAscii(namePtr);
@@ -282,11 +282,11 @@ namespace LiveSplit.OriWotW {
         }
         public void UpdateUberState(UberState uberState = null) {
             //UbserStateController.m_currentStateValueStore.m_groupMap
-            IntPtr groups = (IntPtr)UberStateController.Read<ulong>(Program, 0xb8, 0x40, 0x18);
+            IntPtr groups = UberStateController.Read<IntPtr>(Program, 0xb8, 0x40, 0x18);
             //.Count
             int groupCount = Program.Read<int>(groups, 0x20);
             //.Values
-            groups = (IntPtr)Program.Read<ulong>(groups, 0x18);
+            groups = Program.Read<IntPtr>(groups, 0x18);
             byte[] groupsData = Program.Read(groups + 0x20, groupCount * 0x18);
 
             bool updateAll = uberState == null;
@@ -303,7 +303,7 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_objectStateMap.Count
                 int mapCount = Program.Read<int>(map, 0x20);
                 if (mapCount > 0 && (updateAll || uberState.IsObjectType)) {
-                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    map = Program.Read<IntPtr>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_objectStateMap.Keys[j]
@@ -326,7 +326,7 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_boolStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
                 if (mapCount > 0 && (updateAll || uberState.IsBoolType)) {
-                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    map = Program.Read<IntPtr>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_boolStateMap.Keys[j]
@@ -345,7 +345,7 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_floatStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
                 if (mapCount > 0 && (updateAll || uberState.IsFloatType)) {
-                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    map = Program.Read<IntPtr>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_floatStateMap.Keys[j]
@@ -364,7 +364,7 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_intStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
                 if (mapCount > 0 && (updateAll || uberState.IsIntType)) {
-                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    map = Program.Read<IntPtr>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_intStateMap.Keys[j]
@@ -383,7 +383,7 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_byteStateMap.Count
                 mapCount = Program.Read<int>(map, 0x20);
                 if (mapCount > 0 && (updateAll || uberState.IsByteType)) {
-                    map = (IntPtr)Program.Read<ulong>(map, 0x18);
+                    map = Program.Read<IntPtr>(map, 0x18);
                     byte[] data = Program.Read(map + 0x20, mapCount * 0x18);
                     for (int j = 0; j < mapCount; j++) {
                         //.Values[i].m_byteStateMap.Keys[j]
@@ -400,11 +400,11 @@ namespace LiveSplit.OriWotW {
         }
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
-            IntPtr abilities = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
+            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
-            abilities = (IntPtr)Program.Read<ulong>(abilities, 0x10);
+            abilities = Program.Read<IntPtr>(abilities, 0x10);
             byte[] data = Program.Read(abilities + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
                 //.Items[i]
@@ -418,11 +418,11 @@ namespace LiveSplit.OriWotW {
         public Dictionary<AbilityType, Ability> PlayerAbilities() {
             Dictionary<AbilityType, Ability> currentAbilities = new Dictionary<AbilityType, Ability>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
-            IntPtr abilities = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
+            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
-            abilities = (IntPtr)Program.Read<ulong>(abilities, 0x10);
+            abilities = Program.Read<IntPtr>(abilities, 0x10);
             byte[] data = Program.Read(abilities + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
                 //.Items[i]
@@ -435,11 +435,11 @@ namespace LiveSplit.OriWotW {
         }
         public bool HasShard(ShardType type, int level) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
-            IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
+            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
-            shards = (IntPtr)Program.Read<ulong>(shards, 0x10);
+            shards = Program.Read<IntPtr>(shards, 0x10);
             byte[] data = Program.Read(shards + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
                 //.Items[i]
@@ -453,11 +453,11 @@ namespace LiveSplit.OriWotW {
         public Dictionary<ShardType, Shard> PlayerShards() {
             Dictionary<ShardType, Shard> currentShards = new Dictionary<ShardType, Shard>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
-            IntPtr shards = (IntPtr)PlayerUberStateGroup.Read<ulong>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
+            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
-            shards = (IntPtr)Program.Read<ulong>(shards, 0x10);
+            shards = Program.Read<IntPtr>(shards, 0x10);
             byte[] data = Program.Read(shards + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
                 //.Items[i]
@@ -471,11 +471,11 @@ namespace LiveSplit.OriWotW {
         public float MapCompletion(AreaType areaType = AreaType.None) {
             float totalCompletion = 0;
             //GameWorld.RuntimeAreas
-            IntPtr areas = (IntPtr)GameWorld.Read<ulong>(Program, 0xb8, 0x0, 0x28);
+            IntPtr areas = GameWorld.Read<IntPtr>(Program, 0xb8, 0x0, 0x28);
             //.Count
             int count = Program.Read<int>(areas, 0x18);
             //.Items
-            areas = (IntPtr)Program.Read<ulong>(areas, 0x10);
+            areas = Program.Read<IntPtr>(areas, 0x10);
             byte[] data = Program.Read(areas + 0x20, count * 0x8);
             for (int i = 0; i < count; i++) {
                 IntPtr area = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
@@ -497,7 +497,7 @@ namespace LiveSplit.OriWotW {
             IsHooked = Program != null && !Program.HasExited;
             if (!IsHooked && DateTime.Now > LastHooked.AddSeconds(1)) {
                 LastHooked = DateTime.Now;
-                ClearPointers();
+
                 Process[] processes = Process.GetProcessesByName("OriWotW");
                 Program = processes != null && processes.Length > 0 ? processes[0] : null;
 
@@ -532,24 +532,6 @@ namespace LiveSplit.OriWotW {
 
             fpsTimer.Update(IsHooked ? FrameCount() : 0);
             return IsHooked;
-        }
-        private void ClearPointers() {
-            Characters.ClearPointer();
-            GameWorld.ClearPointer();
-            PlayerUberStateGroup.ClearPointer();
-            TitleScreenManager.ClearPointer();
-            GameStateMachine.ClearPointer();
-            GameController.ClearPointer();
-            ScenesManager.ClearPointer();
-            UberStateController.ClearPointer();
-            UberStateCollection.ClearPointer();
-            DifficultyController.ClearPointer();
-            NoPausePatch.ClearPointer();
-            TargetFrameRatePatch.ClearPointer();
-            VSyncPatch.ClearPointer();
-            FrameCounter.ClearPointer();
-            CheatsHandler.ClearPointer();
-            DebugControls.ClearPointer();
         }
         public void Dispose() {
             if (Program != null) {

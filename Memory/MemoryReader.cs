@@ -18,6 +18,7 @@ namespace LiveSplit.OriWotW {
 
             unsafe {
                 int size = sizeof(T);
+                if (typeof(T) == typeof(IntPtr)) { size = is64Bit ? 8 : 4; }
                 byte[] buffer = Read(targetProcess, address + last, size);
                 fixed (byte* ptr = buffer) {
                     return *(T*)ptr;
@@ -46,9 +47,9 @@ namespace LiveSplit.OriWotW {
         public static string ReadString(this Process targetProcess, IntPtr address) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
 
-            int length = Read<int>(targetProcess, address, 0x10);
+            int length = Read<int>(targetProcess, address, is64Bit ? 0x10 : 0x8);
             if (length < 0 || length > 2048) { return string.Empty; }
-            return Encoding.Unicode.GetString(Read(targetProcess, address + 0x14, 2 * length));
+            return Encoding.Unicode.GetString(Read(targetProcess, address + (is64Bit ? 0x14 : 0xc), 2 * length));
         }
         public static string ReadString(this Process targetProcess, IntPtr address, params int[] offsets) {
             if (targetProcess == null || address == IntPtr.Zero) { return string.Empty; }
@@ -260,7 +261,7 @@ namespace LiveSplit.OriWotW {
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern int VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, out MemInfo lpBuffer, int dwLength);
 
-        public List<MemInfo> memoryInfo;
+        private List<MemInfo> memoryInfo = new List<MemInfo>();
         public Func<MemInfo, bool> MemoryFilter = delegate (MemInfo info) {
             return (info.State & 0x1000) != 0 && (info.Protect & 0x100) == 0;
         };
@@ -305,10 +306,26 @@ namespace LiveSplit.OriWotW {
             }
             return pointers;
         }
-        public void GetMemoryInfo(IntPtr pHandle) {
-            if (memoryInfo != null) { return; }
+        public bool VerifySignature(Process process, IntPtr pointer, string signature) {
+            byte[] pattern;
+            bool[] mask;
+            GetSignature(signature, out pattern, out mask);
+            int[] offsets = GetCharacterOffsets(pattern, mask);
 
-            memoryInfo = new List<MemInfo>();
+            MemInfo memInfoStart = default(MemInfo);
+            MemInfo memInfoEnd = default(MemInfo);
+            if (VirtualQueryEx(process.Handle, pointer, out memInfoStart, Marshal.SizeOf(memInfoStart)) == 0 ||
+                VirtualQueryEx(process.Handle, pointer + pattern.Length, out memInfoEnd, Marshal.SizeOf(memInfoStart)) == 0 ||
+                memInfoStart.BaseAddress != memInfoEnd.BaseAddress || !MemoryFilter(memInfoStart)) {
+                return false;
+            }
+
+            byte[] buff = new byte[pattern.Length];
+            ReadProcessMemory(process.Handle, pointer, buff, (uint)buff.Length, 0);
+            return ScanMemory(buff, pattern, mask, offsets) == 0;
+        }
+        public void GetMemoryInfo(IntPtr pHandle) {
+            memoryInfo.Clear();
             IntPtr current = (IntPtr)65536;
             while (true) {
                 MemInfo memInfo = new MemInfo();

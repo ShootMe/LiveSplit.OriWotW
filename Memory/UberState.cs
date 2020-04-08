@@ -14,6 +14,7 @@ namespace LiveSplit.OriWotW {
         PlayerUberStateDescriptor
     }
     public static class UberStateDefaults {
+        public static UberState playerOnTandem = new UberState() { Name = "playerOnTandemUberState", ID = 54402, GroupName = "playerUberStateGroupDescriptor", GroupID = 3440, Type = UberStateType.SerializedBooleanUberState };
         public static UberState lumaPoolsSeed = new UberState() { Name = "gardenerSeedGrassCollected", ID = 28662, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
         public static UberState windsweptWastesSeed = new UberState() { Name = "gardenerSeedFlowersCollected", ID = 20601, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
         public static UberState mouldwoodDepthsSeed = new UberState() { Name = "gardenerSeedBashCollected", ID = 8192, GroupName = "questUberStateGroup", GroupID = 14019, Type = UberStateType.SerializedBooleanUberState };
