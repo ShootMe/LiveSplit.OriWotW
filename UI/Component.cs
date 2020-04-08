@@ -17,7 +17,8 @@ namespace LiveSplit.OriWotW {
         private LogicManager logic;
         private UserSettings userSettings;
         private LogManager log;
-        private Thread timerLoop;
+        private bool isRunning = false;
+        private bool shouldLog = false;
         private bool isAutosplitting = false;
         private TextComponent infoComponent;
         private DateTime lastInfoCheck = DateTime.MinValue;
@@ -51,31 +52,51 @@ namespace LiveSplit.OriWotW {
             StartAutosplitter();
         }
 
-        public void StartAutosplitter() {
-            if (timerLoop != null) { return; }
-
-            timerLoop = new Thread(UpdateLoop);
-            timerLoop.IsBackground = true;
-            timerLoop.Priority = ThreadPriority.AboveNormal;
-            timerLoop.Start();
-        }
-        private void UpdateLoop() {
-            while (timerLoop != null) {
-                try {
-                    if (logic.IsHooked()) {
-                        logic.Update();
-                        Task.Run(delegate () {
-                            try {
-                                log.Update(logic, userSettings.Settings);
-                            } catch { }
-                        });
-                    }
-                    HandleLogic();
-                } catch (Exception ex) {
-                    log.AddEntry(new EventLogEntry(ex.ToString()));
-                }
-                Thread.Sleep(7);
+        public void WaitForLogic() {
+            lock (logic) {
+                while (!shouldLog && isRunning) { Monitor.Wait(logic); }
+                shouldLog = false;
             }
+        }
+        public void PulseLog() {
+            lock (logic) {
+                shouldLog = true;
+                Monitor.PulseAll(logic);
+            }
+        }
+        public void StartAutosplitter() {
+            if (isRunning) { return; }
+            isRunning = true;
+
+            Task.Factory.StartNew(delegate () {
+                try {
+                    while (isRunning) {
+                        try {
+                            if (logic.IsHooked()) {
+                                logic.Update();
+                                PulseLog();
+                            }
+                            HandleLogic();
+                        } catch (Exception ex) {
+                            log.AddEntry(new EventLogEntry(ex.ToString()));
+                        }
+                        Thread.Sleep(7);
+                    }
+                } catch { }
+            }, TaskCreationOptions.LongRunning);
+
+            Task.Factory.StartNew(delegate () {
+                try {
+                    while (isRunning) {
+                        try {
+                            WaitForLogic();
+                            log.Update(logic, userSettings.Settings);
+                        } catch (Exception ex) {
+                            log.AddEntry(new EventLogEntry(ex.ToString()));
+                        }
+                    }
+                } catch { }
+            }, TaskCreationOptions.LongRunning);
         }
         private void HandleLogic() {
             if (Model == null) { return; }
@@ -175,9 +196,8 @@ namespace LiveSplit.OriWotW {
         public float PaddingTop { get { return 0; } }
         public float VerticalHeight { get { return 0; } }
         public void Dispose() {
-            if (timerLoop != null) {
-                timerLoop = null;
-            }
+            isRunning = false;
+            PulseLog();
             if (Model != null) {
                 Model.CurrentState.OnReset -= OnReset;
                 Model.CurrentState.OnPause -= OnPause;
