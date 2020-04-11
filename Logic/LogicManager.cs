@@ -70,9 +70,7 @@ namespace LiveSplit.OriWotW {
 
             if (currentSplit != CurrentSplit) {
                 CurrentSplit = currentSplit;
-                if (CurrentSplit > 0) {
-                    Running = true;
-                }
+                Running = CurrentSplit > 0;
                 InitializeSplit();
             }
 

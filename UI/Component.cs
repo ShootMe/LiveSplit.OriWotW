@@ -107,10 +107,11 @@ namespace LiveSplit.OriWotW {
                 Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(logic.GameTime));
             }
 
-            isAutosplitting = true;
             if (logic.ShouldReset) {
+                isAutosplitting = true;
                 Model.Reset();
             } else if (logic.ShouldSplit) {
+                isAutosplitting = true;
                 if (Model.CurrentState.CurrentPhase == TimerPhase.NotRunning) {
                     Model.Start();
                 } else {
