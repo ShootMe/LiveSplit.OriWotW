@@ -60,12 +60,20 @@ namespace LiveSplit.OriWotW {
             GameTime = -1;
             return hooked;
         }
-        public void Update() {
+        public void Update(int currentSplit) {
             Memory.PatchNoPause(Settings.NoPause);
             Memory.PatchFPSLock(Settings.FPSLock);
             if (Settings.DisableDebug && Running) {
                 hadDebug = Memory.DebugEnabled();
                 Memory.EnableDebug(false);
+            }
+
+            if (currentSplit != CurrentSplit) {
+                CurrentSplit = currentSplit;
+                if (CurrentSplit > 0) {
+                    Running = true;
+                }
+                InitializeSplit();
             }
 
             if (CurrentSplit < Settings.Autosplits.Count) {

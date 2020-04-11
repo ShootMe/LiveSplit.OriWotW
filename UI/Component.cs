@@ -73,7 +73,8 @@ namespace LiveSplit.OriWotW {
                     while (isRunning) {
                         try {
                             if (logic.IsHooked()) {
-                                logic.Update();
+                                int currentSplit = Model.CurrentState.CurrentPhase == TimerPhase.NotRunning ? 0 : Model.CurrentState.CurrentSplitIndex;
+                                logic.Update(currentSplit);
                                 PulseLog();
                             }
                             HandleLogic();
