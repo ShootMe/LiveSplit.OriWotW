@@ -16,6 +16,7 @@ namespace LiveSplit.OriWotW {
     public class ProgramPointer {
         private int lastID;
         private DateTime lastTry;
+        private IFindPointer currentFinder;
         public IntPtr Pointer { get; private set; }
         public IFindPointer[] Finders { get; private set; }
         public string AsmName { get; private set; }
@@ -56,6 +57,8 @@ namespace LiveSplit.OriWotW {
             } else if (program.Id != lastID) {
                 Pointer = IntPtr.Zero;
                 lastID = program.Id;
+            } else if (Pointer != IntPtr.Zero && !currentFinder.VerifyPointer(program)) {
+                Pointer = IntPtr.Zero;
             }
 
             if (Pointer == IntPtr.Zero && DateTime.Now > lastTry) {
@@ -67,6 +70,7 @@ namespace LiveSplit.OriWotW {
                         try {
                             Pointer = finder.FindPointer(program, AsmName);
                             if (Pointer != IntPtr.Zero || finder.FoundBaseAddress()) {
+                                currentFinder = finder;
                                 break;
                             }
                         } catch { }
@@ -97,6 +101,7 @@ namespace LiveSplit.OriWotW {
     public interface IFindPointer {
         IntPtr FindPointer(Process program, string asmName);
         bool FoundBaseAddress();
+        bool VerifyPointer(Process program);
         PointerVersion Version { get; }
     }
     public class FindIl2CppOffset {
@@ -152,6 +157,9 @@ namespace LiveSplit.OriWotW {
             Decompiler = new Il2CppDecompiler(executor);
             return true;
         }
+        public bool VerifyPointer(Process program) {
+            return true;
+        }
         public IntPtr FindPointer(Process program, string asmName) {
             if (Decompiler == null) { return IntPtr.Zero; }
             return ProgramPointer.DerefPointer(program, GetPointer(program, asmName), AutoDeref);
@@ -175,7 +183,6 @@ namespace LiveSplit.OriWotW {
         }
     }
     public class FindPointerSignature : IFindPointer {
-        private int lastPID;
         public PointerVersion Version { get; private set; }
         private AutoDeref AutoDeref;
         private string Signature;
@@ -197,31 +204,22 @@ namespace LiveSplit.OriWotW {
         public bool FoundBaseAddress() {
             return BasePtr != IntPtr.Zero;
         }
+        public bool VerifyPointer(Process program) {
+            DateTime now = DateTime.Now;
+            if (now > LastVerified) {
+                bool isValid = Searcher.VerifySignature(program, BasePtr, Signature);
+                LastVerified = now.AddSeconds(5);
+                if (!isValid) {
+                    BasePtr = IntPtr.Zero;
+                    return false;
+                }
+            }
+            return true;
+        }
         public IntPtr FindPointer(Process program, string asmName) {
             return ProgramPointer.DerefPointer(program, GetPointer(program, asmName), AutoDeref);
         }
         private IntPtr GetPointer(Process program, string asmName) {
-            if (lastPID != program.Id) {
-                lastPID = program.Id;
-                BasePtr = IntPtr.Zero;
-            }
-
-            if (BasePtr != IntPtr.Zero) {
-                DateTime now = DateTime.Now;
-                if (now > LastVerified) {
-                    bool isValid = Searcher.VerifySignature(program, BasePtr, Signature);
-                    LastVerified = now.AddSeconds(5);
-                    if (!isValid) {
-                        BasePtr = IntPtr.Zero;
-                    }
-                }
-
-                if (BasePtr != IntPtr.Zero) {
-                    int offset = CalculateRelative(program);
-                    return BasePtr + offset;
-                }
-            }
-
             if (string.IsNullOrEmpty(asmName)) {
                 Searcher.MemoryFilter = delegate (MemInfo info) {
                     return (info.State & 0x1000) != 0 && (info.Protect & 0x40) != 0 && (info.Protect & 0x100) == 0;
@@ -233,14 +231,13 @@ namespace LiveSplit.OriWotW {
                 };
             }
 
-            IntPtr ptr = Searcher.FindSignature(program, Signature);
-            if (ptr != IntPtr.Zero) {
-                BasePtr = ptr;
+            BasePtr = Searcher.FindSignature(program, Signature);
+            if (BasePtr != IntPtr.Zero) {
                 LastVerified = DateTime.Now.AddSeconds(5);
                 int offset = CalculateRelative(program);
                 return BasePtr + offset;
             }
-            return IntPtr.Zero;
+            return BasePtr;
         }
         private int CalculateRelative(Process program) {
             int maxIndex = Relative.Length - 1;
@@ -255,7 +252,6 @@ namespace LiveSplit.OriWotW {
         }
     }
     public class FindOffset : IFindPointer {
-        private int lastPID;
         private int[] Offsets;
         private IntPtr BasePtr;
         public PointerVersion Version { get; private set; }
@@ -268,16 +264,15 @@ namespace LiveSplit.OriWotW {
         public bool FoundBaseAddress() {
             return BasePtr != IntPtr.Zero;
         }
+        public bool VerifyPointer(Process program) {
+            return true;
+        }
         public IntPtr FindPointer(Process program, string asmName) {
-            if (lastPID != program.Id) {
-                lastPID = program.Id;
-
-                if (string.IsNullOrEmpty(asmName)) {
-                    BasePtr = program.MainModule.BaseAddress;
-                } else {
-                    Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
-                    BasePtr = range.Item1;
-                }
+            if (string.IsNullOrEmpty(asmName)) {
+                BasePtr = program.MainModule.BaseAddress;
+            } else {
+                Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
+                BasePtr = range.Item1;
             }
 
             return program.Read<IntPtr>(BasePtr, Offsets);
