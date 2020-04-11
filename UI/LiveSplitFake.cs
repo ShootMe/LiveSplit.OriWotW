@@ -56,6 +56,7 @@ namespace LiveSplit.OriWotW {
         public Time CurrentTime;
         public Run Run;
         public ILayout Layout;
+        public int CurrentSplitIndex;
         public event EventHandler OnPause;
         public event EventHandler OnResume;
         public event EventHandlerT<TimerPhase> OnReset;

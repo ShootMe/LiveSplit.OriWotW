@@ -22,9 +22,9 @@ namespace LiveSplit.OriWotW {
         private bool isAutosplitting = false;
         private TextComponent infoComponent;
         private DateTime lastInfoCheck = DateTime.MinValue;
-#if !Manager
+#if !Manager && Console
         public static void Main(string[] args) {
-            Component component = new Component(null);
+            Component component = new Component(new LiveSplitState());
             component.log.EnableLogging = true;
             component.userSettings.Settings.NoPause = true;
             component.userSettings.Settings.FPSLock = false;
