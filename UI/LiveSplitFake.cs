@@ -14,6 +14,7 @@ namespace LiveSplit.OriWotW {
         }
         public Type ComponentFactoryClassType { get; }
     }
+    public class RunEditorDialog : Form { }
     public interface IComponent { }
     public enum TimerPhase {
         NotRunning = 0,
