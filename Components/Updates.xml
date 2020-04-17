@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.3.5">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added ability to show Trial Time with a Text component named as Trial Time </change>
+        </changelog>
+    </update>
     <update version="1.3.4">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

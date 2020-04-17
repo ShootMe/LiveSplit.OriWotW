@@ -21,8 +21,9 @@ namespace LiveSplit.OriWotW {
         private bool isRunning = false;
         private bool shouldLog = false;
         private bool isAutosplitting = false;
-        private TextComponent infoComponent;
+        private TextComponent fpsComponent, raceComponent;
         private DateTime lastInfoCheck = DateTime.MinValue;
+        private DateTime lastTimerCheck = DateTime.MinValue;
         private RunEditorDialog editorDialog;
         private System.ComponentModel.BindingList<ISegment> segmentList;
         private Split oldSplit;
@@ -176,26 +177,44 @@ namespace LiveSplit.OriWotW {
                 }
             }
 
-            if (DateTime.Now > lastInfoCheck) {
-                infoComponent = null;
+            DateTime dateTime = DateTime.Now;
+            if (dateTime > lastInfoCheck) {
+                fpsComponent = null;
+                raceComponent = null;
+
                 IList<ILayoutComponent> components = Model.CurrentState.Layout.LayoutComponents;
                 for (int i = components.Count - 1; i >= 0; i--) {
                     ILayoutComponent component = components[i];
-                    if (component.Component is TextComponent) {
-                        TextComponent text = (TextComponent)component.Component;
+                    if (component.Component is TextComponent text) {
                         if (text.Settings.Text1.IndexOf("FPS", StringComparison.OrdinalIgnoreCase) >= 0) {
-                            infoComponent = text;
-                            break;
+                            fpsComponent = text;
+                        } else if (text.Settings.Text1.IndexOf("Trial Time", StringComparison.OrdinalIgnoreCase) >= 0) {
+                            raceComponent = text;
                         }
                     }
                 }
-                lastInfoCheck = DateTime.Now.AddSeconds(3);
+                lastInfoCheck = dateTime.AddSeconds(3);
             }
 
-            if (infoComponent != null) {
+            if (fpsComponent != null) {
                 string fps = logic.Memory.FPS().ToString("0.0");
-                if (fps != infoComponent.Settings.Text2) {
-                    infoComponent.Settings.Text2 = fps;
+                if (fps != fpsComponent.Settings.Text2) {
+                    fpsComponent.Settings.Text2 = fps;
+                }
+            }
+
+            if (raceComponent != null && dateTime > lastTimerCheck) {
+                lastTimerCheck = dateTime.AddMilliseconds(200);
+                float raceTime = logic.Memory.RaceTime();
+                string display = null;
+                if (raceTime == 0) {
+                    raceTime = logic.Memory.LastRaceTime();
+                    display = $"{raceTime:0.000}";
+                } else {
+                    display = $"{raceTime:0.000}";
+                }
+                if (display != raceComponent.Settings.Text2) {
+                    raceComponent.Settings.Text2 = display;
                 }
             }
         }

@@ -50,6 +50,9 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C8938488B0D????????F6812701000002740E83B9D8000000007505E8", 0x14, 0x0));
         private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e));
+        private static ProgramPointer RaceSystem = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.RaceSystem.get_CurrentStateTime", 0x8f),
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
@@ -100,6 +103,15 @@ namespace LiveSplit.OriWotW {
                 && FrameCounter.GetPointer(Program) != IntPtr.Zero
                 && CheatsHandler.GetPointer(Program) != IntPtr.Zero
                 && DebugControls.GetPointer(Program) != IntPtr.Zero;
+        }
+        public float RaceTime() {
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x28, 0x18);
+        }
+        public float LastRaceTime() {
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x140, 0x104);
+        }
+        public float PersonalBestTime() {
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x28, 0x1c);
         }
         public bool DebugEnabled() {
             return CheatsHandler.Read<bool>(Program, 0xb8, 0x0, 0x20);
