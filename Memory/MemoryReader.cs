@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 namespace LiveSplit.OriWotW {
     public static class MemoryReader {
-        private static Dictionary<int, Module64[]> ModuleCache = new Dictionary<int, Module64[]>();
+        private static readonly Dictionary<int, Module64[]> ModuleCache = new Dictionary<int, Module64[]>();
         public static bool is64Bit;
         public static void Update64Bit(Process program) {
             is64Bit = program.Is64Bit();
@@ -29,8 +29,7 @@ namespace LiveSplit.OriWotW {
             byte[] buffer = new byte[numBytes];
             if (targetProcess == null || address == IntPtr.Zero) { return buffer; }
 
-            int bytesRead;
-            WinAPI.ReadProcessMemory(targetProcess.Handle, address, buffer, numBytes, out bytesRead);
+            WinAPI.ReadProcessMemory(targetProcess.Handle, address, buffer, numBytes, out _);
             return buffer;
         }
         public static byte[] Read(this Process targetProcess, IntPtr address, int numBytes, params int[] offsets) {
@@ -40,8 +39,7 @@ namespace LiveSplit.OriWotW {
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return buffer; }
 
-            int bytesRead;
-            WinAPI.ReadProcessMemory(targetProcess.Handle, address + last, buffer, numBytes, out bytesRead);
+            WinAPI.ReadProcessMemory(targetProcess.Handle, address + last, buffer, numBytes, out _);
             return buffer;
         }
         public static string ReadString(this Process targetProcess, IntPtr address) {
@@ -112,8 +110,7 @@ namespace LiveSplit.OriWotW {
                     Buffer.MemoryCopy(&value, bufferPtr, sizeof(T), sizeof(T));
                 }
             }
-            int bytesWritten;
-            WinAPI.WriteProcessMemory(targetProcess.Handle, address + last, buffer, buffer.Length, out bytesWritten);
+            WinAPI.WriteProcessMemory(targetProcess.Handle, address + last, buffer, buffer.Length, out _);
         }
         public static void Write(this Process targetProcess, IntPtr address, byte[] value, params int[] offsets) {
             if (targetProcess == null) { return; }
@@ -121,14 +118,12 @@ namespace LiveSplit.OriWotW {
             int last = OffsetAddress(targetProcess, ref address, offsets);
             if (address == IntPtr.Zero) { return; }
 
-            int bytesWritten;
-            WinAPI.WriteProcessMemory(targetProcess.Handle, address + last, value, value.Length, out bytesWritten);
+            WinAPI.WriteProcessMemory(targetProcess.Handle, address + last, value, value.Length, out _);
         }
         private static int OffsetAddress(this Process targetProcess, ref IntPtr address, params int[] offsets) {
             byte[] buffer = new byte[is64Bit ? 8 : 4];
-            int bytesRead;
             for (int i = 0; i < offsets.Length - 1; i++) {
-                WinAPI.ReadProcessMemory(targetProcess.Handle, address + offsets[i], buffer, buffer.Length, out bytesRead);
+                WinAPI.ReadProcessMemory(targetProcess.Handle, address + offsets[i], buffer, buffer.Length, out _);
                 if (is64Bit) {
                     address = (IntPtr)BitConverter.ToUInt64(buffer, 0);
                 } else {
@@ -140,8 +135,7 @@ namespace LiveSplit.OriWotW {
         }
         public static bool Is64Bit(this Process process) {
             if (process == null) { return false; }
-            bool flag;
-            WinAPI.IsWow64Process(process.Handle, out flag);
+            WinAPI.IsWow64Process(process.Handle, out bool flag);
             return Environment.Is64BitOperatingSystem && !flag;
         }
         public static Module64 MainModule64(this Process p) {
@@ -166,8 +160,7 @@ namespace LiveSplit.OriWotW {
 
                 IntPtr[] buffer = new IntPtr[1024];
                 uint cb = (uint)(IntPtr.Size * buffer.Length);
-                uint totalModules;
-                if (!WinAPI.EnumProcessModulesEx(p.Handle, buffer, cb, out totalModules, 3u)) {
+                if (!WinAPI.EnumProcessModulesEx(p.Handle, buffer, cb, out uint totalModules, 3u)) {
                     return null;
                 }
                 uint moduleSize = totalModules / (uint)IntPtr.Size;
@@ -233,7 +226,7 @@ namespace LiveSplit.OriWotW {
         public string FileName { get; set; }
         public int MemorySize { get; set; }
         public string Name { get; set; }
-        public FileVersionInfo FileVersionInfo { get { return FileVersionInfo.GetVersionInfo(FileName); } }
+        public FileVersionInfo FileVersionInfo => FileVersionInfo.GetVersionInfo(FileName);
         public override string ToString() {
             return Name ?? base.ToString();
         }
@@ -254,13 +247,13 @@ namespace LiveSplit.OriWotW {
         public uint Protect;
         public uint Type;
         public override string ToString() {
-            return BaseAddress.ToString("X") + " " + Protect.ToString("X") + " " + State.ToString("X") + " " + Type.ToString("X") + " " + RegionSize.ToString("X");
+            return $"{BaseAddress} {Protect:X} {State:X} {Type:X} {RegionSize:X}";
         }
     }
     public class MemorySearcher {
         private const int BUFFER_SIZE = 2097152;
-        private List<MemInfo> memoryInfo = new List<MemInfo>();
-        private byte[] buffer = new byte[BUFFER_SIZE];
+        private readonly List<MemInfo> memoryInfo = new List<MemInfo>();
+        private readonly byte[] buffer = new byte[BUFFER_SIZE];
         public Func<MemInfo, bool> MemoryFilter = delegate (MemInfo info) {
             return (info.State & 0x1000) != 0 && (info.Protect & 0x100) == 0;
         };
@@ -277,20 +270,16 @@ namespace LiveSplit.OriWotW {
             return returnIndex;
         }
         public IntPtr FindSignature(Process process, string signature) {
-            byte[] pattern;
-            bool[] mask;
-            GetSignature(signature, out pattern, out mask);
+            GetSignature(signature, out byte[] pattern, out bool[] mask);
             GetMemoryInfo(process.Handle);
             int[] offsets = GetCharacterOffsets(pattern, mask);
-
 
             for (int i = 0; i < memoryInfo.Count; i++) {
                 MemInfo info = memoryInfo[i];
                 int index = 0;
                 do {
                     int previousIndex = index;
-                    int bytesRead;
-                    index = ReadMemory(process, i, index, out bytesRead);
+                    index = ReadMemory(process, i, index, out int bytesRead);
 
                     int result = ScanMemory(buffer, bytesRead, pattern, mask, offsets);
                     if (result != int.MinValue) {
@@ -304,9 +293,7 @@ namespace LiveSplit.OriWotW {
             return IntPtr.Zero;
         }
         public List<IntPtr> FindSignatures(Process process, string signature) {
-            byte[] pattern;
-            bool[] mask;
-            GetSignature(signature, out pattern, out mask);
+            GetSignature(signature, out byte[] pattern, out bool[] mask);
             GetMemoryInfo(process.Handle);
             int[] offsets = GetCharacterOffsets(pattern, mask);
 
@@ -316,8 +303,7 @@ namespace LiveSplit.OriWotW {
                 int index = 0;
                 do {
                     int previousIndex = index;
-                    int bytesRead;
-                    index = ReadMemory(process, i, index, out bytesRead);
+                    index = ReadMemory(process, i, index, out int bytesRead);
                     info.BaseAddress += previousIndex;
                     ScanMemory(pointers, info, buffer, bytesRead, pattern, mask, offsets);
                     info.BaseAddress -= previousIndex;
@@ -328,29 +314,25 @@ namespace LiveSplit.OriWotW {
             return pointers;
         }
         public bool VerifySignature(Process process, IntPtr pointer, string signature) {
-            byte[] pattern;
-            bool[] mask;
-            GetSignature(signature, out pattern, out mask);
+            GetSignature(signature, out byte[] pattern, out bool[] mask);
             int[] offsets = GetCharacterOffsets(pattern, mask);
 
             MemInfo memInfoStart = default(MemInfo);
-            MemInfo memInfoEnd = default(MemInfo);
             if (WinAPI.VirtualQueryEx(process.Handle, pointer, out memInfoStart, Marshal.SizeOf(memInfoStart)) == 0 ||
-                WinAPI.VirtualQueryEx(process.Handle, pointer + pattern.Length, out memInfoEnd, Marshal.SizeOf(memInfoStart)) == 0 ||
+                WinAPI.VirtualQueryEx(process.Handle, pointer + pattern.Length, out MemInfo memInfoEnd, Marshal.SizeOf(memInfoStart)) == 0 ||
                 memInfoStart.BaseAddress != memInfoEnd.BaseAddress || !MemoryFilter(memInfoStart)) {
                 return false;
             }
 
             byte[] buff = new byte[pattern.Length];
-            int bytesRead;
-            WinAPI.ReadProcessMemory(process.Handle, pointer, buff, buff.Length, out bytesRead);
+            WinAPI.ReadProcessMemory(process.Handle, pointer, buff, buff.Length, out _);
             return ScanMemory(buff, buff.Length, pattern, mask, offsets) == 0;
         }
         public void GetMemoryInfo(IntPtr pHandle) {
             memoryInfo.Clear();
             IntPtr current = (IntPtr)65536;
             while (true) {
-                MemInfo memInfo = new MemInfo();
+                MemInfo memInfo = default(MemInfo);
                 int dump = WinAPI.VirtualQueryEx(pHandle, current, out memInfo, Marshal.SizeOf(memInfo));
                 if (dump == 0) { break; }
 
