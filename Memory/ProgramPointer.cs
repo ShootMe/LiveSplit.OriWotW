@@ -164,16 +164,14 @@ namespace LiveSplit.OriWotW {
             return ProgramPointer.DerefPointer(program, GetPointer(program, asmName), AutoDeref);
         }
         private IntPtr GetPointer(Process program, string asmName) {
-            if (BasePtr == IntPtr.Zero) {
-                ulong rva = Decompiler.GetRVA(FullName);
-                if (string.IsNullOrEmpty(asmName)) {
-                    BasePtr = program.MainModule.BaseAddress + (int)rva + Offset;
-                } else {
-                    Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
-                    BasePtr = range.Item1 + (int)rva + Offset;
-                }
+            ulong rva = Decompiler.GetRVA(FullName);
+            if (string.IsNullOrEmpty(asmName)) {
+                BasePtr = program.MainModule.BaseAddress + (int)rva + Offset;
+            } else {
+                Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
+                BasePtr = range.Item1 + (int)rva + Offset;
             }
-
+            
             int offset = 0;
             if (AutoDeref != AutoDeref.None) {
                 offset = program.Read<int>(BasePtr) + 4;
