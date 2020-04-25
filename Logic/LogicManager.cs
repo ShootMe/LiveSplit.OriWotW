@@ -155,6 +155,10 @@ namespace LiveSplit.OriWotW {
                     case SplitType.Teleporter:
                         CheckTeleporter(split);
                         break;
+                    case SplitType.Hitbox:
+                        Vector4 hitbox = new Vector4(split.Value);
+                        CheckHitbox(hitbox);
+                        break;
                     case SplitType.GameEnd:
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
                         break;

@@ -21,6 +21,8 @@ namespace LiveSplit.OriWotW {
         GameEnd,
         [Description("Health Cell")]
         HealthCell,
+        [Description("Hitbox")]
+        Hitbox,
         [Description("Keystone")]
         Keystone,
         [Description("Map %")]
