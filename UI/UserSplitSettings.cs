@@ -98,7 +98,7 @@ namespace LiveSplit.OriWotW {
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "X, Y, Width, Height";
                 }
-                txtValue.Width = 200;
+                txtValue.Width = 202;
                 txtValue.Visible = true;
                 cboValue.Visible = false;
             } else {
