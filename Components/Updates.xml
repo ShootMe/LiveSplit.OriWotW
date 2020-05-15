@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.4.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Update loadless timer to pause on black screen when quiting to menu to be more like it used to be </change>
+        </changelog>
+    </update>
     <update version="1.3.9">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

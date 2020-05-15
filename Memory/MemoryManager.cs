@@ -192,7 +192,8 @@ namespace LiveSplit.OriWotW {
                 return true;
             }
             string scene = CurrentScene();
-            return state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway");
+            return (state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway"))
+                || ((state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen");
         }
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
