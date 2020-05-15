@@ -29,7 +29,6 @@
             this.btnClearLog = new System.Windows.Forms.Button();
             this.chkLog = new System.Windows.Forms.CheckBox();
             this.chkNoPause = new System.Windows.Forms.CheckBox();
-            this.chkFPSLock = new System.Windows.Forms.CheckBox();
             this.chkDebug = new System.Windows.Forms.CheckBox();
             this.tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
@@ -98,21 +97,10 @@
             this.tooltips.SetToolTip(this.chkNoPause, "Will allow the game to run even when it doesn\'t have focus");
             this.chkNoPause.UseVisualStyleBackColor = true;
             // 
-            // chkFPSLock
-            // 
-            this.chkFPSLock.AutoSize = true;
-            this.chkFPSLock.Location = new System.Drawing.Point(77, 8);
-            this.chkFPSLock.Name = "chkFPSLock";
-            this.chkFPSLock.Size = new System.Drawing.Size(73, 17);
-            this.chkFPSLock.TabIndex = 2;
-            this.chkFPSLock.Text = "FPS Lock";
-            this.tooltips.SetToolTip(this.chkFPSLock, "Trys to cap the max FPS to 60");
-            this.chkFPSLock.UseVisualStyleBackColor = true;
-            // 
             // chkDebug
             // 
             this.chkDebug.AutoSize = true;
-            this.chkDebug.Location = new System.Drawing.Point(152, 8);
+            this.chkDebug.Location = new System.Drawing.Point(82, 8);
             this.chkDebug.Name = "chkDebug";
             this.chkDebug.Size = new System.Drawing.Size(96, 17);
             this.chkDebug.TabIndex = 3;
@@ -126,7 +114,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.chkDebug);
-            this.Controls.Add(this.chkFPSLock);
             this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
             this.Controls.Add(this.btnClearLog);
@@ -147,7 +134,6 @@
         private System.Windows.Forms.Button btnClearLog;
         private System.Windows.Forms.CheckBox chkLog;
         private System.Windows.Forms.CheckBox chkNoPause;
-        private System.Windows.Forms.CheckBox chkFPSLock;
         private System.Windows.Forms.CheckBox chkDebug;
         private System.Windows.Forms.ToolTip tooltips;
     }

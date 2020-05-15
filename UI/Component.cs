@@ -33,7 +33,6 @@ namespace LiveSplit.OriWotW {
             Component component = new Component(new LiveSplitState());
             component.log.EnableLogging = true;
             component.userSettings.Settings.NoPause = true;
-            component.userSettings.Settings.FPSLock = false;
             Application.Run();
         }
 #endif

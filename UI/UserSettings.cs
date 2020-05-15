@@ -41,9 +41,6 @@ namespace LiveSplit.OriWotW {
             AddXmlItem<bool>(document, xmlSettings, "NoPause", chkNoPause.Checked);
             Settings.NoPause = chkNoPause.Checked;
 
-            AddXmlItem<bool>(document, xmlSettings, "FPSLock", chkFPSLock.Checked);
-            Settings.FPSLock = chkFPSLock.Checked;
-
             AddXmlItem<bool>(document, xmlSettings, "DisableDebug", chkDebug.Checked);
             Settings.DisableDebug = chkDebug.Checked;
 
@@ -69,10 +66,6 @@ namespace LiveSplit.OriWotW {
             bool noPause = GetXmlBoolItem(node, ".//NoPause", false);
             chkNoPause.Checked = noPause;
             Settings.NoPause = noPause;
-
-            bool fpsLock = GetXmlBoolItem(node, ".//FPSLock", false);
-            chkFPSLock.Checked = fpsLock;
-            Settings.FPSLock = fpsLock;
 
             bool disableDebug = GetXmlBoolItem(node, ".//DisableDebug", true);
             chkDebug.Checked = disableDebug;

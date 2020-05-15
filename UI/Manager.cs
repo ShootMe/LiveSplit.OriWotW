@@ -10,7 +10,6 @@ namespace LiveSplit.OriWotW {
         private bool useLivesplitColors = true;
         private Vector2 lastPosition, lastSpeed;
         private bool noPause = false;
-        private bool fpsLock = false;
         private int lastFrameCount;
 #if Manager
         public static void Main(string[] args) {
@@ -78,14 +77,12 @@ namespace LiveSplit.OriWotW {
             lblMap.Text = $"Total: {mapCompletion:0.00}%";
             lblArea.Text = $"Area: {area} - {areaCompletion:0.00}%";
             lblScene.Text = $"Scene: {scene}";
-            lblPos.Text = $"Pos: {position}";
-            lblSpeed.Text = $"Speed: {speed} ({!speed:0.00})";
+            lblPos.Text = $"Pos: {position.X}, {position.Y}";
+            lblSpeed.Text = $"Speed: {speed.X:0.000}, {speed.Y:0.000} ({!speed:0.000})";
             string debugEnabled = Memory.DebugEnabled() ? "On" : "Off";
             noPause = Memory.NoPauseEnabled();
             string noPuaseEnabled = noPause ? "On" : "Off";
-            fpsLock = Memory.FPSLockEnabled();
-            string fpsLockEnabled = fpsLock ? "On" : "Off";
-            lblExtra.Text = $"Debug: {debugEnabled}  NoPause: {noPuaseEnabled} FPS Lock: {fpsLockEnabled}";
+            lblExtra.Text = $"Debug: {debugEnabled}  NoPause: {noPuaseEnabled}";
             lblFPS.Text = $"FPS: {FPS:0.0}";
 
             if (gameState == GameState.Game) {
@@ -116,8 +113,6 @@ namespace LiveSplit.OriWotW {
                 }
             } else if (e.KeyCode == Keys.D) {
                 Memory.EnableDebug(!Memory.DebugEnabled());
-            } else if (e.KeyCode == Keys.F) {
-                Memory.PatchFPSLock(!fpsLock);
             } else if (e.KeyCode == Keys.N) {
                 Memory.PatchNoPause(!noPause);
             }

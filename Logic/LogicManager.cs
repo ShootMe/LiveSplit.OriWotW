@@ -62,7 +62,6 @@ namespace LiveSplit.OriWotW {
         }
         public void Update(int currentSplit) {
             Memory.PatchNoPause(Settings.NoPause);
-            Memory.PatchFPSLock(Settings.FPSLock);
             if (Settings.DisableDebug && Running) {
                 hadDebug = Memory.DebugEnabled();
                 Memory.EnableDebug(false);

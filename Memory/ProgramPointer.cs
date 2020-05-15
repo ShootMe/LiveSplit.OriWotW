@@ -6,7 +6,8 @@ using LiveSplit.OriWotW.Il2Cpp;
 namespace LiveSplit.OriWotW {
     public enum PointerVersion {
         All,
-        V2
+        V2,
+        V3
     }
     public enum AutoDeref {
         None,
@@ -171,7 +172,7 @@ namespace LiveSplit.OriWotW {
                 Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
                 BasePtr = range.Item1 + (int)rva + Offset;
             }
-            
+
             int offset = 0;
             if (AutoDeref != AutoDeref.None) {
                 offset = program.Read<int>(BasePtr) + 4;

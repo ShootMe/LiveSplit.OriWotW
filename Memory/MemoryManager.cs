@@ -7,6 +7,8 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x15c),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4, 0x0));
         private static ProgramPointer GameWorld = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.V3, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
+            new FindPointerSignature(PointerVersion.V3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E28498B46204885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E204885C9", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.V2, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
             new FindPointerSignature(PointerVersion.V2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E28498B46204885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E204885C9", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0xa7),
@@ -38,16 +40,14 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer NoPausePatch = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.None, "__mainWisp.GameController.OnApplicationFocus", 0x1b),
             new FindPointerSignature(PointerVersion.All, AutoDeref.None, "4C8BDC565741564883EC5049C743C8FEFFFFFF49895B1049896B18??????488BF14533F6443835????????754B488B05????????4C6380C0000000488B05????????418B8C00????????418B9400????????4D8973D04D8973D84D8973E04D8D43D0E8????????9033C9FF15????????90C605????????0180BE????????000F85????????4084ED0F85????????33C9E8????????4885C00F84????????33D2488BC8E8????????84C07561", 0x1b, 0x0));
-        private static ProgramPointer TargetFrameRatePatch = new ProgramPointer("UnityPlayer.dll",
-            new FindPointerSignature(PointerVersion.All, AutoDeref.None, "660F6EC30F5BC0F30F5EC8????8BDE??????????660F6EC80F5BC90F57C00F297424300F2FC1720A", 0xb));
-        private static ProgramPointer VSyncPatch = new ProgramPointer("UnityPlayer.dll",
-            new FindPointerSignature(PointerVersion.All, AutoDeref.None, "E8????????4863484C488B4030488D148948C1E2058B4402684883C428C3", -0x4));
         private static ProgramPointer FrameCounter = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0));
         private static ProgramPointer CheatsHandler = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.V3, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
+            new FindPointerSignature(PointerVersion.V3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7a),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C8938488B0D????????F6812701000002740E83B9D8000000007505E8", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0));
         private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e));
         private static ProgramPointer RaceSystem = new ProgramPointer("GameAssembly.dll",
@@ -58,7 +58,6 @@ namespace LiveSplit.OriWotW {
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
         private bool? noPausePatched = null;
-        private bool? targetFrameRatePatched = null;
         private bool? debugEnabled = null;
         private FPSTimer fpsTimer = new FPSTimer(200, 15);
         private static Dictionary<long, UberState> uberIDLookup = null;
@@ -79,30 +78,11 @@ namespace LiveSplit.OriWotW {
                 $"USL: {(ulong)UberStateCollection.GetPointer(Program):X} ",
                 $"DC: {(ulong)DifficultyController.GetPointer(Program):X} ",
                 $"NP: {(ulong)NoPausePatch.GetPointer(Program):X} ",
-                $"TFR: {(ulong)TargetFrameRatePatch.GetPointer(Program):X} ",
-                $"VS: {(ulong)VSyncPatch.GetPointer(Program):X} ",
                 $"FC: {(ulong)FrameCounter.GetPointer(Program):X} ",
                 $"CH: {(ulong)CheatsHandler.GetPointer(Program):X} ",
-                $"DC: {(ulong)DebugControls.GetPointer(Program):X} "
+                $"DC: {(ulong)DebugControls.GetPointer(Program):X} ",
+                $"RS: {(ulong)RaceSystem.GetPointer(Program):X} "
             );
-        }
-        public bool AllPointersFound() {
-            return Characters.GetPointer(Program) != IntPtr.Zero
-                && GameWorld.GetPointer(Program) != IntPtr.Zero
-                && PlayerUberStateGroup.GetPointer(Program) != IntPtr.Zero
-                && TitleScreenManager.GetPointer(Program) != IntPtr.Zero
-                && GameStateMachine.GetPointer(Program) != IntPtr.Zero
-                && GameController.GetPointer(Program) != IntPtr.Zero
-                && ScenesManager.GetPointer(Program) != IntPtr.Zero
-                && UberStateController.GetPointer(Program) != IntPtr.Zero
-                && UberStateCollection.GetPointer(Program) != IntPtr.Zero
-                && DifficultyController.GetPointer(Program) != IntPtr.Zero
-                && NoPausePatch.GetPointer(Program) != IntPtr.Zero
-                && TargetFrameRatePatch.GetPointer(Program) != IntPtr.Zero
-                && VSyncPatch.GetPointer(Program) != IntPtr.Zero
-                && FrameCounter.GetPointer(Program) != IntPtr.Zero
-                && CheatsHandler.GetPointer(Program) != IntPtr.Zero
-                && DebugControls.GetPointer(Program) != IntPtr.Zero;
         }
         public float RaceTime() {
             return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x28, 0x18);
@@ -128,7 +108,7 @@ namespace LiveSplit.OriWotW {
             }
         }
         public string Patches() {
-            return "NoPause: " + (!noPausePatched.HasValue ? "No Value" : noPausePatched.ToString()) + " FPS: " + (!targetFrameRatePatched.HasValue ? "No Value" : targetFrameRatePatched.ToString());
+            return "NoPause: " + (!noPausePatched.HasValue ? "No Value" : noPausePatched.ToString()) + " Debug: " + DebugEnabled().ToString();
         }
         public bool NoPauseEnabled() {
             return NoPausePatch.Read<int>(Program) == 0x4890C5FF;
@@ -143,23 +123,6 @@ namespace LiveSplit.OriWotW {
                     NoPausePatch.Write(Program, new byte[] { 0x0F, 0xB6, 0xEA });
                 }
                 noPausePatched = patch;
-            }
-        }
-        public bool FPSLockEnabled() {
-            return VSyncPatch.Read<uint>(Program) == 0x90C3C033;
-        }
-        public void PatchFPSLock(bool patch) {
-            if (!targetFrameRatePatched.HasValue || patch != targetFrameRatePatched.Value) {
-                if (TargetFrameRatePatch.GetPointer(Program) == IntPtr.Zero) { return; }
-
-                if (patch) {
-                    TargetFrameRatePatch.Write(Program, new byte[] { 0x90, 0x90, 0x8B, 0xDE, 0xB8, 0x3C, 0x00, 0x00, 0x00 });
-                    VSyncPatch.Write(Program, new byte[] { 0x33, 0xC0, 0xC3, 0x90 });
-                } else {
-                    TargetFrameRatePatch.Write(Program, new byte[] { 0xEB, 0x0E, 0x8B, 0xDE, 0xE8, 0xE7, 0x1E, 0xFF, 0xFF });
-                    VSyncPatch.Write(Program, new byte[] { 0x48, 0x83, 0xEC, 0x28 });
-                }
-                targetFrameRatePatched = patch;
             }
         }
         public int FrameCount() {
@@ -489,6 +452,7 @@ namespace LiveSplit.OriWotW {
             //.Items
             areas = Program.Read<IntPtr>(areas, 0x10);
             byte[] data = Program.Read(areas + 0x20, count * 0x8);
+            int completionOffset = Version == PointerVersion.V3 ? 0x5c : 0x34;
             for (int i = 0; i < count; i++) {
                 IntPtr area = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
                 if (areaType != AreaType.None) {
@@ -496,11 +460,11 @@ namespace LiveSplit.OriWotW {
                     AreaType type = Program.Read<AreaType>(area, 0x10, 0x20);
                     if (type == areaType) {
                         //.Items[i].m_completionAmount
-                        return Program.Read<float>(area, 0x34) * 100f;
+                        return Program.Read<float>(area, completionOffset) * 100f;
                     }
                 } else {
                     //.Items[i].m_completionAmount
-                    totalCompletion += Program.Read<float>(area, 0x34);
+                    totalCompletion += Program.Read<float>(area, completionOffset);
                 }
             }
             return totalCompletion * 100f / (count == 0 ? 1 : count);
@@ -531,11 +495,11 @@ namespace LiveSplit.OriWotW {
                     if (module != null) {
                         switch (module.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.V2; break;
+                            case 77844480: MemoryManager.Version = PointerVersion.V3; break;
                         }
                     }
                     uberIDLookup = null;
                     noPausePatched = null;
-                    targetFrameRatePatched = null;
                     debugEnabled = null;
                     IsHooked = true;
                     fpsTimer.Reset();

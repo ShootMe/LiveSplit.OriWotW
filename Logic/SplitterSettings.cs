@@ -3,7 +3,6 @@ namespace LiveSplit.OriWotW {
     public class SplitterSettings {
         public BindingList<Split> Autosplits = new BindingList<Split>();
         public bool NoPause;
-        public bool FPSLock;
         public bool DisableDebug;
 
         public SplitterSettings() {
@@ -11,7 +10,7 @@ namespace LiveSplit.OriWotW {
             Autosplits.AllowRemove = true;
             Autosplits.AllowEdit = true;
             NoPause = false;
-            FPSLock = false;
+            DisableDebug = false;
         }
     }
 }
