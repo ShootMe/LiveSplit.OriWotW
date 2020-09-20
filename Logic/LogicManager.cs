@@ -1,4 +1,5 @@
 ﻿using System;
+using LiveSplit.Options;
 namespace LiveSplit.OriWotW {
     public class LogicManager {
         public bool ShouldSplit { get; private set; }
@@ -158,6 +159,9 @@ namespace LiveSplit.OriWotW {
                         Vector4 hitbox = new Vector4(split.Value);
                         CheckHitbox(hitbox);
                         break;
+                    case SplitType.UberState:
+                        CheckBoolUberState(split);
+                        break;
                     case SplitType.GameEnd:
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
                         break;
@@ -262,6 +266,20 @@ namespace LiveSplit.OriWotW {
                 case SplitSpiritTrial.WellspringComplete: CheckUberIntValue(UberStateDefaults.wellspringRace, 2); break;
                 case SplitSpiritTrial.WindsweptWastesActivate: CheckUberIntValue(UberStateDefaults.desertRace, 1); break;
                 case SplitSpiritTrial.WindsweptWastesComplete: CheckUberIntValue(UberStateDefaults.desertRace, 2); break;
+            }
+        }
+        private void CheckBoolUberState(Split split) {
+            try {
+                var parts = split.Value.Split('|');
+                if (int.TryParse(parts[0], out int groupId)) {
+                    if (int.TryParse(parts[1], out int id)) {
+                        CheckUberBoolValue(Memory.GetUberState(groupId, id));
+                    } 
+                    else Log.Error($"failed to parse {split.Value}");
+                } 
+                else Log.Error($"failed to parse {split.Value}");
+            } catch (Exception e) {
+                Log.Error($"Exception thrown parsing {split.Value}: {e}");
             }
         }
         private void CheckSeed(Split split) {
