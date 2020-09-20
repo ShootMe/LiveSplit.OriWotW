@@ -256,6 +256,15 @@ namespace LiveSplit.OriWotW {
 
             return uberIDLookup;
         }
+
+        public UberState GetUberState(int groupId, int id) {
+            if (uberIDLookup == null) {
+                PopulateUberStates();
+            }
+            uberIDLookup.TryGetValue(((long)groupId << 32) | (long)id, out UberState value);
+            UpdateUberState(value);
+            return uberIDLookup[((long)groupId << 32) | (long)id];
+        }
         public void UpdateUberState(UberState uberState = null) {
             //UbserStateController.m_currentStateValueStore.m_groupMap
             IntPtr groups = UberStateController.Read<IntPtr>(Program, 0xb8, 0x40, 0x18);

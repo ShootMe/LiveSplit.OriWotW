@@ -101,6 +101,13 @@ namespace LiveSplit.OriWotW {
                 txtValue.Width = 202;
                 txtValue.Visible = true;
                 cboValue.Visible = false;
+            } else if (nextControlType == SplitType.UberState) {
+                if (nextControlType != UserSplit.Type) {
+                    UserSplit.Value = "34543|11226";
+                }
+                txtValue.Width = 202;
+                txtValue.Visible = true;
+                cboValue.Visible = false;
             } else {
                 if (nextControlType != UserSplit.Type) {
                     switch (nextControlType) {
