@@ -74,10 +74,10 @@ namespace LiveSplit.OriWotW {
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {
                 string[] splitValues = splitNode.InnerText.Split('|');
-                if (splitValues.Length == 2) {
+                if (splitValues.Length == 2 || splitValues.Length == 3) {
                     SplitType type = SplitType.ManualSplit;
                     if (Enum.TryParse<SplitType>(splitValues[0], out type)) {
-                        string value = splitValues[1];
+                        string value = splitValues.Length == 2 ? splitValues[1] : string.Concat(splitValues[1], '|', splitValues[2]);
                         Settings.Autosplits.Add(new Split() { Type = type, Value = value });
                     }
                 }
