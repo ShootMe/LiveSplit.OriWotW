@@ -273,11 +273,12 @@ namespace LiveSplit.OriWotW {
                 var parts = split.Value.Split('|');
                 if (int.TryParse(parts[0], out int groupId)) {
                     if (int.TryParse(parts[1], out int id)) {
-                        CheckUberBoolValue(Memory.GetUberState(groupId, id));
-                    } 
-                    else Log.Error($"failed to parse {split.Value}");
-                } 
-                else Log.Error($"failed to parse {split.Value}");
+                        UberState value = Memory.GetUberState(groupId, id);
+                        if (value != null) {
+                            CheckUberBoolValue(value);
+                        }
+                    } else Log.Error($"failed to parse {split.Value}");
+                } else Log.Error($"failed to parse {split.Value}");
             } catch (Exception e) {
                 Log.Error($"Exception thrown parsing {split.Value}: {e}");
             }
