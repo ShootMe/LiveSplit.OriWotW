@@ -5,7 +5,18 @@ namespace LiveSplit.OriWotW {
         public bool ShouldSplit { get; private set; }
         public bool ShouldReset { get; private set; }
         public int CurrentSplit { get; private set; }
-        public bool Running { get; private set; }
+
+        private bool _running;
+        public bool Running {
+            get => _running;
+            private set {
+                if (!_running && value) {
+                    hadDebug = Memory.DebugEnabled();
+                }
+                _running = value;
+            }
+        }
+
         public bool Paused { get; private set; }
         public float GameTime { get; private set; }
         public MemoryManager Memory { get; private set; }
@@ -64,7 +75,6 @@ namespace LiveSplit.OriWotW {
         public void Update(int currentSplit) {
             Memory.PatchNoPause(Settings.NoPause);
             if (Settings.DisableDebug && Running) {
-                hadDebug = Memory.DebugEnabled();
                 Memory.EnableDebug(false);
             }
 
