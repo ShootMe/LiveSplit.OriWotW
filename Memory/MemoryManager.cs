@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
-using LiveSplit.OriWotW;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
         private static ProgramPointer Characters = new ProgramPointer("GameAssembly.dll",
