@@ -55,8 +55,11 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
+        public Module64 GameAssembly { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
+        public Nullable<ControlScheme> LastControlScheme { get; set; }
+        public int ControllerCounter { get; set; } = 0;
         private bool? noPausePatched = null;
         private bool? debugEnabled = null;
         private FPSTimer fpsTimer = new FPSTimer(200, 15);
@@ -181,10 +184,27 @@ namespace LiveSplit.OriWotW {
             //TitleScreenManager.Instance.m_currentScreen
             return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
+        public Nullable<ControlScheme> GetControlScheme() {
+            GameSettings gameSettings = MemoryReader.Read<GameSettings>(Program, GameAssembly.BaseAddress, 0x04424A80, 0xB8, 0x0, 0xC0);
+
+            if (gameSettings.Instance != IntPtr.Zero)
+                return gameSettings.m_currentControlSchemes;
+
+            return null;
+        }
         public bool IsLoadingGame(GameState state) {
-            if (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0) {
+            Nullable<ControlScheme> CurrentControlScheme = GetControlScheme();
+
+            if (LastControlScheme != null && CurrentControlScheme != null && LastControlScheme != CurrentControlScheme) {
+                ControllerCounter = 0;
+            }
+            LastControlScheme = CurrentControlScheme;
+            ControllerCounter++;
+
+            if (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0 && ControllerCounter > 30) {
                 return true;
             }
+
             //int m_isLoadingGame = FindIl2CppOffset.GetOffset(Program, "__mainWisp.GameController.m_isLoadingGame");
             int m_isLoadingGame = Version == PointerVersion.All ? 0x103 : 0x10b;
             //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
@@ -192,8 +212,9 @@ namespace LiveSplit.OriWotW {
                 return true;
             }
             string scene = CurrentScene();
-            return (state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway"))
-                || ((state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen");
+            return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen";
+            /*return (state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway"))
+                || ((state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen");*/
         }
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
@@ -502,10 +523,10 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
-                    Module64 module = Program.Module64("GameAssembly.dll");
+                    GameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
-                    if (module != null) {
-                        switch (module.MemorySize) {
+                    if (GameAssembly != null) {
+                        switch (GameAssembly.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.V2; break;
                             case 77844480: MemoryManager.Version = PointerVersion.V3; break;
                         }
