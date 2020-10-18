@@ -122,6 +122,7 @@
     <Compile Include="Memory\Ability.cs" />
     <Compile Include="Memory\AreaType.cs" />
     <Compile Include="Memory\FPSTimer.cs" />
+    <Compile Include="Memory\GameSettings.cs" />
     <Compile Include="Memory\GameState.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />

@@ -53,12 +53,13 @@ namespace LiveSplit.OriWotW {
         private static ProgramPointer RaceSystem = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.RaceSystem.get_CurrentStateTime", 0x8f),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0));
+        private static ProgramPointer GameSettings = new ProgramPointer("GameAssembly.dll",
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8????????488B05????????488B88B8000000488B014885C0", 0x4a, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
-        public Module64 GameAssembly { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
-        public Nullable<ControlScheme> LastControlScheme { get; set; }
+        public ControlScheme LastControlScheme { get; set; }
         public int ControllerCounter { get; set; } = 0;
         private bool? noPausePatched = null;
         private bool? debugEnabled = null;
@@ -184,21 +185,16 @@ namespace LiveSplit.OriWotW {
             //TitleScreenManager.Instance.m_currentScreen
             return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
         }
-        public Nullable<ControlScheme> GetControlScheme() {
-            GameSettings gameSettings = MemoryReader.Read<GameSettings>(Program, GameAssembly.BaseAddress, 0x04424A80, 0xB8, 0x0, 0xC0);
-
-            if (gameSettings.Instance != IntPtr.Zero)
-                return gameSettings.m_currentControlSchemes;
-
-            return null;
+        public ControlScheme GetControlScheme() {
+            //GameSettings.Instance.m_currentControlSchemes
+            return GameSettings.Read<ControlScheme>(Program, 0xb8, 0x0, 0x94);
         }
         public bool IsLoadingGame(GameState state) {
-            Nullable<ControlScheme> CurrentControlScheme = GetControlScheme();
-
-            if (LastControlScheme != null && CurrentControlScheme != null && LastControlScheme != CurrentControlScheme) {
+            ControlScheme currentControlScheme = GetControlScheme();
+            if (LastControlScheme != currentControlScheme) {
                 ControllerCounter = 0;
             }
-            LastControlScheme = CurrentControlScheme;
+            LastControlScheme = currentControlScheme;
             ControllerCounter++;
 
             if (FrameCounter.GetPointer(Program) != IntPtr.Zero && fpsTimer.FPSShort == 0 && ControllerCounter > 30) {
@@ -213,8 +209,6 @@ namespace LiveSplit.OriWotW {
             }
             string scene = CurrentScene();
             return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen";
-            /*return (state == OriWotW.GameState.Game && (scene == "wotwTitleScreen" || scene == "kuFlyAway"))
-                || ((state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen");*/
         }
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
@@ -523,10 +517,10 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
-                    GameAssembly = Program.Module64("GameAssembly.dll");
+                    Module64 gameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
-                    if (GameAssembly != null) {
-                        switch (GameAssembly.MemorySize) {
+                    if (gameAssembly != null) {
+                        switch (gameAssembly.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.V2; break;
                             case 77844480: MemoryManager.Version = PointerVersion.V3; break;
                         }
