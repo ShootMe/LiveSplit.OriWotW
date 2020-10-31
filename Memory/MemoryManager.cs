@@ -104,6 +104,9 @@ namespace LiveSplit.OriWotW {
             if (!debugEnabled.HasValue || enable != debugEnabled.Value) {
                 if (CheatsHandler.GetPointer(Program) == IntPtr.Zero) { return; }
 
+                // Disable infinite energy - Characters.sein.Energy.InfiniteEnergy
+                Characters.Write<bool>(Program, false, 0xb8, 0x10, 0x80, 0x0);
+
                 DebugControls.Write<bool>(Program, enable, 0xb8, 0x8);
                 CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, 0x20);
                 CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
