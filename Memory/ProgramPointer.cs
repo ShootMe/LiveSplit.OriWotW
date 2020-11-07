@@ -6,8 +6,9 @@ using LiveSplit.OriWotW.Il2Cpp;
 namespace LiveSplit.OriWotW {
     public enum PointerVersion {
         All,
-        V2,
-        V3
+        P1,
+        P2,
+        P3
     }
     public enum AutoDeref {
         None,
@@ -166,6 +167,8 @@ namespace LiveSplit.OriWotW {
         }
         private IntPtr GetPointer(Process program, string asmName) {
             ulong rva = Decompiler.GetRVA(FullName);
+            if (rva == 0) { return IntPtr.Zero; }
+
             if (string.IsNullOrEmpty(asmName)) {
                 BasePtr = program.MainModule.BaseAddress + (int)rva + Offset;
             } else {

@@ -1,5 +1,5 @@
 ﻿namespace LiveSplit.OriWotW {
-    public enum GameState {
+    public enum GameState : int {
         Logos,
         StartScreen,
         TitleScreen,

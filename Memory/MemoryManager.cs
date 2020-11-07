@@ -4,13 +4,19 @@ using System.Diagnostics;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
         private static ProgramPointer Characters = new ProgramPointer("GameAssembly.dll",
-            new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x15c),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4, 0x0));
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x9b),
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33D2488BCBE8????????488B05????????488B88B8000000C641040133C9", 0x3b, 0x0),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x15c),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x15c),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "488B80B80000004C8B40084D85C0743D488B15????????B90C000000E8????????488BF84885DB743C488B4B304885C9742D33D2E8????????4885C0741B48897818488B5C24504883C4405FC3", -0x4, 0x0));
         private static ProgramPointer GameWorld = new ProgramPointer("GameAssembly.dll",
-            new FindIl2Cpp(PointerVersion.V3, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
-            new FindPointerSignature(PointerVersion.V3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E28498B46204885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E204885C9", 0x14, 0x0),
-            new FindIl2Cpp(PointerVersion.V2, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
-            new FindPointerSignature(PointerVersion.V2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E28498B46204885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E204885C9", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E??498B46??4885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E??498B46??4885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E??498B46??4885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0xa7),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4C8BDC55565741544155415641574883EC5049C743A8FEFFFFFF49895B104C8BE933ED", 0xa7, 0x0));
         private static ProgramPointer PlayerUberStateGroup = new ProgramPointer("GameAssembly.dll",
@@ -23,29 +29,58 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameStateMachine.get_Instance", 0x6f),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????488B83B8000000488B004885C00F85C6000000488BCBE8????????488B43604885C074278B08E8", 0x14, 0x0));
         private static ProgramPointer GameController = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc6),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc3),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc3),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc3),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0));
         private static ProgramPointer ScenesManager = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x75),
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x76),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x76),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x76),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0));
         private static ProgramPointer UberStateController = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__uberSerialization.UberStateController.get_Instance", 0x90),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????F6832701000002741883BBD800000000750F488BCBE8????????488B1D????????488B83B800000048837828000F85", 0x35, 0x0));
         private static ProgramPointer UberStateCollection = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__uberSerialization.UberStateCollection.get_Instance", 0x8b),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__uberSerialization.UberStateCollection.GetGroup", 0x73),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__uberSerialization.UberStateCollection.GetGroup", 0x73),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__uberSerialization.UberStateCollection.GetGroup", 0x73),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0));
         private static ProgramPointer DifficultyController = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C9747B4533C08B5338E8????????807B29007531C6432901488B05", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0));
         private static ProgramPointer NoPausePatch = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.None, "__mainWisp.GameController.OnApplicationFocus", 0x1b),
             new FindPointerSignature(PointerVersion.All, AutoDeref.None, "4C8BDC565741564883EC5049C743C8FEFFFFFF49895B1049896B18??????488BF14533F6443835????????754B488B05????????4C6380C0000000488B05????????418B8C00????????418B9400????????4D8973D04D8973D84D8973E04D8D43D0E8????????9033C9FF15????????90C605????????0180BE????????000F85????????4084ED0F85????????33C9E8????????4885C00F84????????33D2488BC8E8????????84C07561", 0x1b, 0x0));
         private static ProgramPointer FrameCounter = new ProgramPointer("GameAssembly.dll",
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c5),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0),
+            new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0));
         private static ProgramPointer CheatsHandler = new ProgramPointer("GameAssembly.dll",
-            new FindIl2Cpp(PointerVersion.V3, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
-            new FindPointerSignature(PointerVersion.V3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
+            new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7a),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0));
         private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
@@ -54,7 +89,10 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.RaceSystem.get_CurrentStateTime", 0x8f),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0));
         private static ProgramPointer GameSettings = new ProgramPointer("GameAssembly.dll",
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8????????488B05????????488B88B8000000488B014885C0", 0x4a, 0x0));
+            new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B800000048893833D2488BCF", 0x14, 0x0),
+            new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
+            new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
         public bool IsHooked { get; set; }
@@ -85,30 +123,46 @@ namespace LiveSplit.OriWotW {
                 $"FC: {(ulong)FrameCounter.GetPointer(Program):X} ",
                 $"CH: {(ulong)CheatsHandler.GetPointer(Program):X} ",
                 $"DC: {(ulong)DebugControls.GetPointer(Program):X} ",
-                $"RS: {(ulong)RaceSystem.GetPointer(Program):X} "
+                $"RS: {(ulong)RaceSystem.GetPointer(Program):X} ",
+                $"GS: {(ulong)GameSettings.GetPointer(Program):X} "
             );
         }
         public float RaceTime() {
-            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x28, 0x18);
+            //RaceSystem.Instance.m_timer.ElapsedTime
+            int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            int m_elapsedTime = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, m_timer, m_elapsedTime);
         }
         public float LastRaceTime() {
-            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x140, 0x104);
+            //RaceSystem.Instance.Context.LastRaceTime
+            int m_Context = Version <= PointerVersion.P2 ? 0x140 : 0x168;
+            int lastRaceTime = Version <= PointerVersion.P2 ? 0x104 : 0x114;
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, m_Context, lastRaceTime);
         }
         public float PersonalBestTime() {
-            return RaceSystem.Read<float>(Program, 0xb8, 0x0, 0x28, 0x1c);
+            //RaceSystem.Instance.m_timer.PersonalBestTime
+            int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            int m_personalBestTime = Version <= PointerVersion.P2 ? 0x1c : 0x34;
+            return RaceSystem.Read<float>(Program, 0xb8, 0x0, m_timer, m_personalBestTime);
         }
         public bool DebugEnabled() {
-            return CheatsHandler.Read<bool>(Program, 0xb8, 0x0, 0x20);
+            //CheatsHandler.Instance.DebugEnabled
+            int m_debugEnabled = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            return CheatsHandler.Read<bool>(Program, 0xb8, 0x0, m_debugEnabled);
         }
         public void EnableDebug(bool enable) {
             if (!debugEnabled.HasValue || enable != debugEnabled.Value) {
                 if (CheatsHandler.GetPointer(Program) == IntPtr.Zero) { return; }
 
                 // Disable infinite energy - Characters.sein.Energy.InfiniteEnergy
-                Characters.Write<bool>(Program, false, 0xb8, 0x10, 0x80, 0x0, 0xb8, 0x0);
+                int energy = Version <= PointerVersion.P2 ? 0x80 : 0x98;
+                Characters.Write<bool>(Program, false, 0xb8, 0x10, energy, 0x0, 0xb8, 0x0);
 
                 DebugControls.Write<bool>(Program, enable, 0xb8, 0x8);
-                CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, 0x20);
+                //CheatsHandler.Instance.DebugEnabled
+                int m_debugEnabled = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+                CheatsHandler.Write<bool>(Program, enable, 0xb8, 0x0, m_debugEnabled);
+                //CheatsHandler.DebugWasEnabled/DebugAlwaysEnabled
                 CheatsHandler.Write<short>(Program, enable ? (short)0x0101 : (short)0x0, 0xb8, 0x8);
 
                 debugEnabled = enable;
@@ -140,57 +194,73 @@ namespace LiveSplit.OriWotW {
         }
         public int Difficulty() {
             //DifficultyController.Instance.Difficulty
-            return DifficultyController.Read<int>(Program, 0xb8, 0x0, 0x20);
+            int m_difficulty = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            return DifficultyController.Read<int>(Program, 0xb8, 0x0, m_difficulty);
         }
         public void SetDifficulty(int difficulty) {
             //DifficultyController.Instance.Difficulty
-            DifficultyController.Write<int>(Program, difficulty, 0xb8, 0x0, 0x20);
+            int m_difficulty = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            DifficultyController.Write<int>(Program, difficulty, 0xb8, 0x0, m_difficulty);
         }
         public Stats PlayerStats() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats
-            return PlayerUberStateGroup.Read<Stats>(Program, 0xb8, 0x0, 0x18, 0x30, 0x28, 0x10);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            return PlayerUberStateGroup.Read<Stats>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x28, 0x10);
         }
         public int Keystones() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_keystones
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x28);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x18, 0x28);
         }
         public int Ore() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_ore
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, 0x18, 0x30, 0x18, 0x34);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x18, 0x34);
         }
         public Vector2 Position() {
             //Characters.Sein.PlatformBehaviour.PlatformMovement.m_prevPosition
-            return Characters.Read<Vector2>(Program, 0xb8, 0x10, 0x98, 0x18, 0xd0);
+            int platformBehaviour = Version <= PointerVersion.P2 ? 0x98 : 0xb0;
+            int platformMovement = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            int m_prevPosition = Version <= PointerVersion.P2 ? 0xd0 : 0xe8;
+            return Characters.Read<Vector2>(Program, 0xb8, 0x10, platformBehaviour, platformMovement, m_prevPosition);
         }
         public string CurrentScene() {
             //Scenes.Manager.m_currentScene.Scene
             //int m_currentScene = FindIl2CppOffset.GetOffset(Program, "__mainWisp.ScenesManager.m_currentScene");
-            int m_currentScene = Version == PointerVersion.All ? 0x180 : 0x190;
+            int m_currentScene = Version < PointerVersion.P1 ? 0x180 : Version <= PointerVersion.P2 ? 0x190 : 0x1b8;
             return ScenesManager.Read(Program, 0xb8, 0x0, m_currentScene, 0x10, 0x0);
         }
         public AreaType PlayerArea() {
             //GameWorld.CurrentArea.Area.WorldMapAreaUniqueID
-            return GameWorld.Read<AreaType>(Program, 0xb8, 0x0, 0x30, 0x10, 0x20);
+            int currentArea = Version <= PointerVersion.P2 ? 0x30 : 0x48;
+            int worldMapAreaUniqueID = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            return GameWorld.Read<AreaType>(Program, 0xb8, 0x0, currentArea, 0x10, worldMapAreaUniqueID);
         }
         public double ElapsedTime() {
             //GameController.Instance.Timer.CurrentTime
-            return GameController.Read<double>(Program, 0xb8, 0x0, 0x28, 0x20);
+            int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            int m_currentTime = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            return GameController.Read<double>(Program, 0xb8, 0x0, m_timer, m_currentTime);
         }
         public bool Dead() {
-            //Characters.Sein.PlatformBehaviour.Mortality.DamageReciever.m_died
-            return Characters.Read<bool>(Program, 0xb8, 0x10, 0x88, 0x10, 0xe4);
+            //Characters.Sein.Mortality.DamageReciever.m_died
+            int mortality = Version <= PointerVersion.P2 ? 0x88 : 0xa0;
+            int m_died = Version <= PointerVersion.P2 ? 0xe4 : 0x110;
+            return Characters.Read<bool>(Program, 0xb8, 0x10, mortality, 0x10, m_died);
         }
         public GameState GameState() {
             //GameStateMachine.m_instance.CurrentState
-            return (GameState)GameStateMachine.Read<int>(Program, 0xb8, 0x0, 0x10);
+            return GameStateMachine.Read<GameState>(Program, 0xb8, 0x0, 0x10);
         }
         public Screen TitleScreen() {
             //TitleScreenManager.Instance.m_currentScreen
-            return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, 0xb8);
+            int m_currentScreen = Version <= PointerVersion.P2 ? 0xb8 : 0xf0;
+            return (Screen)TitleScreenManager.Read<int>(Program, 0xb8, 0x0, m_currentScreen);
         }
         public ControlScheme GetControlScheme() {
             //GameSettings.Instance.m_currentControlSchemes
-            return GameSettings.Read<ControlScheme>(Program, 0xb8, 0x0, 0x94);
+            int m_currentControlSchemes = Version <= PointerVersion.P2 ? 0x94 : 0xd0;
+            return GameSettings.Read<ControlScheme>(Program, 0xb8, 0x0, m_currentControlSchemes);
         }
         public bool IsLoadingGame(GameState state) {
             ControlScheme currentControlScheme = GetControlScheme();
@@ -205,13 +275,12 @@ namespace LiveSplit.OriWotW {
             }
 
             //int m_isLoadingGame = FindIl2CppOffset.GetOffset(Program, "__mainWisp.GameController.m_isLoadingGame");
-            int m_isLoadingGame = Version == PointerVersion.All ? 0x103 : 0x10b;
+            int m_isLoadingGame = Version < PointerVersion.P1 ? 0x103 : Version <= PointerVersion.P2 ? 0x10b : 0x123;
             //GameController.FreezeFixedUpdate || GameController.Instance.m_isLoadingGame
             if (GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame)) {
                 return true;
             }
-            string scene = CurrentScene();
-            return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && scene == "wotwTitleScreen";
+            return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && CurrentScene() == "wotwTitleScreen";
         }
         private void PopulateUberStates() {
             uberIDLookup = new Dictionary<long, UberState>();
@@ -224,7 +293,7 @@ namespace LiveSplit.OriWotW {
                 //.m_descriptorsArray[i]
                 IntPtr descriptor = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
 
-                UberStateType type = UberStateType.SerializedBooleanUberState;
+                UberStateType type;
                 Enum.TryParse<UberStateType>(Program.ReadAscii(descriptor, 0x0, 0x10, 0x0), out type);
 
                 int groupOffset = 0x38;
@@ -405,7 +474,8 @@ namespace LiveSplit.OriWotW {
         }
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
-            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
@@ -423,7 +493,8 @@ namespace LiveSplit.OriWotW {
         public Dictionary<AbilityType, Ability> PlayerAbilities() {
             Dictionary<AbilityType, Ability> currentAbilities = new Dictionary<AbilityType, Ability>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
-            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x10, 0x18);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
@@ -440,7 +511,8 @@ namespace LiveSplit.OriWotW {
         }
         public bool HasShard(ShardType type, int level) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
-            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
@@ -458,7 +530,8 @@ namespace LiveSplit.OriWotW {
         public Dictionary<ShardType, Shard> PlayerShards() {
             Dictionary<ShardType, Shard> currentShards = new Dictionary<ShardType, Shard>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
-            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, 0x18, 0x30, 0x20, 0x18);
+            int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
@@ -475,26 +548,30 @@ namespace LiveSplit.OriWotW {
         }
         public float MapCompletion(AreaType areaType = AreaType.None) {
             float totalCompletion = 0;
+
+            int worldMapAreaUniqueID = Version <= PointerVersion.P2 ? 0x20 : 0x38;
+            int runtimeAreas = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            int m_completionAmount = Version <= PointerVersion.P1 ? 0x34 : 0x5c;
+
             //GameWorld.RuntimeAreas
-            IntPtr areas = GameWorld.Read<IntPtr>(Program, 0xb8, 0x0, 0x28);
+            IntPtr areas = GameWorld.Read<IntPtr>(Program, 0xb8, 0x0, runtimeAreas);
             //.Count
             int count = Program.Read<int>(areas, 0x18);
             //.Items
             areas = Program.Read<IntPtr>(areas, 0x10);
             byte[] data = Program.Read(areas + 0x20, count * 0x8);
-            int completionOffset = Version == PointerVersion.V3 ? 0x5c : 0x34;
             for (int i = 0; i < count; i++) {
                 IntPtr area = (IntPtr)BitConverter.ToUInt64(data, i * 0x8);
                 if (areaType != AreaType.None) {
                     //.Items[i].Area.WorldMapAreaUniqueID
-                    AreaType type = Program.Read<AreaType>(area, 0x10, 0x20);
+                    AreaType type = Program.Read<AreaType>(area, 0x10, worldMapAreaUniqueID);
                     if (type == areaType) {
                         //.Items[i].m_completionAmount
-                        return Program.Read<float>(area, completionOffset) * 100f;
+                        return Program.Read<float>(area, m_completionAmount) * 100f;
                     }
                 } else {
                     //.Items[i].m_completionAmount
-                    totalCompletion += Program.Read<float>(area, completionOffset);
+                    totalCompletion += Program.Read<float>(area, m_completionAmount);
                 }
             }
             return totalCompletion * 100f / (count == 0 ? 1 : count);
@@ -524,8 +601,9 @@ namespace LiveSplit.OriWotW {
                     MemoryManager.Version = PointerVersion.All;
                     if (gameAssembly != null) {
                         switch (gameAssembly.MemorySize) {
-                            case 77447168: MemoryManager.Version = PointerVersion.V2; break;
-                            case 77844480: MemoryManager.Version = PointerVersion.V3; break;
+                            case 77447168: MemoryManager.Version = PointerVersion.P1; break;
+                            case 77844480: MemoryManager.Version = PointerVersion.P2; break;
+                            case 81121280: MemoryManager.Version = PointerVersion.P3; break;
                         }
                     }
                     uberIDLookup = null;
