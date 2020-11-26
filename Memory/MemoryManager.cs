@@ -114,9 +114,6 @@ namespace LiveSplit.OriWotW {
         public Module64 GameAssembly;
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
-        public int LastMStatePtrCheck = 0;
-        public IntPtr MState;
-        public IntPtr MState2;
         public ControlScheme LastControlScheme { get; set; }
         public int ControllerCounter { get; set; } = 0;
         private bool? noPausePatched = null;
