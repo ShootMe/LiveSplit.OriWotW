@@ -601,6 +601,7 @@ namespace LiveSplit.OriWotW {
             RaceSystemPtr raceSystemPtr = new RaceSystemPtr();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2: {
                         RaceSystemPtrV2 raceSystemPtrV2 = MemoryReader.Read<RaceSystemPtrV2>(Program, raceSystem);
                         raceSystemPtr.Context = raceSystemPtrV2.Context;
@@ -629,6 +630,7 @@ namespace LiveSplit.OriWotW {
                 IntPtr ptr1 = MemoryReader.Read<IntPtr>(Program, raceSystem.m_states, 0x10);
                 byte[] data = Program.Read(ptr1 + 0x20, count * 0x8);
                 switch (Version) {
+                    case PointerVersion.P1:
                     case PointerVersion.P2: {
                             RaceCountdownStatePtrV2 statePtrV2 = Program.Read<RaceCountdownStatePtrV2>((IntPtr)BitConverter.ToUInt64(data, 6 * 0x8));
                             raceCountdownStatePtr.CurrentTime = statePtrV2.CurrentTime;
@@ -654,6 +656,7 @@ namespace LiveSplit.OriWotW {
             m_timer timer = new m_timer();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2: {
                         m_timerV2 m_timerv2 = MemoryReader.Read<m_timerV2>(Program, raceSystem.m_timer);
                         timer.BestTime = m_timerv2.BestTime;
@@ -687,6 +690,7 @@ namespace LiveSplit.OriWotW {
             RaceSystemPtr raceSystem = GetRaceSystem();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2:
                     return MemoryReader.Read<float>(Program, raceSystem.m_timer, 0x18);
 
@@ -701,6 +705,7 @@ namespace LiveSplit.OriWotW {
             RaceStateMachineContext raceState = new RaceStateMachineContext();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2: {
                         RaceStateMachineContextV2 raceStateMachineContextV2 = MemoryReader.Read<RaceStateMachineContextV2>(Program, raceSystem.Context);
                         raceState.Configuration = raceStateMachineContextV2.Configuration;
@@ -734,6 +739,7 @@ namespace LiveSplit.OriWotW {
             RaceHandlerPtr handler = new RaceHandlerPtr();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2: {
                         RaceHandlerV2 raceHandler = MemoryReader.Read<RaceHandlerV2>(Program, context.Configuration, 0x20, 0x0);
                         RaceDataV2 raceData = MemoryReader.Read<RaceDataV2>(Program, raceHandler.Data);
@@ -767,6 +773,7 @@ namespace LiveSplit.OriWotW {
             RaceSystemPtr raceSystem = GetRaceSystem();
 
             switch (Version) {
+                case PointerVersion.P1:
                 case PointerVersion.P2:
                     return MemoryReader.Read<bool>(Program, raceSystem.m_timer, 0x4c);
 
