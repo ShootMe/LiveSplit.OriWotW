@@ -143,6 +143,12 @@ namespace LiveSplit.OriWotW {
                 $"GS: {(ulong)GameSettings.GetPointer(Program):X} "
             );
         }
+        public bool IsRacing() {
+            //RaceSystem.Instance.m_timer.ElapsedTime
+            int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            int m_startedRace = Version <= PointerVersion.P2 ? 0x4c : 0x64;
+            return RaceSystem.Read<bool>(Program, 0xb8, 0x0, m_timer, m_startedRace);
+        }
         public float RaceTime() {
             //RaceSystem.Instance.m_timer.ElapsedTime
             int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
@@ -160,6 +166,40 @@ namespace LiveSplit.OriWotW {
             int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
             int m_personalBestTime = Version <= PointerVersion.P2 ? 0x1c : 0x34;
             return RaceSystem.Read<float>(Program, 0xb8, 0x0, m_timer, m_personalBestTime);
+        }
+        public bool RaceCountdownFinished() {
+            //RaceSystem.Instance.m_states
+            int m_states = Version <= PointerVersion.P2 ? 0x150 : 0x178;
+            IntPtr states = RaceSystem.Read<IntPtr>(Program, 0xb8, 0x0, m_states, 0x10);
+            int count = Program.Read<int>(states, 0x18);
+            if (count > 5) {
+                //RaceSystem.Instance.m_states[6].m_countdownFinished
+                return Program.Read<bool>(states, 0x20 + (6 * 0x8), 0x18);
+            }
+            return false;
+        }
+        public RaceHandler GetRaceHandler() {
+            int m_Context = Version <= PointerVersion.P2 ? 0x140 : 0x168;
+            //RaceSystem.Instance.Context.Configuration.Handler
+            IntPtr handler = RaceSystem.Read<IntPtr>(Program, 0xb8, 0x0, m_Context, 0x18, 0x20);
+            int data = Version <= PointerVersion.P2 ? 0x18 : 0x30;
+            int m_inProgress = Version <= PointerVersion.P2 ? 0x21 : 0x39;
+            int raceInProgressState = Version <= PointerVersion.P2 ? 0x60 : 0x80;
+            int m_value = Version <= PointerVersion.P2 ? 0x40 : 0x49;
+            return new RaceHandler() {
+                InProgress = Program.Read<bool>(handler, m_inProgress),
+                RaceInProgressState = Program.Read<bool>(handler, data, raceInProgressState, m_value)
+            };
+        }
+        public RaceStateMachineContext GetRaceStateContext() {
+            int m_Context = Version <= PointerVersion.P2 ? 0x140 : 0x168;
+            int userRequestedRetry = Version <= PointerVersion.P2 ? 0xd0 : 0xe0;
+            //RaceSystem.Instance.Context
+            IntPtr context = RaceSystem.Read<IntPtr>(Program, 0xb8, 0x0, m_Context);
+            return new RaceStateMachineContext() {
+                StopReason = Program.Read<RaceStopReason>(context, 0x3c),
+                UserRequestedRetry = Program.Read<bool>(context, userRequestedRetry)
+            };
         }
         public bool DebugEnabled() {
             //CheatsHandler.Instance.DebugEnabled

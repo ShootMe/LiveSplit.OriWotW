@@ -38,17 +38,21 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitBoss>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitBoss>(UserSplit.Value);
                         break;
-                    case SplitType.Shard:
-                        cboValue.DataSource = Utility.GetEnumList<SplitShard>();
-                        cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
-                        break;
                     case SplitType.Map:
                         cboValue.DataSource = Utility.GetEnumList<SplitMap>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitMap>(UserSplit.Value);
                         break;
+                    case SplitType.RaceState:
+                        cboValue.DataSource = Utility.GetEnumList<SplitRace>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitRace>(UserSplit.Value);
+                        break;
                     case SplitType.Seed:
                         cboValue.DataSource = Utility.GetEnumList<SplitSeed>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitSeed>(UserSplit.Value);
+                        break;
+                    case SplitType.Shard:
+                        cboValue.DataSource = Utility.GetEnumList<SplitShard>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
                         break;
                     case SplitType.SpiritTrial:
                         cboValue.DataSource = Utility.GetEnumList<SplitSpiritTrial>();
@@ -115,11 +119,12 @@ namespace LiveSplit.OriWotW {
                         case SplitType.AreaLeave: DefaultValue = SplitArea.InkwaterMarsh; break;
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
                         case SplitType.Boss: DefaultValue = SplitBoss.HowlEnd; break;
-                        case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
-                        case SplitType.Seed: DefaultValue = SplitSeed.Wellspring; break;
                         case SplitType.Map: DefaultValue = SplitMap.InkwaterMarsh; break;
-                        case SplitType.Teleporter: DefaultValue = SplitTeleporter.KwoloksHollowActivated; break;
+                        case SplitType.RaceState: DefaultValue = SplitRace.RaceHasStarted; break;
+                        case SplitType.Seed: DefaultValue = SplitSeed.Wellspring; break;
+                        case SplitType.Shard: DefaultValue = SplitShard.Reckless; break;
                         case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
+                        case SplitType.Teleporter: DefaultValue = SplitTeleporter.KwoloksHollowActivated; break;
                         case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;
                         case SplitType.WorldEvent: DefaultValue = SplitWorldEvent.WaterPurified; break;
                     }

@@ -27,6 +27,7 @@ namespace LiveSplit.OriWotW {
         private string lastStrValue;
         private Screen lastScreen;
         private DateTime splitLate;
+        private RaceState raceState;
 
         public LogicManager(SplitterSettings settings) {
             Memory = new MemoryManager();
@@ -86,6 +87,7 @@ namespace LiveSplit.OriWotW {
 
             if (CurrentSplit < Settings.Autosplits.Count) {
                 CheckSplit(Settings.Autosplits[CurrentSplit], false);
+
                 if (!Running) {
                     Paused = true;
                     if (ShouldSplit) {
@@ -97,6 +99,43 @@ namespace LiveSplit.OriWotW {
                     Increment();
                 }
             }
+
+            if (ShouldResetRace() || ShouldResetRaceOver()) {
+                ShouldReset = true;
+                raceState.RaceHasStarted = false;
+            }
+            if (CurrentSplit < Settings.Autosplits.Count && Settings.UseRaceTime) {
+                float raceTime = Memory.RaceTime();
+                if (raceTime > 0.0f) {
+                    GameTime = raceTime;
+                }
+            } else if (CurrentSplit >= Settings.Autosplits.Count && Settings.UseRaceTime) {
+                float raceTime = Memory.RaceTime();
+                if (raceTime > 0.0f) {
+                    GameTime = raceTime;
+                } else if (raceTime == 0.0f) {
+                    GameTime = Memory.LastRaceTime();
+                }
+            }
+        }
+        public bool ShouldResetRace() {
+            if (Running && Settings.Autosplits.Count > 0) {
+                Split firstSplit = Settings.Autosplits[0];
+                if (firstSplit.Type == SplitType.RaceState && Utility.GetEnumValue<SplitRace>(firstSplit.Value) == SplitRace.RaceHasStartedAutoReset) {
+                    return !Memory.RaceCountdownFinished() && Memory.RaceTime() == 0.0f;
+                }
+            }
+            return false;
+        }
+        public bool ShouldResetRaceOver() {
+            if (Running && Settings.Autosplits.Count > 0) {
+                Split lastSplit = Settings.Autosplits[Settings.Autosplits.Count - 1];
+                if (lastSplit.Type == SplitType.RaceState && Utility.GetEnumValue<SplitRace>(lastSplit.Value) == SplitRace.RaceHasFinishedAutoStop && !Memory.IsRacing()) {
+                    RaceHandler handler = Memory.GetRaceHandler();
+                    return !handler.InProgress && !handler.RaceInProgressState;
+                }
+            }
+            return false;
         }
         private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
@@ -241,6 +280,9 @@ namespace LiveSplit.OriWotW {
                         ShouldSplit = lastIntValue != energy && energy == splitEnergy;
                         lastIntValue = energy;
                         break;
+                    case SplitType.RaceState:
+                        CheckRace(split);
+                        break;
                 }
 
                 if ((state != GameState.Game && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && state != GameState.Game)) {
@@ -249,6 +291,38 @@ namespace LiveSplit.OriWotW {
                     ShouldSplit = true;
                     splitLate = DateTime.MaxValue;
                 }
+            }
+        }
+        private void CheckRace(Split split) {
+            SplitRace raceSplit = Utility.GetEnumValue<SplitRace>(split.Value);
+            RaceStateMachineContext raceStateContext = Memory.GetRaceStateContext();
+            bool isRacing = Memory.IsRacing();
+
+            switch (raceSplit) {
+                case SplitRace.RaceHasStartedAutoReset:
+                case SplitRace.RaceHasStarted:
+                    if (isRacing && Memory.RaceTime() < 0.5f && Memory.RaceCountdownFinished()) {
+                        raceState.RaceHasStarted = true;
+                        ShouldSplit = true;
+                    } else {
+                        ShouldSplit = false;
+                    }
+                    break;
+
+                case SplitRace.RaceHasFinishedAutoStop:
+                case SplitRace.RaceHasFinished:
+                    if (!isRacing && raceState.RaceHasStarted && Memory.RaceTime() == 0.0f &&
+                        Memory.RaceCountdownFinished() && raceState.LastReason != RaceStopReason.UserAction && !raceStateContext.UserRequestedRetry) {
+                        ShouldSplit = true;
+                        raceState.RaceHasStarted = false;
+                        raceState.LastReason = RaceStopReason.None;
+                    } else {
+                        ShouldSplit = false;
+                    }
+                    break;
+            }
+            if (raceStateContext.StopReason != RaceStopReason.None) {
+                raceState.LastReason = raceStateContext.StopReason;
             }
         }
         private void CheckHitbox(Vector4 hitbox) {

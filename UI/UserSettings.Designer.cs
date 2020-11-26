@@ -30,6 +30,7 @@
             this.chkLog = new System.Windows.Forms.CheckBox();
             this.chkNoPause = new System.Windows.Forms.CheckBox();
             this.chkDebug = new System.Windows.Forms.CheckBox();
+            this.chkUseRaceTime = new System.Windows.Forms.CheckBox();
             this.tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
@@ -54,9 +55,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flowMain.AutoScroll = true;
             this.flowMain.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowMain.Location = new System.Drawing.Point(0, 33);
+            this.flowMain.Location = new System.Drawing.Point(0, 58);
             this.flowMain.Name = "flowMain";
-            this.flowMain.Size = new System.Drawing.Size(470, 300);
+            this.flowMain.Size = new System.Drawing.Size(470, 275);
             this.flowMain.TabIndex = 0;
             this.flowMain.WrapContents = false;
             this.flowMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.flowMain_DragEnter);
@@ -109,10 +110,22 @@
         "ished");
             this.chkDebug.UseVisualStyleBackColor = true;
             // 
+            // chkUseRaceTime
+            // 
+            this.chkUseRaceTime.AutoSize = true;
+            this.chkUseRaceTime.Location = new System.Drawing.Point(3, 31);
+            this.chkUseRaceTime.Name = "chkUseRaceTime";
+            this.chkUseRaceTime.Size = new System.Drawing.Size(100, 17);
+            this.chkUseRaceTime.TabIndex = 7;
+            this.chkUseRaceTime.Text = "Use Race Time";
+            this.tooltips.SetToolTip(this.chkUseRaceTime, "Uses the in game race timers time for the game time.");
+            this.chkUseRaceTime.UseVisualStyleBackColor = true;
+            // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkUseRaceTime);
             this.Controls.Add(this.chkDebug);
             this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
@@ -135,6 +148,7 @@
         private System.Windows.Forms.CheckBox chkLog;
         private System.Windows.Forms.CheckBox chkNoPause;
         private System.Windows.Forms.CheckBox chkDebug;
+        private System.Windows.Forms.CheckBox chkUseRaceTime;
         private System.Windows.Forms.ToolTip tooltips;
     }
 }

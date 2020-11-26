@@ -34,4 +34,35 @@ namespace LiveSplit.OriWotW {
         [Description("Windswept Wastes (Complete)")]
         WindsweptWastesComplete
     }
+    public enum SplitRace {
+        [Description("Race Has Started")]
+        RaceHasStarted,
+        [Description("Race Has Finished")]
+        RaceHasFinished,
+        [Description("Race Has Started Auto Reset")]
+        RaceHasStartedAutoReset,
+        [Description("Race Has Finished Auto Stop")]
+        RaceHasFinishedAutoStop
+    }
+    public struct RaceState {
+        public bool RaceHasStarted;
+        public RaceStopReason LastReason;
+    }
+    public enum RaceStopReason {
+        None = 0,
+        Finished = 1,
+        Timeout = 2,
+        Death = 3,
+        SpectatingFinished = 4,
+        TechnicalFailure = 5,
+        UserAction = 6
+    }
+    public struct RaceHandler {
+        public bool RaceInProgressState;
+        public bool InProgress;
+    }
+    public struct RaceStateMachineContext {
+        public bool UserRequestedRetry;
+        public RaceStopReason StopReason;
+    }
 }

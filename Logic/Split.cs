@@ -29,6 +29,8 @@ namespace LiveSplit.OriWotW {
         Map,
         [Description("Ore")]
         Ore,
+        [Description("Race State")]
+        RaceState,
         [Description("Seed")]
         Seed,
         [Description("Shard")]

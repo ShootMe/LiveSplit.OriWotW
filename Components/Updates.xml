@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.5.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Add ability to split on Race State and added a setting to set gametime with race time </change>
+        </changelog>
+    </update>
     <update version="1.4.9">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
