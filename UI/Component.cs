@@ -108,8 +108,26 @@ namespace LiveSplit.OriWotW {
             if (Model == null) { return; }
 
             Model.CurrentState.IsGameTimePaused = logic.Paused;
-            if (logic.GameTime >= 0) {
-                Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(logic.GameTime));
+            if (logic.Memory.IsHooked == true) {
+                if (logic.ShouldResetRace() == true || logic.ShouldResetRaceOver() == true) {
+                    isAutosplitting = true;
+                    logic.RaceState.RaceHasStarted = false;
+                    Model.Reset();
+                }
+                if (logic.CurrentSplit < logic.Settings.Autosplits.Count && userSettings.Settings.UseRaceTime == true) {
+                    float elapsedTime = logic.Memory.GetRacetimerElapsedTime();
+                    if (elapsedTime > 0.0f)
+                        Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(elapsedTime));
+                } else if (logic.CurrentSplit >= logic.Settings.Autosplits.Count && userSettings.Settings.UseRaceTime == true) {
+                    m_timer elapsedTime = logic.Memory.GetRaceTimer();
+                    RaceStateMachineContext context = logic.Memory.GetRaceStateContext();
+                    if (elapsedTime.ElapsedTime > 0.0f)
+                        Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(elapsedTime.ElapsedTime));
+                    else if (elapsedTime.ElapsedTime == 0.0f)
+                        Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(context.LastRaceTime));
+                } else if (logic.GameTime >= 0.0f) {
+                    Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(logic.GameTime));
+                }
             }
 
             if (logic.ShouldReset) {

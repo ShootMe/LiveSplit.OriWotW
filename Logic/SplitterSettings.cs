@@ -4,6 +4,7 @@ namespace LiveSplit.OriWotW {
         public BindingList<Split> Autosplits = new BindingList<Split>();
         public bool NoPause;
         public bool DisableDebug;
+        public bool UseRaceTime;
 
         public SplitterSettings() {
             Autosplits.AllowNew = true;
@@ -11,6 +12,7 @@ namespace LiveSplit.OriWotW {
             Autosplits.AllowEdit = true;
             NoPause = false;
             DisableDebug = false;
+            UseRaceTime = false;
         }
     }
 }

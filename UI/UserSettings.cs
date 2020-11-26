@@ -44,6 +44,9 @@ namespace LiveSplit.OriWotW {
             AddXmlItem<bool>(document, xmlSettings, "DisableDebug", chkDebug.Checked);
             Settings.DisableDebug = chkDebug.Checked;
 
+            AddXmlItem<bool>(document, xmlSettings, "UseRaceTime", chkUseRaceTime.Checked);
+            Settings.UseRaceTime = chkUseRaceTime.Checked;
+
             XmlElement xmlSplits = document.CreateElement("Splits");
             xmlSettings.AppendChild(xmlSplits);
 
@@ -70,6 +73,10 @@ namespace LiveSplit.OriWotW {
             bool disableDebug = GetXmlBoolItem(node, ".//DisableDebug", true);
             chkDebug.Checked = disableDebug;
             Settings.DisableDebug = disableDebug;
+
+            bool useRaceTime = GetXmlBoolItem(node, ".//UseRaceTime", false);
+            chkUseRaceTime.Checked = useRaceTime;
+            Settings.UseRaceTime = useRaceTime;
 
             XmlNodeList splitNodes = node.SelectNodes(".//Splits/Split");
             foreach (XmlNode splitNode in splitNodes) {

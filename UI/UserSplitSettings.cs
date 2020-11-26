@@ -66,6 +66,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitWorldEvent>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitWorldEvent>(UserSplit.Value);
                         break;
+                    case SplitType.RaceState:
+                        cboValue.DataSource = Utility.GetEnumList<SplitRace>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitRace>(UserSplit.Value);
+                        break;
                     default:
                         txtValue.Text = UserSplit.Value;
                         break;
@@ -122,6 +126,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.SpiritTrial: DefaultValue = SplitSpiritTrial.KwoloksHollowActivate; break;
                         case SplitType.Wisp: DefaultValue = SplitWisp.VoiceOfTheForest; break;
                         case SplitType.WorldEvent: DefaultValue = SplitWorldEvent.WaterPurified; break;
+                        case SplitType.RaceState: DefaultValue = SplitRace.RaceHasStarted; break;
                     }
                     UserSplit.Value = DefaultValue.ToString();
                 }

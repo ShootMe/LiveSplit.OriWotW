@@ -111,8 +111,12 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
+        public Module64 GameAssembly;
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
+        public int LastMStatePtrCheck = 0;
+        public IntPtr MState;
+        public IntPtr MState2;
         public ControlScheme LastControlScheme { get; set; }
         public int ControllerCounter { get; set; } = 0;
         private bool? noPausePatched = null;
@@ -592,6 +596,186 @@ namespace LiveSplit.OriWotW {
             }
             return totalCompletion * 100f / (count == 0 ? 1 : count);
         }
+        public RaceSystemPtr GetRaceSystem() {
+            IntPtr raceSystem = RaceSystem.Read<IntPtr>(Program, 0xb8, 0x0);
+            RaceSystemPtr raceSystemPtr = new RaceSystemPtr();
+
+            switch (Version) {
+                case PointerVersion.P2: {
+                        RaceSystemPtrV2 raceSystemPtrV2 = MemoryReader.Read<RaceSystemPtrV2>(Program, raceSystem);
+                        raceSystemPtr.Context = raceSystemPtrV2.Context;
+                        raceSystemPtr.m_states = raceSystemPtrV2.m_states;
+                        raceSystemPtr.m_timer = raceSystemPtrV2.m_timer;
+                    }
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4: {
+                        RaceSystemPtrV3V4 raceSystemPtrV3V4 = MemoryReader.Read<RaceSystemPtrV3V4>(Program, raceSystem);
+                        raceSystemPtr.Context = raceSystemPtrV3V4.Context;
+                        raceSystemPtr.m_states = raceSystemPtrV3V4.m_states;
+                        raceSystemPtr.m_timer = raceSystemPtrV3V4.m_timer;
+                    }
+                    break;
+            }
+            return raceSystemPtr;
+        }
+        public RaceCountdownStatePtr RaceCountdownState() {
+            RaceSystemPtr raceSystem = GetRaceSystem();
+            RaceCountdownStatePtr raceCountdownStatePtr = new RaceCountdownStatePtr();
+            int count = MemoryReader.Read<int>(Program, raceSystem.m_states, 0x10, 0x18);
+
+            if (count > 5) {
+                IntPtr ptr1 = MemoryReader.Read<IntPtr>(Program, raceSystem.m_states, 0x10);
+                byte[] data = Program.Read(ptr1 + 0x20, count * 0x8);
+                switch (Version) {
+                    case PointerVersion.P2: {
+                            RaceCountdownStatePtrV2 statePtrV2 = Program.Read<RaceCountdownStatePtrV2>((IntPtr)BitConverter.ToUInt64(data, 6 * 0x8));
+                            raceCountdownStatePtr.CurrentTime = statePtrV2.CurrentTime;
+                            raceCountdownStatePtr.m_countdownFinished = statePtrV2.m_countdownFinished;
+                            raceCountdownStatePtr.m_countdownTimeline = statePtrV2.m_countdownTimeline;
+                            raceCountdownStatePtr.m_markerInitialized = statePtrV2.m_markerInitialized;
+                        }
+                        break;
+
+                    case PointerVersion.P3:
+                    case PointerVersion.P4: {
+                            RaceCountdownStatePtrV3V4 statePtrV3V4 = Program.Read<RaceCountdownStatePtrV3V4>((IntPtr)BitConverter.ToUInt64(data, 6 * 0x8));
+                            raceCountdownStatePtr.m_countdownFinished = statePtrV3V4.m_countdownFinished;
+                            raceCountdownStatePtr.m_countdownTimeline = statePtrV3V4.m_countdownTimeline;
+                        }
+                        break;
+                }
+            }
+            return raceCountdownStatePtr;
+        }
+        public m_timer GetRaceTimer() {
+            RaceSystemPtr raceSystem = GetRaceSystem();
+            m_timer timer = new m_timer();
+
+            switch (Version) {
+                case PointerVersion.P2: {
+                        m_timerV2 m_timerv2 = MemoryReader.Read<m_timerV2>(Program, raceSystem.m_timer);
+                        timer.BestTime = m_timerv2.BestTime;
+                        timer.ElapsedTime = m_timerv2.ElapsedTime;
+                        timer.m_startedRace = m_timerv2.m_startedRace;
+                        timer.PersonalBestTime = m_timerv2.PersonalBestTime;
+                        timer.PreviousElapsedTime = m_timerv2.PreviousElapsedTime;
+                        timer.TimeLimit = m_timerv2.TimeLimit;
+                        timer.TimeToBeat = m_timerv2.TimeToBeat;
+                        timer.m_adjustedElapsedTime = m_timerv2.m_adjustedElapsedTime;
+                    }
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4: {
+                        m_timerV3V4 m_timerv3V4 = MemoryReader.Read<m_timerV3V4>(Program, raceSystem.m_timer);
+                        timer.BestTime = m_timerv3V4.BestTime;
+                        timer.ElapsedTime = m_timerv3V4.ElapsedTime;
+                        timer.m_startedRace = m_timerv3V4.m_startedRace;
+                        timer.PersonalBestTime = m_timerv3V4.PersonalBestTime;
+                        timer.PreviousElapsedTime = m_timerv3V4.PreviousElapsedTime;
+                        timer.TimeLimit = m_timerv3V4.TimeLimit;
+                        timer.TimeToBeat = m_timerv3V4.TimeToBeat;
+                        timer.m_adjustedElapsedTime = m_timerv3V4.m_adjustedElapsedTime;
+                    }
+                    break;
+            }
+            return timer;
+        }
+        public float GetRacetimerElapsedTime() {
+            RaceSystemPtr raceSystem = GetRaceSystem();
+
+            switch (Version) {
+                case PointerVersion.P2:
+                    return MemoryReader.Read<float>(Program, raceSystem.m_timer, 0x18);
+
+                case PointerVersion.P3:
+                case PointerVersion.P4:
+                    return MemoryReader.Read<float>(Program, raceSystem.m_timer, 0x30);
+            }
+            return -1.0f;
+        }
+        public RaceStateMachineContext GetRaceStateContext() {
+            RaceSystemPtr raceSystem = GetRaceSystem();
+            RaceStateMachineContext raceState = new RaceStateMachineContext();
+
+            switch (Version) {
+                case PointerVersion.P2: {
+                        RaceStateMachineContextV2 raceStateMachineContextV2 = MemoryReader.Read<RaceStateMachineContextV2>(Program, raceSystem.Context);
+                        raceState.Configuration = raceStateMachineContextV2.Configuration;
+                        raceState.DeltaTime = raceStateMachineContextV2.DeltaTime;
+                        raceState.StopReason = raceStateMachineContextV2.StopReason;
+                        raceState.UserRequestedLeaderboard = raceStateMachineContextV2.UserRequestedLeaderboard;
+                        raceState.UserRequestedRetry = raceStateMachineContextV2.UserRequestedRetry;
+                        raceState.UserRequestedWatchReplay = raceStateMachineContextV2.UserRequestedWatchReplay;
+                        raceState.LastRaceTime = raceStateMachineContextV2.LastRaceTime;
+                    }
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4: {
+                        RaceStateMachineContextV3V4 raceStateMachineContextV3V4 = MemoryReader.Read<RaceStateMachineContextV3V4>(Program, raceSystem.Context);
+                        raceState.Configuration = raceStateMachineContextV3V4.Configuration;
+                        raceState.DeltaTime = raceStateMachineContextV3V4.DeltaTime;
+                        raceState.StopReason = raceStateMachineContextV3V4.StopReason;
+                        raceState.UserRequestedLeaderboard = raceStateMachineContextV3V4.UserRequestedLeaderboard;
+                        raceState.UserRequestedRetry = raceStateMachineContextV3V4.UserRequestedRetry;
+                        raceState.UserRequestedWatchReplay = raceStateMachineContextV3V4.UserRequestedWatchReplay;
+                        raceState.LastRaceTime = raceStateMachineContextV3V4.LastRaceTime;
+                    }
+                    break;
+            }
+
+            return raceState;
+        }
+        public RaceHandlerPtr GetRaceHandler() {
+            RaceStateMachineContext context = GetRaceStateContext();
+            RaceHandlerPtr handler = new RaceHandlerPtr();
+
+            switch (Version) {
+                case PointerVersion.P2: {
+                        RaceHandlerV2 raceHandler = MemoryReader.Read<RaceHandlerV2>(Program, context.Configuration, 0x20, 0x0);
+                        RaceDataV2 raceData = MemoryReader.Read<RaceDataV2>(Program, raceHandler.Data);
+                        handler.Data.m_raceState = MemoryReader.Read<int>(Program, raceData.m_raceState, 0x38);
+                        handler.Data.RaceInProgressState = MemoryReader.Read<bool>(Program, raceData.RaceInProgressState, 0x40);
+                        handler.m_inEndProximity = raceHandler.m_inEndProximity;
+                        handler.m_initialized = raceHandler.m_initialized;
+                        handler.m_inProgress = raceHandler.m_inProgress;
+                        handler.m_inStartProximity = raceHandler.m_inStartProximity;
+                        handler.m_isSyncing = raceHandler.m_isSyncing;
+                    }
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4: {
+                        RaceHandlerV3V4 raceHandler = MemoryReader.Read<RaceHandlerV3V4>(Program, context.Configuration, 0x20, 0x0);
+                        RaceDataV3V4 raceData = MemoryReader.Read<RaceDataV3V4>(Program, raceHandler.Data);
+                        handler.Data.m_raceState = MemoryReader.Read<int>(Program, raceData.m_raceState, 0x44);
+                        handler.Data.RaceInProgressState = MemoryReader.Read<bool>(Program, raceData.RaceInProgressState, 0x49);
+                        handler.m_inEndProximity = raceHandler.m_inEndProximity;
+                        handler.m_initialized = raceHandler.m_initialized;
+                        handler.m_inProgress = raceHandler.m_inProgress;
+                        handler.m_inStartProximity = raceHandler.m_inStartProximity;
+                        handler.m_isSyncing = raceHandler.m_isSyncing;
+                    }
+                    break;
+            }
+            return handler;
+        }
+        public bool IsRacing() {
+            RaceSystemPtr raceSystem = GetRaceSystem();
+
+            switch (Version) {
+                case PointerVersion.P2:
+                    return MemoryReader.Read<bool>(Program, raceSystem.m_timer, 0x4c);
+
+                case PointerVersion.P3:
+                case PointerVersion.P4:
+                    return MemoryReader.Read<bool>(Program, raceSystem.m_timer, 0x64);
+            }
+            return false;
+        }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
             if (!IsHooked && DateTime.Now > LastHooked.AddSeconds(1)) {
@@ -613,10 +797,10 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
-                    Module64 gameAssembly = Program.Module64("GameAssembly.dll");
+                    GameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
-                    if (gameAssembly != null) {
-                        switch (gameAssembly.MemorySize) {
+                    if (GameAssembly != null) {
+                        switch (GameAssembly.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.P1; break;
                             case 77844480: MemoryManager.Version = PointerVersion.P2; break;
                             case 81121280: MemoryManager.Version = PointerVersion.P3; break;

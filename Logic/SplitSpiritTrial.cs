@@ -34,4 +34,15 @@ namespace LiveSplit.OriWotW {
         [Description("Windswept Wastes (Complete)")]
         WindsweptWastesComplete
     }
+
+    public enum SplitRace {
+        [Description("Race Has Started")]
+        RaceHasStarted,
+        [Description("Race Has Finished")]
+        RaceHasFinished,
+        [Description("Race Has Started Auto Reset")]
+        RaceHasStartedAutoReset,
+        [Description("Race Has Finished Auto Stop")]
+        RaceHasFinishedAutoStop
+    }
 }

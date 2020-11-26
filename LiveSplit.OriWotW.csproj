@@ -75,15 +75,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiveSplit.Core">
-      <HintPath>..\..\LiveSplit\LiveSplit.Core.dll</HintPath>
+      <HintPath>C:\Users\Tekoppar\Desktop\Livesplit\LiveSplit.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.Text">
-      <HintPath>..\..\LiveSplit\Components\LiveSplit.Text.dll</HintPath>
+      <HintPath>C:\Users\Tekoppar\Desktop\Livesplit\Components\LiveSplit.Text.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.View">
-      <HintPath>..\..\LiveSplit\LiveSplit.View.dll</HintPath>
+      <HintPath>C:\Users\Tekoppar\Desktop\Livesplit\LiveSplit.View.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -92,7 +92,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="UpdateManager">
-      <HintPath>..\..\LiveSplit\UpdateManager.dll</HintPath>
+      <HintPath>C:\Users\Tekoppar\Desktop\Livesplit\UpdateManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -124,6 +124,7 @@
     <Compile Include="Memory\FPSTimer.cs" />
     <Compile Include="Memory\GameSettings.cs" />
     <Compile Include="Memory\GameState.cs" />
+    <Compile Include="Memory\RaceSystem.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
     <Compile Include="Memory\Stats.cs" />
@@ -202,8 +203,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(ProjectDir)Components\$(TargetFileName)
-copy $(TargetPath) D:\Extra\LiveSplit\Components\$(TargetFileName)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
