@@ -144,7 +144,7 @@ namespace LiveSplit.OriWotW {
             );
         }
         public bool IsRacing() {
-            //RaceSystem.Instance.m_timer.ElapsedTime
+            //RaceSystem.Instance.m_timer.m_startedRace
             int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
             int m_startedRace = Version <= PointerVersion.P2 ? 0x4c : 0x64;
             return RaceSystem.Read<bool>(Program, 0xb8, 0x0, m_timer, m_startedRace);
