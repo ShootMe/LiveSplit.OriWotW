@@ -797,10 +797,10 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
-                    GameAssembly = Program.Module64("GameAssembly.dll");
+                    Module64 gameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
-                    if (GameAssembly != null) {
-                        switch (GameAssembly.MemorySize) {
+                    if (gameAssembly != null) {
+                        switch (gameAssembly.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.P1; break;
                             case 77844480: MemoryManager.Version = PointerVersion.P2; break;
                             case 81121280: MemoryManager.Version = PointerVersion.P3; break;
