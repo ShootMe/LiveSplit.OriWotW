@@ -44,7 +44,11 @@ namespace LiveSplit.OriWotW {
         [Description("World Event")]
         WorldEvent,
         [Description("Uber State")]
-        UberState
+        UberState,
+        [Description("Keystone Door")]
+        KeystoneDoor,
+        [Description("Uber State Value")]
+        UberStateValue
     }
     public class Split {
         public string Name { get; set; }
