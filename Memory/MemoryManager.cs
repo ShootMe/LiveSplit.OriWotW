@@ -662,7 +662,7 @@ namespace LiveSplit.OriWotW {
             items[EquipmentType.Weapon_Torch] = State == 1 ? true : false;
 
             for (int i = 0; i < count; i++) {
-                IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x20 + (i * 0x8));
+                IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x10, 0x20 + (i * 0x8));
                 InventoryItem inventoryItem = MemoryReader.Read<InventoryItem>(Program, inventoryItemPtr);
                 EquipmentType equipmentType = (EquipmentType)inventoryItem.m_type;
 
@@ -747,7 +747,7 @@ namespace LiveSplit.OriWotW {
                     int count = MemoryReader.Read<int>(Program, m_inventory, 0x18);
 
                     for (int i = 0; i < count; i++) {
-                        IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x20 + (i * 0x8));
+                        IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x10, 0x20 + (i * 0x8));
                         InventoryItem inventoryItem = MemoryReader.Read<InventoryItem>(Program, inventoryItemPtr);
 
                         if (InventoryItem.InventoryItemTypeToAbilityType.ContainsKey((int)inventoryItem.m_type) == true && toFind == (EquipmentType)inventoryItem.m_type &&
