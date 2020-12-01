@@ -70,6 +70,10 @@ namespace LiveSplit.OriWotW {
                         cboValue.DataSource = Utility.GetEnumList<SplitWorldEvent>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitWorldEvent>(UserSplit.Value);
                         break;
+                    case SplitType.KeystoneDoor:
+                        cboValue.DataSource = Utility.GetEnumList<SplitKeystoneDoor>();
+                        cboValue.SelectedValue = Utility.GetEnumValue<SplitKeystoneDoor>(UserSplit.Value);
+                        break;
                     default:
                         txtValue.Text = UserSplit.Value;
                         break;
@@ -108,6 +112,13 @@ namespace LiveSplit.OriWotW {
             } else if (nextControlType == SplitType.UberState) {
                 if (nextControlType != UserSplit.Type) {
                     UserSplit.Value = "34543|11226";
+                }
+                txtValue.Width = 202;
+                txtValue.Visible = true;
+                cboValue.Visible = false;
+            } else if (nextControlType == SplitType.UberStateValue) {
+                if (nextControlType != UserSplit.Type) {
+                    UserSplit.Value = "UberGroup, UberId, Comparison, Value | 8246,62310,>,500.0";
                 }
                 txtValue.Width = 202;
                 txtValue.Visible = true;
