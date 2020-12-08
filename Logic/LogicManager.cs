@@ -30,6 +30,7 @@ namespace LiveSplit.OriWotW {
         private Screen lastScreen;
         private DateTime splitLate;
         private RaceState raceState;
+        private Vector3 PreviousPosition = new Vector3(-12345679, -987654321, 122333);
 
         public LogicManager(SplitterSettings settings) {
             Memory = new MemoryManager();
@@ -334,10 +335,23 @@ namespace LiveSplit.OriWotW {
             }
         }
         private void CheckHitbox(Vector4 hitbox) {
-            Vector4 ori = new Vector4(Memory.Position(), 0f, 0f, true);
-            bool containsOri = hitbox.Intersects(ori);
-            ShouldSplit = containsOri && !lastBoolValue;
-            lastBoolValue = containsOri;
+            Vector3 OriPosition = Vector3._Vector3(Memory.Position(), 0.0f);
+            bool hitboxSplit = hitbox.IsPositionInsideRect(OriPosition);
+            float distance = Vector3.Distance(ref this.PreviousPosition, ref OriPosition);
+
+            if (hitboxSplit == false)
+                hitboxSplit = hitbox.IsPositionInsideRect(this.PreviousPosition);
+
+            if (hitboxSplit == false && this.PreviousPosition != new Vector3(-12345679, -987654321, 122333))
+                hitboxSplit = hitbox.IsRectBetweenPositions(this.PreviousPosition, OriPosition);
+
+            if (distance < 15.0f && Vector3.Equal(this.PreviousPosition, OriPosition) == false)
+                ShouldSplit = hitboxSplit && !lastBoolValue;
+            
+            if (this.PreviousPosition.Equals(OriPosition) == false)
+                this.PreviousPosition = OriPosition;
+
+            lastBoolValue = hitboxSplit;
         }
         private void CheckSpiritTrial(Split split) {
             SplitSpiritTrial spiritTrial = Utility.GetEnumValue<SplitSpiritTrial>(split.Value);
