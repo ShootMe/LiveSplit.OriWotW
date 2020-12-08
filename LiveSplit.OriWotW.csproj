@@ -110,6 +110,7 @@
     <Compile Include="Logic\SplitAbility.cs" />
     <Compile Include="Logic\SplitArea.cs" />
     <Compile Include="Logic\SplitBoss.cs" />
+    <Compile Include="Logic\SplitKeystoneDoor.cs" />
     <Compile Include="Logic\SplitMap.cs" />
     <Compile Include="Logic\SplitSeed.cs" />
     <Compile Include="Logic\SplitShard.cs" />
@@ -124,11 +125,13 @@
     <Compile Include="Memory\FPSTimer.cs" />
     <Compile Include="Memory\GameSettings.cs" />
     <Compile Include="Memory\GameState.cs" />
+    <Compile Include="Memory\InventoryItem.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
     <Compile Include="Memory\Stats.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
+    <Compile Include="Memory\Vector3.cs" />
     <Compile Include="Memory\Vector4.cs" />
     <Compile Include="Logic\SplitWorldEvent.cs" />
     <Compile Include="Memory\UberState.cs" />
