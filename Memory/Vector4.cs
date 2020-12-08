@@ -11,12 +11,6 @@ namespace LiveSplit.OriWotW {
         [FieldOffset(12)]
         public float H;
 
-        public Vector4(float x, float y, float w, float h) {
-            this.X = x;
-            this.Y = y;
-            this.W = w;
-            this.H = h;
-        }
         public Vector4(string cordinates) {
             string[] cords = cordinates.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
             if (cords.Length == 4) {
@@ -53,25 +47,6 @@ namespace LiveSplit.OriWotW {
         }
         public bool Intersects(Vector4 other) {
             return X + W >= other.X && other.X + other.W >= X && Y - H <= other.Y && other.Y - other.H <= Y;
-        }
-        public bool IsPositionInsideRect(Vector3 position) {
-            return Y > position.Y && Y - H < position.Y && X < position.X && X + W > position.X;
-        }
-        public bool IsRectBetweenPositions(Vector3 start, Vector3 end) {
-            bool xBetween, yBetween, xInside, yInside = false;
-            float middleX = X + (W / 2);
-            float middleY = Y + (H / 2);
-            xBetween = start.X < middleX && middleX < end.X || start.X > middleX && middleX > end.X;
-            yBetween = start.Y < middleY && middleY < end.Y || start.Y > middleY && middleY > end.Y;
-            xInside = X < start.X && X + W > start.X || X < end.X && X + W > end.X;
-            yInside = Y > start.Y && Y - H < start.Y || Y > end.Y && Y - H < end.Y;
-
-            //return (start.X < X && X < end.X || start.X > X && X > end.X) && (start.Y < Y && Y < end.Y || start.Y > Y && Y > end.Y);
-
-            if ((xBetween == true && yInside == true) || (yBetween == true && xInside == true) || xBetween == true && yBetween == true)
-                return true;
-
-            return false;
         }
         public override string ToString() {
             return $"{X:0.00}, {Y:0.00}, {W:0.00}, {H:0.00}";
