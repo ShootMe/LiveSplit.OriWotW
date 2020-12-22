@@ -125,13 +125,12 @@
     <Compile Include="Memory\FPSTimer.cs" />
     <Compile Include="Memory\GameSettings.cs" />
     <Compile Include="Memory\GameState.cs" />
-    <Compile Include="Memory\InventoryItem.cs" />
+    <Compile Include="Memory\PointerCache.cs" />
     <Compile Include="Memory\Screen.cs" />
     <Compile Include="Memory\Shard.cs" />
     <Compile Include="Memory\Stats.cs" />
     <Compile Include="Memory\Vector2.cs" />
     <Compile Include="Memory\ProgramPointer.cs" />
-    <Compile Include="Memory\Vector3.cs" />
     <Compile Include="Memory\Vector4.cs" />
     <Compile Include="Logic\SplitWorldEvent.cs" />
     <Compile Include="Memory\UberState.cs" />

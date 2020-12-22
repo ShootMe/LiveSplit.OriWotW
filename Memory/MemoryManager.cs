@@ -111,22 +111,14 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
-        public Module64 GameAssembly;
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
         public ControlScheme LastControlScheme { get; set; }
         public int ControllerCounter { get; set; } = 0;
-        public int LastMStatePtrCheck = 0;
-        public IntPtr LastPlayerUberState;
-        public IntPtr LastPlayerUberState250;
-        public int SeinLastKeystoneCount = -1;
-        public int SeinLastAllocatedKeystoneCount = -1;
-        public IntPtr LastUberGroupPtr = IntPtr.Zero;
-        public IntPtr LastUberIdPtr = IntPtr.Zero;
-        public string LastUberValueType = "None";
         private bool? noPausePatched = null;
         private bool? debugEnabled = null;
         private FPSTimer fpsTimer = new FPSTimer(200, 15);
+        private PointerCache playerUberStateGroup = new PointerCache();
         private static Dictionary<long, UberState> uberIDLookup = null;
 
         public MemoryManager() {
@@ -270,17 +262,26 @@ namespace LiveSplit.OriWotW {
         public Stats PlayerStats() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Stats
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            return PlayerUberStateGroup.Read<Stats>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x28, 0x10);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            return Program.Read<Stats>(playerUberStateGroup, 0x28, 0x10);
         }
         public int Keystones() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_keystones
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x18, 0x28);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            return Program.Read<int>(playerUberStateGroup, 0x18, 0x28);
+        }
+        public int AllocatedKeystones() {
+            //Characters.Sein.Inventory.m_allocatedKeystones.Count
+            int inventory = Version <= PointerVersion.P2 ? 0x60 : 0x78;
+            int m_allocatedKeystones = Version <= PointerVersion.P2 ? 0x28 : 0x40;
+            return Characters.Read<int>(Program, 0xb8, 0x10, inventory, m_allocatedKeystones, 0x18, 0x30);
         }
         public int Ore() {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Inventory.m_ore
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            return PlayerUberStateGroup.Read<int>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x18, 0x34);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            return Program.Read<int>(playerUberStateGroup, 0x18, 0x34);
         }
         public Vector2 Position() {
             //Characters.Sein.PlatformBehaviour.PlatformMovement.m_prevPosition
@@ -420,6 +421,21 @@ namespace LiveSplit.OriWotW {
             return null;
         }
         public void UpdateUberState(UberState uberState = null) {
+            if (uberState != null && uberState.GroupPointer != IntPtr.Zero) {
+                int groupID = Program.Read<int>(uberState.GroupPointer);
+                int id = Program.Read<int>(uberState.IDPointer);
+                if (groupID == uberState.GroupID && id == uberState.ID) {
+                    switch (uberState.Type) {
+                        case UberStateType.SavePedestalUberState: uberState.Value.Byte = Program.Read<byte>(uberState.ValuePointer); break;
+                        case UberStateType.SerializedBooleanUberState: uberState.Value.Bool = Program.Read<byte>(uberState.ValuePointer) != 0; break;
+                        case UberStateType.SerializedFloatUberState: uberState.Value.Float = Program.Read<float>(uberState.ValuePointer); break;
+                        case UberStateType.SerializedIntUberState: uberState.Value.Int = Program.Read<int>(uberState.ValuePointer); break;
+                        case UberStateType.SerializedByteUberState: uberState.Value.Byte = Program.Read<byte>(uberState.ValuePointer); break;
+                    }
+                    return;
+                }
+            }
+
             //UbserStateController.m_currentStateValueStore.m_groupMap
             IntPtr groups = UberStateController.Read<IntPtr>(Program, 0xb8, 0x40, 0x18);
             //.Count
@@ -433,7 +449,8 @@ namespace LiveSplit.OriWotW {
                 //.Values[i].m_id.m_id
                 IntPtr group = (IntPtr)BitConverter.ToUInt64(groupsData, 0x10 + (i * 0x18));
                 byte[] groupData = Program.Read(group + 0x18, 48);
-                long groupID = Program.Read<int>((IntPtr)BitConverter.ToUInt64(groupData, 0), 0x10);
+                IntPtr groupPtr = (IntPtr)BitConverter.ToUInt64(groupData, 0) + 0x10;
+                long groupID = Program.Read<int>(groupPtr);
 
                 if (!updateAll && groupID != uberState.GroupID) { continue; }
 
@@ -451,8 +468,11 @@ namespace LiveSplit.OriWotW {
                         if (!updateAll && id != uberState.ID) { continue; }
 
                         if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.GroupPointer = groupPtr;
+                            uberState.IDPointer = map + 0x20 + (j * 0x18);
                             if (uberState.Type == UberStateType.SavePedestalUberState) {
-                                uberState.Value.Byte = Program.Read<byte>((IntPtr)BitConverter.ToUInt64(data, 0x10 + (j * 0x18)), 0x11);
+                                uberState.ValuePointer = (IntPtr)(BitConverter.ToUInt64(data, 0x10 + (j * 0x18)) + 0x11);
+                                uberState.Value.Byte = Program.Read<byte>(uberState.ValuePointer);
                             } else {
                                 //playerUberStateDescriptor
                             }
@@ -474,6 +494,9 @@ namespace LiveSplit.OriWotW {
                         if (!updateAll && id != uberState.ID) { continue; }
 
                         if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.GroupPointer = groupPtr;
+                            uberState.IDPointer = map + 0x20 + (j * 0x18);
+                            uberState.ValuePointer = map + 0x30 + (j * 0x18);
                             uberState.Value.Bool = data[0x10 + (j * 0x18)] != 0;
                         }
                     }
@@ -493,6 +516,9 @@ namespace LiveSplit.OriWotW {
                         if (!updateAll && id != uberState.ID) { continue; }
 
                         if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.GroupPointer = groupPtr;
+                            uberState.IDPointer = map + 0x20 + (j * 0x18);
+                            uberState.ValuePointer = map + 0x30 + (j * 0x18);
                             uberState.Value.Float = BitConverter.ToSingle(data, 0x10 + (j * 0x18));
                         }
                     }
@@ -512,6 +538,9 @@ namespace LiveSplit.OriWotW {
                         if (!updateAll && id != uberState.ID) { continue; }
 
                         if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.GroupPointer = groupPtr;
+                            uberState.IDPointer = map + 0x20 + (j * 0x18);
+                            uberState.ValuePointer = map + 0x30 + (j * 0x18);
                             uberState.Value.Int = BitConverter.ToInt32(data, 0x10 + (j * 0x18));
                         }
                     }
@@ -531,6 +560,9 @@ namespace LiveSplit.OriWotW {
                         if (!updateAll && id != uberState.ID) { continue; }
 
                         if (!updateAll || uberIDLookup.TryGetValue((groupID << 32) | id, out uberState)) {
+                            uberState.GroupPointer = groupPtr;
+                            uberState.IDPointer = map + 0x20 + (j * 0x18);
+                            uberState.ValuePointer = map + 0x30 + (j * 0x18);
                             uberState.Value.Byte = data[0x10 + (j * 0x18)];
                         }
                     }
@@ -540,7 +572,8 @@ namespace LiveSplit.OriWotW {
         public bool HasAbility(AbilityType type) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x10, 0x18);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            IntPtr abilities = Program.Read<IntPtr>(playerUberStateGroup, 0x10, 0x18);
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
@@ -559,7 +592,9 @@ namespace LiveSplit.OriWotW {
             Dictionary<AbilityType, Ability> currentAbilities = new Dictionary<AbilityType, Ability>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Abilities.m_abilitiesList
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            IntPtr abilities = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x10, 0x18);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            IntPtr abilities = Program.Read<IntPtr>(playerUberStateGroup, 0x10, 0x18);
+
             //.Count
             int count = Program.Read<int>(abilities, 0x18);
             //.Items
@@ -577,7 +612,8 @@ namespace LiveSplit.OriWotW {
         public bool HasShard(ShardType type, int level) {
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x20, 0x18);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            IntPtr shards = Program.Read<IntPtr>(playerUberStateGroup, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
@@ -596,7 +632,8 @@ namespace LiveSplit.OriWotW {
             Dictionary<ShardType, Shard> currentShards = new Dictionary<ShardType, Shard>();
             //PlayerUberStateGroup.Instance.PlayerUberState.m_state.Shards.m_shardsList
             int playerUberState = Version <= PointerVersion.P2 ? 0x18 : 0x30;
-            IntPtr shards = PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30, 0x20, 0x18);
+            playerUberStateGroup.Update(PlayerUberStateGroup.Read<IntPtr>(Program, 0xb8, 0x0, playerUberState, 0x30));
+            IntPtr shards = Program.Read<IntPtr>(playerUberStateGroup, 0x20, 0x18);
             //.Count
             int count = Program.Read<int>(shards, 0x18);
             //.Items
@@ -641,317 +678,6 @@ namespace LiveSplit.OriWotW {
             }
             return totalCompletion * 100f / (count == 0 ? 1 : count);
         }
-        public void UpdateSeinItemStates(ref Dictionary<EquipmentType, bool> items) {
-            IntPtr sptr = IntPtr.Zero;
-            IntPtr m_inventory = IntPtr.Zero;
-            switch (Version) {
-                case PointerVersion.P1:
-                case PointerVersion.P2:
-                    sptr = Characters.Read<IntPtr>(Program, 0xb8, 0x10, 0xA0, 0x18, 0x30);
-                    m_inventory = MemoryReader.Read<IntPtr>(Program, sptr, 0x18, 0x10);
-                    break;
-                case PointerVersion.P3:
-                case PointerVersion.P4:
-                    sptr = Characters.Read<IntPtr>(Program, 0xb8, 0x10, 0xB8, 0x30, 0x30);
-                    m_inventory = MemoryReader.Read<IntPtr>(Program, sptr, 0x18, 0x10);
-                    break;
-            }
-
-            int count = MemoryReader.Read<int>(Program, m_inventory, 0x18);
-            int State = MemoryReader.Read<int>(Program, sptr, 0x30, 0x10);
-            items[EquipmentType.Weapon_Torch] = State == 1 ? true : false;
-
-            for (int i = 0; i < count; i++) {
-                IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x10, 0x20 + (i * 0x8));
-                InventoryItem inventoryItem = MemoryReader.Read<InventoryItem>(Program, inventoryItemPtr);
-                EquipmentType equipmentType = (EquipmentType)inventoryItem.m_type;
-
-                if (items.ContainsKey(equipmentType) == true) {
-                    if (InventoryItem.InventoryItemTypeToAbilityType.ContainsKey((int)inventoryItem.m_type) == true)
-                        items[equipmentType] = inventoryItem.m_gained;
-                } else
-                    items.Add(equipmentType, inventoryItem.m_gained);
-            }
-        }
-        public AbilityState HasAbilityNew(AbilityType type, ref Dictionary<EquipmentType, bool> items) {
-            //Characters.m_sein.PlayerAbilities.StateDescriptor.m_state
-            IntPtr sptr = IntPtr.Zero;
-            switch (Version) {
-                case PointerVersion.P1:
-                case PointerVersion.P2:
-                    sptr = Characters.Read<IntPtr>(Program, 0xb8, 0x10, 0xA0, 0x18, 0x30);
-                    break;
-                case PointerVersion.P3:
-                case PointerVersion.P4:
-                    sptr = Characters.Read<IntPtr>(Program, 0xb8, 0x10, 0xB8, 0x30, 0x30);
-                    break;
-            }
-            //PlayerAbilitiesPtr pptr = MemoryReader.Read<PlayerAbilitiesPtr>(Program, seinCharacterPtr.PlayerAbilities);
-            //StateDescriptorPtr sptr = MemoryReader.Read<StateDescriptorPtr>(Program, pptr.StateDescriptor);
-            //SaveSlotBackupsManager.m_instance.m_currentReadingSlot
-            //IntPtr SaveSlotBackupsManager = MemoryReader.Read<IntPtr>(Program, GameAssembly.BaseAddress, 0x04763290, 0xb8, 0x0 + 0x08, 0x54);
-            int readingSaveSlots = -1;
-            if (Version == PointerVersion.P3 || Version == PointerVersion.P4)
-                readingSaveSlots = MemoryReader.Read<int>(Program, GameAssembly.BaseAddress, 0x04765228, 0xb8, 0x0 + 0x08, 0x54);// SaveSlotBackupsManager, 0x54);
-
-            EquipmentType toFind = EquipmentType.None;
-            bool updateItems = false;
-            AbilityState currentState = AbilityState.DontHaveAbility;
-
-            LastMStatePtrCheck++;
-            if (LastMStatePtrCheck > 25) {
-                if (LastPlayerUberState != IntPtr.Zero && sptr == LastPlayerUberState && LastPlayerUberState250 != IntPtr.Zero && sptr == LastPlayerUberState250)
-                    updateItems = true;
-
-                LastPlayerUberState = sptr;
-
-                if (LastMStatePtrCheck > 250) {
-                    updateItems = true;
-                    LastPlayerUberState250 = sptr;
-                    LastMStatePtrCheck = 0;
-                }
-            }
-
-            if (readingSaveSlots != -1 || (LastPlayerUberState != IntPtr.Zero && sptr != LastPlayerUberState) || (LastPlayerUberState250 != IntPtr.Zero && sptr != LastPlayerUberState250))
-                currentState = AbilityState.IsReadingBackups;
-
-            if (currentState != AbilityState.IsReadingBackups) {
-                if (InventoryItem.AbilityTypeToEquipmentType.ContainsKey((int)type) == true)
-                    toFind = (EquipmentType)InventoryItem.AbilityTypeToEquipmentType[(int)type];
-
-                if (toFind == EquipmentType.Weapon_Torch) {
-                    //Characters.m_sein.PlayerAbilities.StateDescriptor.m_state.Holdables.State
-                    int State = -1;
-                    switch (Version) {
-                        case PointerVersion.P1:
-                        case PointerVersion.P2:
-                        case PointerVersion.P3:
-                        case PointerVersion.P4:
-                            State = MemoryReader.Read<int>(Program, sptr, 0x30, 0x10);
-                            break;
-                    }
-                    if (State == 1 && items[toFind] == false)
-                        currentState = AbilityState.HaveAbility;
-                } else {
-                    //IntPtr Inventory = MemoryReader.Read<IntPtr>(Program, m_state, 0x18);
-                    //Characters.m_sein.PlayerAbilities.StateDescriptor.m_state.Inventory.m_inventory
-                    IntPtr m_inventory = IntPtr.Zero;
-                    switch (Version) {
-                        case PointerVersion.P1:
-                        case PointerVersion.P2:
-                        case PointerVersion.P3:
-                        case PointerVersion.P4:
-                            m_inventory = MemoryReader.Read<IntPtr>(Program, sptr, 0x18, 0x10);
-                            break;
-                    }
-                    int count = MemoryReader.Read<int>(Program, m_inventory, 0x18);
-
-                    for (int i = 0; i < count; i++) {
-                        IntPtr inventoryItemPtr = MemoryReader.Read<IntPtr>(Program, m_inventory, 0x10, 0x20 + (i * 0x8));
-                        InventoryItem inventoryItem = MemoryReader.Read<InventoryItem>(Program, inventoryItemPtr);
-
-                        if (InventoryItem.InventoryItemTypeToAbilityType.ContainsKey((int)inventoryItem.m_type) == true && toFind == (EquipmentType)inventoryItem.m_type &&
-                            inventoryItem.m_gained == true && items.ContainsKey(toFind) == true && items[toFind] == false)
-                            currentState = AbilityState.HaveAbility;
-                    }
-                }
-
-                if (updateItems == true)
-                    UpdateSeinItemStates(ref items);
-            }
-
-            return currentState;
-        }
-        public bool OpenedKeystoneDoor() {
-            int allocatedKeystones = -1;
-            int currentKeystones = Keystones();
-            bool shouldSplit = false;
-
-            //characters.m_sein.Inventory.m_allocatedKeystones - Characters.SeinCharacter.SeinInventory
-            switch (Version) {
-                case PointerVersion.P1:
-                case PointerVersion.P2:
-                    allocatedKeystones = Characters.Read<int>(Program, 0xb8, 0x10, 0x60, 0x28, 0x18, 0x30);
-                    break;
-
-                case PointerVersion.P3:
-                case PointerVersion.P4:
-                    allocatedKeystones = Characters.Read<int>(Program, 0xb8, 0x10, 0x78, 0x40, 0x18, 0x30);
-                    break;
-            }
-
-            if ((SeinLastKeystoneCount == currentKeystones + 2 || SeinLastKeystoneCount == currentKeystones + 4) && allocatedKeystones == 0 && SeinLastAllocatedKeystoneCount > 0) {
-                shouldSplit = true;
-                SeinLastKeystoneCount = -1;
-                SeinLastAllocatedKeystoneCount = -1;
-            }
-
-            if (SeinLastAllocatedKeystoneCount == -1 || allocatedKeystones == 0 || SeinLastAllocatedKeystoneCount == currentKeystones)
-                SeinLastKeystoneCount = currentKeystones;
-
-            if (SeinLastAllocatedKeystoneCount == currentKeystones || allocatedKeystones > 0)
-                SeinLastAllocatedKeystoneCount = allocatedKeystones;
-
-            return shouldSplit;
-        }
-        public bool AllocatedKeystones() {
-            int allocatedKeystones = -1;
-
-            //characters.m_sein.Inventory.m_allocatedKeystones - Characters.SeinCharacter.SeinInventory
-            switch (Version) {
-                case PointerVersion.P1:
-                case PointerVersion.P2:
-                    allocatedKeystones = Characters.Read<int>(Program, 0xb8, 0x10, 0x60, 0x28, 0x18, 0x30);
-                    break;
-
-                case PointerVersion.P3:
-                case PointerVersion.P4:
-                    allocatedKeystones = Characters.Read<int>(Program, 0xb8, 0x10, 0x78, 0x40, 0x18, 0x30);
-                    break;
-            }
-
-            if (allocatedKeystones > 0)
-                return true;
-
-            return false;
-        }
-        public string GetUberStateValue(int UberGroup, int UberId) {
-            if (LastUberGroupPtr != IntPtr.Zero && LastUberIdPtr != IntPtr.Zero) {
-                int lastUberGroupId = MemoryReader.Read<int>(Program, LastUberGroupPtr, 0x18, 0x10);
-                int lastUberId = MemoryReader.Read<int>(Program, LastUberIdPtr + 0x8, 0x10);
-
-                if (UberGroup == lastUberGroupId && UberId == lastUberId) {
-                    switch (LastUberValueType) {
-                        case "Bool": return MemoryReader.Read<bool>(Program, LastUberIdPtr + 0x10).ToString();
-                        case "Float": return MemoryReader.Read<float>(Program, LastUberIdPtr + 0x10).ToString();
-                        case "Int": return MemoryReader.Read<int>(Program, LastUberIdPtr + 0x10).ToString();
-                        case "Byte": return MemoryReader.Read<byte>(Program, LastUberIdPtr + 0x10).ToString();
-                    }
-                }
-            }
-
-            //UberStateController.s_instance.m_currentStateValueStore.m_groupMap - UberStateController.UberStateValueStore.Dictionary<UberID, UberStateValueGroup>
-            IntPtr m_groupMap = IntPtr.Zero;
-            switch (Version) {
-                case PointerVersion.P1:
-                case PointerVersion.P2:
-                    m_groupMap = MemoryReader.Read<IntPtr>(Program, GameAssembly.BaseAddress, 0x4422878, 0xb8, 0x40, 0x18);
-                    break;
-
-                case PointerVersion.P3:
-                case PointerVersion.P4:
-                    m_groupMap = MemoryReader.Read<IntPtr>(Program, GameAssembly.BaseAddress, 0x04739128, 0xb8, 0x40, 0x18);
-                    break;
-            }
-            int groupId = -1;
-            int count = MemoryReader.Read<int>(Program, m_groupMap, 0x20) * 3;
-            bool wasFound = false;
-
-            for (int i = 0; i < count; i += 3) {
-                IntPtr ptr = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18);// + ((i * 0x8) + 2));
-                groupId = MemoryReader.Read<int>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x18, 0x10);
-
-                if (groupId == UberGroup && groupId != -1) {
-                    LastUberGroupPtr = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8));
-                    IntPtr uberStateBools = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x28);
-                    bool uberBoolValue = GetUberBoolValue(uberStateBools, UberId, ref wasFound);
-
-                    if (wasFound == true) {
-                        LastUberValueType = "Bool";
-                        return uberBoolValue.ToString();
-                    }
-
-                    IntPtr uberStateFloats = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x30);
-                    float uberFloatValue = GetUberFloatValue(uberStateFloats, UberId, ref wasFound);
-
-                    if (wasFound == true) {
-                        LastUberValueType = "Float";
-                        return uberFloatValue.ToString();
-                    }
-
-                    IntPtr uberStateInts = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x38);
-                    int uberIntValue = GetUberIntValue(uberStateInts, UberId, ref wasFound);
-
-                    if (wasFound == true) {
-                        LastUberValueType = "Int";
-                        return uberIntValue.ToString();
-                    }
-
-                    IntPtr uberStateBytes = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x40);
-                    byte uberByteValue = GetUberByteValue(uberStateBytes, UberId, ref wasFound);
-
-                    if (wasFound == true) {
-                        LastUberValueType = "Byte";
-                        return uberByteValue.ToString();
-                    }
-                }
-            }
-            return "";
-        }
-        private bool GetUberBoolValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
-            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
-            int uberId = -1;
-
-            for (int i = 0; i < count; i += 3) {
-                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
-
-                if (uberId == UberId && uberId != -1) {
-                    wasFound = true;
-                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8));
-                    return MemoryReader.Read<bool>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
-                }
-            }
-
-            return false;
-        }
-        private float GetUberFloatValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
-            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
-            int uberId = -1;
-
-            for (int i = 0; i < count; i += 3) {
-                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
-
-                if (uberId == UberId && uberId != -1) {
-                    wasFound = true;
-                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
-                    return MemoryReader.Read<float>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
-                }
-            }
-
-            return -1.0f;
-        }
-        private int GetUberIntValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
-            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
-            int uberId = -1;
-
-            for (int i = 0; i < count; i += 3) {
-                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
-
-                if (uberId == UberId && uberId != -1) {
-                    wasFound = true;
-                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
-                    return MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
-                }
-            }
-
-            return -1;
-        }
-        private byte GetUberByteValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
-            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
-            int uberId = -1;
-
-            for (int i = 0; i < count; i += 3) {
-                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
-
-                if (uberId == UberId && uberId != -1) {
-                    wasFound = true;
-                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
-                    return MemoryReader.Read<byte>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
-                }
-            }
-
-            return 0;
-        }
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
             if (!IsHooked && DateTime.Now > LastHooked.AddSeconds(1)) {
@@ -973,10 +699,10 @@ namespace LiveSplit.OriWotW {
                 if (Program != null && !Program.HasExited) {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
-                    GameAssembly = Program.Module64("GameAssembly.dll");
+                    Module64 gameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
-                    if (GameAssembly != null) {
-                        switch (GameAssembly.MemorySize) {
+                    if (gameAssembly != null) {
+                        switch (gameAssembly.MemorySize) {
                             case 77447168: MemoryManager.Version = PointerVersion.P1; break;
                             case 77844480: MemoryManager.Version = PointerVersion.P2; break;
                             case 81121280: MemoryManager.Version = PointerVersion.P3; break;

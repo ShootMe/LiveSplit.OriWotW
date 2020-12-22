@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 namespace LiveSplit.OriWotW {
     public enum UberStateType {
         BooleanUberState,
@@ -86,6 +87,7 @@ namespace LiveSplit.OriWotW {
         public int GroupID;
         public string GroupName;
         public UberValue Value;
+        public IntPtr GroupPointer, IDPointer, ValuePointer;
 
         public UberState Clone() {
             return new UberState() { Type = Type, ID = ID, Name = Name, GroupID = GroupID, GroupName = GroupName, Value = Value };

@@ -130,6 +130,7 @@ namespace LiveSplit.OriWotW {
                         case SplitType.AreaLeave: DefaultValue = SplitArea.InkwaterMarsh; break;
                         case SplitType.Ability: DefaultValue = SplitAbility.DoubleJump; break;
                         case SplitType.Boss: DefaultValue = SplitBoss.HowlEnd; break;
+                        case SplitType.KeystoneDoor: DefaultValue = SplitKeystoneDoor.OpenedKeystoneDoor; break;
                         case SplitType.Map: DefaultValue = SplitMap.InkwaterMarsh; break;
                         case SplitType.RaceState: DefaultValue = SplitRace.RaceHasStarted; break;
                         case SplitType.Seed: DefaultValue = SplitSeed.Wellspring; break;

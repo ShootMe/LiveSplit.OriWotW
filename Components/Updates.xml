@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.5.1">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Keystone door splits and uberstate value splits </change>
+            <change> Fixes ability splits when using backup saves </change>
+        </changelog>
+    </update>
     <update version="1.5.0">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

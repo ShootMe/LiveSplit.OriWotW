@@ -27,11 +27,6 @@ namespace LiveSplit.OriWotW {
         DamageUpgrade1 = 120,
         DamageUpgrade2
     }
-    public enum AbilityState {
-        DontHaveAbility = 0,
-        HaveAbility = 1,
-        IsReadingBackups = 2
-    }
     [StructLayout(LayoutKind.Explicit, Size = 8, Pack = 1)]
     public struct Ability {
         [FieldOffset(0)]

@@ -7,6 +7,7 @@ namespace LiveSplit.OriWotW {
         Pointers,
         Position,
         Keystones,
+        AllocatedKeys,
         Ore,
         MapCompletion,
         Abilities,
@@ -70,6 +71,7 @@ namespace LiveSplit.OriWotW {
                         case LogObject.CurrentSplit: current = $"{logic.CurrentSplit} ({GetCurrentSplit(logic, settings)})"; break;
                         case LogObject.Pointers: current = logic.Memory.GamePointers(); break;
                         case LogObject.Keystones: current = dontCheckValue ? previous : logic.Memory.Keystones().ToString(); break;
+                        case LogObject.AllocatedKeys: current = dontCheckValue ? previous : logic.Memory.AllocatedKeystones().ToString(); break;
                         case LogObject.Ore: current = dontCheckValue ? previous : logic.Memory.Ore().ToString(); break;
                         case LogObject.MapCompletion: current = dontCheckValue ? previous : logic.Memory.MapCompletion().ToString("0.000"); break;
                         case LogObject.Abilities: if (!dontCheckValue) { CheckAbilities(logic); } break;
