@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LiveSplit.Options;
 namespace LiveSplit.OriWotW {
     public class LogicManager {
@@ -21,6 +22,7 @@ namespace LiveSplit.OriWotW {
         public float GameTime { get; private set; }
         public MemoryManager Memory { get; private set; }
         public SplitterSettings Settings { get; private set; }
+        public Dictionary<EquipmentType, bool> SeinItemsStates = new Dictionary<EquipmentType, bool>();
         private bool lastBoolValue;
         private bool hadDebug;
         private int lastIntValue;
@@ -283,6 +285,12 @@ namespace LiveSplit.OriWotW {
                     case SplitType.RaceState:
                         CheckRace(split);
                         break;
+                    case SplitType.KeystoneDoor:
+                        CheckKeystoneDoor(split);
+                        break;
+                    case SplitType.UberStateValue:
+                        CheckUberStateValue(split);
+                        break;
                 }
 
                 if ((state != GameState.Game && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && state != GameState.Game)) {
@@ -528,9 +536,174 @@ namespace LiveSplit.OriWotW {
             lastBoolValue = value.Value.Bool;
         }
         private void CheckAbility(AbilityType value, bool currentValue = true) {
-            bool hasAbility = Memory.HasAbility(value);
-            ShouldSplit = hasAbility == currentValue && lastBoolValue != currentValue;
-            lastBoolValue = hasAbility;
+            //bool hasAbility = Memory.HasAbility(value);
+            bool hasAbility = false;
+            switch (MemoryManager.Version) {
+                case PointerVersion.P1:
+                case PointerVersion.P2:
+                    hasAbility = Memory.HasAbility(value);
+                    ShouldSplit = hasAbility == currentValue && lastBoolValue != currentValue;
+                    lastBoolValue = hasAbility;
+                    break;
+                case PointerVersion.P3:
+                case PointerVersion.P4:
+                    AbilityState abilityState = Memory.HasAbilityNew(value, ref SeinItemsStates);
+                    if (abilityState != AbilityState.IsReadingBackups) {
+                        hasAbility = abilityState == AbilityState.HaveAbility ? true : false;
+                        ShouldSplit = hasAbility == currentValue && lastBoolValue != currentValue;
+                        lastBoolValue = hasAbility;
+
+                        if (ShouldSplit == true) {
+                            Memory.LastPlayerUberState = IntPtr.Zero;
+                            Memory.LastPlayerUberState250 = IntPtr.Zero;
+                        }
+                    }
+                    break;
+            }
+        }
+        private void CheckKeystoneDoor(Split split) {
+            SplitKeystoneDoor splitKeystoneDoor = Utility.GetEnumValue<SplitKeystoneDoor>(split.Value);
+
+            switch (splitKeystoneDoor) {
+                case SplitKeystoneDoor.OpenedKeystoneDoor:
+                    ShouldSplit = Memory.OpenedKeystoneDoor();
+                    break;
+                case SplitKeystoneDoor.PutInKeystone:
+                    ShouldSplit = Memory.AllocatedKeystones();
+                    break;
+            }
+        }
+        private void CheckUberStateValue(Split split) {
+            string[] values = split.Value.Split(',');
+            int uberGroup = -1;
+            int uberId = -1;
+            bool parseWasSuccess = false;
+
+            parseWasSuccess = int.TryParse(values[0], out uberGroup);
+            if (parseWasSuccess == false || uberGroup == -1) {
+                ShouldSplit = false;
+                return;
+            }
+
+            parseWasSuccess = int.TryParse(values[1], out uberId);
+            if (parseWasSuccess == false || uberId == -1) {
+                ShouldSplit = false;
+                return;
+            }
+
+            string uberValue = Memory.GetUberStateValue(uberGroup, uberId);
+            string splitUberValue = values[2];
+            string splitUberValueComparison = "=="; //0 = ==, 1 = > 2 = < 3 = !=
+            bool shouldSplit = false;
+
+            if (values.Length >= 4) {
+                splitUberValueComparison = values[2];
+                splitUberValue = values[3];
+            }
+
+            switch (Memory.LastUberValueType) {
+                case "Bool": {
+                        bool splitBool = false;
+                        parseWasSuccess = bool.TryParse(splitUberValue, out splitBool);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        switch (splitUberValueComparison) {
+                            default:
+                            case "==": shouldSplit = splitBool == (uberValue == "True" ? true : false); break;
+                            case "!=": shouldSplit = splitBool != (uberValue == "True" ? true : false); break;
+                        }
+                    }
+                    break;
+                case "Float": {
+                        float splitFloat = -1.0f;
+                        parseWasSuccess = float.TryParse(splitUberValue, out splitFloat);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        float uberFloatValue = -1.0f;
+                        parseWasSuccess = float.TryParse(uberValue, out uberFloatValue);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        switch (splitUberValueComparison) {
+                            default:
+                            case "==": shouldSplit = splitFloat == uberFloatValue; break;
+                            case ">": shouldSplit = splitFloat < uberFloatValue; break;
+                            case "<": shouldSplit = splitFloat > uberFloatValue; break;
+                            case "!=": shouldSplit = splitFloat != uberFloatValue; break;
+                        }
+                    }
+                    break;
+                case "Int": {
+                        int splitInt = -1;
+                        parseWasSuccess = int.TryParse(splitUberValue, out splitInt);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        int uberIntValue = -1;
+                        parseWasSuccess = int.TryParse(uberValue, out uberIntValue);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        switch (splitUberValueComparison) {
+                            default:
+                            case "==": shouldSplit = splitInt == uberIntValue; break;
+                            case ">": shouldSplit = splitInt < uberIntValue; break;
+                            case "<": shouldSplit = splitInt > uberIntValue; break;
+                            case "!=": shouldSplit = splitInt != uberIntValue; break;
+                        }
+                    }
+                    break;
+                case "Byte": {
+                        byte splitByte = 0;
+                        parseWasSuccess = byte.TryParse(splitUberValue, out splitByte);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        byte uberByteValue = 0;
+                        parseWasSuccess = byte.TryParse(uberValue, out uberByteValue);
+
+                        if (parseWasSuccess == false) {
+                            ShouldSplit = false;
+                            return;
+                        }
+
+                        switch (splitUberValueComparison) {
+                            default:
+                            case "==": shouldSplit = splitByte == uberByteValue; break;
+                            case ">": shouldSplit = splitByte < uberByteValue; break;
+                            case "<": shouldSplit = splitByte > uberByteValue; break;
+                            case "!=": shouldSplit = splitByte != uberByteValue; break;
+                        }
+                    }
+                    break;
+            }
+            if (shouldSplit == true) {
+                Memory.LastUberValueType = "None";
+                Memory.LastUberGroupPtr = Memory.LastUberIdPtr = IntPtr.Zero;
+                ShouldSplit = true;
+            } else
+                ShouldSplit = false;
+
         }
     }
 }
