@@ -424,7 +424,8 @@ namespace LiveSplit.OriWotW {
             if (uberState != null && uberState.GroupPointer != IntPtr.Zero) {
                 int groupID = Program.Read<int>(uberState.GroupPointer);
                 int id = Program.Read<int>(uberState.IDPointer);
-                if (groupID == uberState.GroupID && id == uberState.ID) {
+                uberState.PointerTimer++;
+                if (groupID == uberState.GroupID && id == uberState.ID && uberState.PointerTimer < 40) {
                     switch (uberState.Type) {
                         case UberStateType.SavePedestalUberState: uberState.Value.Byte = Program.Read<byte>(uberState.ValuePointer); break;
                         case UberStateType.SerializedBooleanUberState: uberState.Value.Bool = Program.Read<byte>(uberState.ValuePointer) != 0; break;
@@ -434,6 +435,7 @@ namespace LiveSplit.OriWotW {
                     }
                     return;
                 }
+                uberState.PointerTimer = 0;
             }
 
             //UbserStateController.m_currentStateValueStore.m_groupMap

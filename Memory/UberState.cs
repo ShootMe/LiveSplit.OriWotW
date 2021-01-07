@@ -88,6 +88,7 @@ namespace LiveSplit.OriWotW {
         public string GroupName;
         public UberValue Value;
         public IntPtr GroupPointer, IDPointer, ValuePointer;
+        public int PointerTimer;
 
         public UberState Clone() {
             return new UberState() { Type = Type, ID = ID, Name = Name, GroupID = GroupID, GroupName = GroupName, Value = Value };

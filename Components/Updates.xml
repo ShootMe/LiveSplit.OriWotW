@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.5.2">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Fix splits not working all the time (Voice of the Forest, Kwolok Defeat, etc) </change>
+        </changelog>
+    </update>
     <update version="1.5.1">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
