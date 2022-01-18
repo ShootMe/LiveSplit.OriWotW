@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LiveSplit.OriWotW {
+﻿namespace LiveSplit.OriWotW {
     public enum FadeState {
         Null = -1,
         FadeToBlack = 0,
