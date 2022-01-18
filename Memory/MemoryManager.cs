@@ -111,6 +111,7 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
+        public Module64 GameAssembly { get; set; }
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
         public ControlScheme LastControlScheme { get; set; }
@@ -118,6 +119,7 @@ namespace LiveSplit.OriWotW {
         private bool? noPausePatched = null;
         private bool? debugEnabled = null;
         private FPSTimer fpsTimer = new FPSTimer(200, 15);
+        public Fader CurrentFader = new Fader();
         private PointerCache playerUberStateGroup = new PointerCache();
         private static Dictionary<long, UberState> uberIDLookup = null;
 
@@ -328,6 +330,35 @@ namespace LiveSplit.OriWotW {
             int m_currentControlSchemes = Version <= PointerVersion.P2 ? 0x94 : 0xd0;
             return GameSettings.Read<ControlScheme>(Program, 0xb8, 0x0, m_currentControlSchemes);
         }
+        public bool FaderPause() {
+            int currentFrameCount = FrameCount();
+            float fadeTimer = -1.0f;
+            FadeState fadeState = FadeState.Null;
+
+            //UI -> UI.static -> UI.Fader -> FaderB.m_stateCurrentTime
+            //UI -> UI.static -> UI.Fader -> FaderB.m_currentTimelineFaderType
+            switch (Version) {
+                case PointerVersion.P1:
+                    fadeTimer = MemoryReader.Read<float>(Program, GameAssembly.BaseAddress, 0x043E6650, 0xb8, 0x10, 0x50);
+                    fadeState = (FadeState)MemoryReader.Read<int>(Program, GameAssembly.BaseAddress, 0x043E6650, 0xb8, 0x10, 0x68);
+                    break;
+                case PointerVersion.P2:
+                    fadeTimer = MemoryReader.Read<float>(Program, GameAssembly.BaseAddress, 0x04464828, 0xb8, 0x10, 0x50);
+                    fadeState = (FadeState)MemoryReader.Read<int>(Program, GameAssembly.BaseAddress, 0x04464828, 0xb8, 0x10, 0x68);
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4:
+                    fadeTimer = MemoryReader.Read<float>(Program, GameAssembly.BaseAddress, 0x04783338, 0xb8, 0x10, 0x78);
+                    fadeState = (FadeState)MemoryReader.Read<int>(Program, GameAssembly.BaseAddress, 0x04783338, 0xb8, 0x10, 0x94);
+                    break;
+            }
+
+            CurrentFader.ShouldPause(fadeTimer, currentFrameCount);
+            CurrentFader.UpdateFadeState(fadeState);
+
+            return CurrentFader.IsPaused();
+        }
         public bool IsLoadingGame(GameState state) {
             ControlScheme currentControlScheme = GetControlScheme();
             if (LastControlScheme != currentControlScheme) {
@@ -346,6 +377,8 @@ namespace LiveSplit.OriWotW {
             if (GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame)) {
                 return true;
             }
+            if (FaderPause())
+                return true;
             return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && CurrentScene() == "wotwTitleScreen";
         }
         private void PopulateUberStates() {
@@ -702,6 +735,7 @@ namespace LiveSplit.OriWotW {
                     MemoryReader.Update64Bit(Program);
                     FindIl2Cpp.InitializeIl2Cpp(Program);
                     Module64 gameAssembly = Program.Module64("GameAssembly.dll");
+                    GameAssembly = Program.Module64("GameAssembly.dll");
                     MemoryManager.Version = PointerVersion.All;
                     if (gameAssembly != null) {
                         switch (gameAssembly.MemorySize) {
