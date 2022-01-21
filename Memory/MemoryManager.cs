@@ -377,8 +377,8 @@ namespace LiveSplit.OriWotW {
             if (GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame)) {
                 return true;
             }
-            if (FaderPause())
-                return true;
+            //if (FaderPause())
+            //    return true;
             return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && CurrentScene() == "wotwTitleScreen";
         }
         private void PopulateUberStates() {
