@@ -115,6 +115,9 @@ namespace LiveSplit.OriWotW {
         public bool IsHooked { get; set; }
         public DateTime LastHooked { get; set; }
         public ControlScheme LastControlScheme { get; set; }
+        public IntPtr LastUberGroupPtr = IntPtr.Zero;
+        public IntPtr LastUberIdPtr = IntPtr.Zero;
+        public string LastUberValueType = "None";
         public int ControllerCounter { get; set; } = 0;
         private bool? noPausePatched = null;
         private bool? debugEnabled = null;
@@ -359,8 +362,12 @@ namespace LiveSplit.OriWotW {
 
             return CurrentFader.IsPaused();
         }
-        public bool IsLoadingGame(GameState state) {
+        public bool IsLoadingGame(GameState state, bool running) {
             ControlScheme currentControlScheme = GetControlScheme();
+
+            string uberValue = GetUberStateValue(21786, 48748);
+            CurrentFader.CheckStartQTM(uberValue, state, running);
+
             if (LastControlScheme != currentControlScheme) {
                 ControllerCounter = 0;
             }
@@ -711,6 +718,145 @@ namespace LiveSplit.OriWotW {
             }
             return totalCompletion * 100f / (count == 0 ? 1 : count);
         }
+
+        public string GetUberStateValue(int UberGroup, int UberId) {
+            if (LastUberGroupPtr != IntPtr.Zero && LastUberIdPtr != IntPtr.Zero) {
+                int lastUberGroupId = MemoryReader.Read<int>(Program, LastUberGroupPtr, 0x18, 0x10);
+                int lastUberId = MemoryReader.Read<int>(Program, LastUberIdPtr + 0x8, 0x10);
+
+                if (UberGroup == lastUberGroupId && UberId == lastUberId) {
+                    switch (LastUberValueType) {
+                        case "Bool": return MemoryReader.Read<bool>(Program, LastUberIdPtr + 0x10).ToString();
+                        case "Float": return MemoryReader.Read<float>(Program, LastUberIdPtr + 0x10).ToString();
+                        case "Int": return MemoryReader.Read<int>(Program, LastUberIdPtr + 0x10).ToString();
+                        case "Byte": return MemoryReader.Read<byte>(Program, LastUberIdPtr + 0x10).ToString();
+                    }
+                }
+            }
+
+            //UberStateController.s_instance.m_currentStateValueStore.m_groupMap - UberStateController.UberStateValueStore.Dictionary<UberID, UberStateValueGroup>
+            IntPtr m_groupMap = IntPtr.Zero;
+            switch (Version) {
+                case PointerVersion.P1:
+                case PointerVersion.P2:
+                    m_groupMap = MemoryReader.Read<IntPtr>(Program, GameAssembly.BaseAddress, 0x4422878, 0xb8, 0x40, 0x18);
+                    break;
+
+                case PointerVersion.P3:
+                case PointerVersion.P4:
+                    m_groupMap = MemoryReader.Read<IntPtr>(Program, GameAssembly.BaseAddress, 0x04739128, 0xb8, 0x40, 0x18);
+                    break;
+            }
+            int groupId = -1;
+            int count = MemoryReader.Read<int>(Program, m_groupMap, 0x20) * 3;
+            bool wasFound = false;
+
+            for (int i = 0; i < count; i += 3) {
+                IntPtr ptr = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18);// + ((i * 0x8) + 2));
+                groupId = MemoryReader.Read<int>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x18, 0x10);
+
+                if (groupId == UberGroup && groupId != -1) {
+                    LastUberGroupPtr = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8));
+                    IntPtr uberStateBools = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x28);
+                    bool uberBoolValue = GetUberBoolValue(uberStateBools, UberId, ref wasFound);
+
+                    if (wasFound == true) {
+                        LastUberValueType = "Bool";
+                        return uberBoolValue.ToString();
+                    }
+
+                    IntPtr uberStateFloats = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x30);
+                    float uberFloatValue = GetUberFloatValue(uberStateFloats, UberId, ref wasFound);
+
+                    if (wasFound == true) {
+                        LastUberValueType = "Float";
+                        return uberFloatValue.ToString();
+                    }
+
+                    IntPtr uberStateInts = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x38);
+                    int uberIntValue = GetUberIntValue(uberStateInts, UberId, ref wasFound);
+
+                    if (wasFound == true) {
+                        LastUberValueType = "Int";
+                        return uberIntValue.ToString();
+                    }
+
+                    IntPtr uberStateBytes = MemoryReader.Read<IntPtr>(Program, m_groupMap, 0x18, 0x20 + ((i + 2) * 0x8), 0x40);
+                    byte uberByteValue = GetUberByteValue(uberStateBytes, UberId, ref wasFound);
+
+                    if (wasFound == true) {
+                        LastUberValueType = "Byte";
+                        return uberByteValue.ToString();
+                    }
+                }
+            }
+            return "";
+        }
+        private bool GetUberBoolValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
+            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
+            int uberId = -1;
+
+            for (int i = 0; i < count; i += 3) {
+                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
+
+                if (uberId == UberId && uberId != -1) {
+                    wasFound = true;
+                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8));
+                    return MemoryReader.Read<bool>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
+                }
+            }
+
+            return false;
+        }
+        private float GetUberFloatValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
+            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
+            int uberId = -1;
+
+            for (int i = 0; i < count; i += 3) {
+                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
+
+                if (uberId == UberId && uberId != -1) {
+                    wasFound = true;
+                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
+                    return MemoryReader.Read<float>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
+                }
+            }
+
+            return -1.0f;
+        }
+        private int GetUberIntValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
+            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
+            int uberId = -1;
+
+            for (int i = 0; i < count; i += 3) {
+                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
+
+                if (uberId == UberId && uberId != -1) {
+                    wasFound = true;
+                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
+                    return MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
+                }
+            }
+
+            return -1;
+        }
+        private byte GetUberByteValue(IntPtr uberPtr, int UberId, ref bool wasFound) {
+            int count = MemoryReader.Read<int>(Program, uberPtr, 0x20) * 3;
+            int uberId = -1;
+
+            for (int i = 0; i < count; i += 3) {
+                uberId = MemoryReader.Read<int>(Program, uberPtr, 0x18, 0x20 + ((i + 1) * 0x8), 0x10);
+
+                if (uberId == UberId && uberId != -1) {
+                    wasFound = true;
+                    LastUberIdPtr = MemoryReader.Read<IntPtr>(Program, uberPtr, 0x18, 0x20 + (i * 0x8));
+                    return MemoryReader.Read<byte>(Program, uberPtr, 0x18, 0x20 + ((i + 2) * 0x8));
+                }
+            }
+
+            return 0;
+        }
+
         public bool HookProcess() {
             IsHooked = Program != null && !Program.HasExited;
             if (!IsHooked && DateTime.Now > LastHooked.AddSeconds(1)) {
