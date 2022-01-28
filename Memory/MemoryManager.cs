@@ -359,7 +359,13 @@ namespace LiveSplit.OriWotW {
 
             return CurrentFader.IsPaused();
         }
-        public bool IsLoadingGame(GameState state) {
+        public bool IsLoadingGame(GameState state, bool running) {
+            UberState finishedIntroTopSwamp = GetUberState(21786, 48748);
+            if (finishedIntroTopSwamp != null) {
+                UpdateUberState(finishedIntroTopSwamp);
+                CurrentFader.CheckStartQTM(finishedIntroTopSwamp.Value.Bool, state, running);
+            }
+
             ControlScheme currentControlScheme = GetControlScheme();
             if (LastControlScheme != currentControlScheme) {
                 ControllerCounter = 0;
@@ -377,8 +383,10 @@ namespace LiveSplit.OriWotW {
             if (GameController.Read<bool>(Program, 0xb8, 0xa) || GameController.Read<bool>(Program, 0xb8, 0x0, m_isLoadingGame)) {
                 return true;
             }
-            //if (FaderPause())
-            //    return true;
+
+            if (FaderPause()) {
+                return true;
+            }
             return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && CurrentScene() == "wotwTitleScreen";
         }
         private void PopulateUberStates() {
@@ -443,7 +451,7 @@ namespace LiveSplit.OriWotW {
             return uberIDLookup;
         }
         public UberState GetUberState(int groupId, int id) {
-            if (uberIDLookup == null) {
+            if (uberIDLookup == null || uberIDLookup.Count == 0) {
                 PopulateUberStates();
             }
 

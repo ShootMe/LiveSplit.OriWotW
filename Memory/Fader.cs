@@ -45,12 +45,12 @@
                 case FadeState.FadeToBlack: CurrentState = FadeState.Null; LastFadeTimer = -1.0f; break;
                 case FadeState.FadeStay: CurrentState = fadeState; break;
                 case FadeState.Invisible: CurrentState = FadeState.Null; LastFadeTimer = -1.0f; break;
-                case FadeState.Timeline: CurrentState = FadeState.Null; LastFadeTimer = -1.0f;  break;
+                case FadeState.Timeline: CurrentState = FadeState.Null; LastFadeTimer = -1.0f; break;
                 case FadeState.TimelineFinished: CurrentState = FadeState.Null; LastFadeTimer = -1.0f; break;
             }
         }
 
-        public void CheckStartQTM(string uberValue, GameState state, bool running) {
+        public void CheckStartQTM(bool uberValue, GameState state, bool running) {
             if (lastRunning == false && running == true && state != GameState.TitleScreen) {
                 startQTMStateShouldPause = false;
                 return;
@@ -58,25 +58,25 @@
 
             switch (startQTMState) {
                 case StartPauseState.Null:
-                    if (state == OriWotW.GameState.TitleScreen && uberValue.Equals("False")) {
+                    if (state == GameState.TitleScreen && !uberValue) {
                         startQTMState = StartPauseState.StartedValueFalse;
                         startQTMStateShouldPause = true;
                     }
                     break;
                 case StartPauseState.StartedValueFalse:
-                    if (state == OriWotW.GameState.Game && uberValue.Equals("True")) {
+                    if (state == GameState.Game && uberValue) {
                         startQTMState = StartPauseState.InGameUberValueTrue;
                         startQTMStateShouldPause = true;
                     }
                     break;
                 case StartPauseState.InGameUberValueTrue:
-                    if (state == OriWotW.GameState.StartScreen && startQTMState == StartPauseState.InGameUberValueTrue && uberValue.Equals("False")) {
+                    if (state == GameState.StartScreen && startQTMState == StartPauseState.InGameUberValueTrue && !uberValue) {
                         startQTMState = StartPauseState.QTMValueFalse;
                         startQTMStateShouldPause = true;
                     }
                     break;
                 case StartPauseState.QTMValueFalse:
-                    if (state == OriWotW.GameState.Game && startQTMState == StartPauseState.QTMValueFalse && uberValue.Equals("True")) {
+                    if (state == GameState.Game && startQTMState == StartPauseState.QTMValueFalse && uberValue) {
                         startQTMState = StartPauseState.ReInGameUberValueTrue;
                         startQTMStateShouldPause = false;
                     }

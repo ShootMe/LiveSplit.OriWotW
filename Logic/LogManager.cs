@@ -61,7 +61,7 @@ namespace LiveSplit.OriWotW {
                 DateTime date = DateTime.Now;
                 bool isDead = logic.Memory.Dead();
                 GameState gameState = logic.Memory.GameState();
-                bool isLoading = logic.Memory.IsLoadingGame(gameState);
+                bool isLoading = logic.Memory.IsLoadingGame(gameState, logic.Running);
                 bool dontCheckValue = isDead || isLoading || gameState != GameState.Game;
                 foreach (LogObject key in Enum.GetValues(typeof(LogObject))) {
                     string previous = currentValues[key];

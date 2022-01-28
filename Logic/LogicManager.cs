@@ -43,6 +43,7 @@ namespace LiveSplit.OriWotW {
             InitializeSplit();
             ShouldSplit = false;
             ShouldReset = false;
+            Memory.CurrentFader.ResetStartQTM();
             if (Settings.DisableDebug) {
                 Memory.EnableDebug(hadDebug);
             }
@@ -140,7 +141,7 @@ namespace LiveSplit.OriWotW {
         private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
             ShouldSplit = false;
-            Paused = Memory.IsLoadingGame(state);
+            Paused = Memory.IsLoadingGame(state, Running);
 
             if (split.Type == SplitType.GameStart) {
                 Screen screen = Memory.TitleScreen();
