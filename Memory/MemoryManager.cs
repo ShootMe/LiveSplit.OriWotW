@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.MemoryMappedFiles;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
         private static ProgramPointer Characters = new ProgramPointer("GameAssembly.dll",
@@ -109,6 +110,8 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
+        private static MemoryMappedFile CommunityPatchMMF;
+        public static MemoryMappedViewAccessor CommunityPatch;
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
         public Module64 GameAssembly { get; set; }
@@ -143,7 +146,8 @@ namespace LiveSplit.OriWotW {
                 $"CH: {(ulong)CheatsHandler.GetPointer(Program):X} ",
                 $"DC: {(ulong)DebugControls.GetPointer(Program):X} ",
                 $"RS: {(ulong)RaceSystem.GetPointer(Program):X} ",
-                $"GS: {(ulong)GameSettings.GetPointer(Program):X} "
+                $"GS: {(ulong)GameSettings.GetPointer(Program):X} ",
+                $"CP: {CommunityPatch} "
             );
         }
         public bool IsRacing() {
@@ -360,6 +364,20 @@ namespace LiveSplit.OriWotW {
             return CurrentFader.IsPaused();
         }
         public bool IsLoadingGame(GameState state, bool running) {
+            if (CommunityPatch == null) {
+                try {
+                    CommunityPatchMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchLoading", MemoryMappedFileRights.Read);
+                    CommunityPatch = CommunityPatchMMF.CreateViewAccessor(0, 1, MemoryMappedFileAccess.Read);
+                } catch {
+                    CommunityPatchMMF = null;
+                    CommunityPatch = null;
+                }
+            }
+
+            if (CommunityPatch != null) {
+                return CommunityPatch.ReadBoolean(0);
+            }
+
             UberState finishedIntroTopSwamp = GetUberState(21786, 48748);
             if (finishedIntroTopSwamp != null) {
                 UpdateUberState(finishedIntroTopSwamp);
@@ -387,6 +405,7 @@ namespace LiveSplit.OriWotW {
             if (FaderPause()) {
                 return true;
             }
+
             return (state == OriWotW.GameState.TitleScreen || state == OriWotW.GameState.StartScreen) && CurrentScene() == "wotwTitleScreen";
         }
         private void PopulateUberStates() {
@@ -753,6 +772,13 @@ namespace LiveSplit.OriWotW {
                             case 81129472: MemoryManager.Version = PointerVersion.P4; break;
                         }
                     }
+
+                    if (CommunityPatchMMF != null) {
+                        CommunityPatchMMF.Dispose();
+                        CommunityPatch.Dispose();
+                    }
+                    CommunityPatch = null;
+                    CommunityPatchMMF = null;
                     uberIDLookup = null;
                     noPausePatched = null;
                     debugEnabled = null;
@@ -767,6 +793,10 @@ namespace LiveSplit.OriWotW {
         public void Dispose() {
             if (Program != null) {
                 Program.Dispose();
+            }
+            if (CommunityPatchMMF != null) {
+                CommunityPatchMMF.Dispose();
+                CommunityPatch.Dispose();
             }
         }
     }

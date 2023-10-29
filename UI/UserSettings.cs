@@ -95,7 +95,7 @@ namespace LiveSplit.OriWotW {
         private void Settings_Load(object sender, EventArgs e) {
             Form form = FindForm();
             form.Text = "Will of the Wisps Autosplitter v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-
+            lblCommunityPatch.Visible = MemoryManager.CommunityPatch != null;
             FixSplits();
         }
         private void FixSplits() {

@@ -32,6 +32,7 @@
             this.chkDebug = new System.Windows.Forms.CheckBox();
             this.chkUseRaceTime = new System.Windows.Forms.CheckBox();
             this.tooltips = new System.Windows.Forms.ToolTip(this.components);
+            this.lblCommunityPatch = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnLog
@@ -121,10 +122,21 @@
             this.tooltips.SetToolTip(this.chkUseRaceTime, "Uses the in game race timers time for the game time.");
             this.chkUseRaceTime.UseVisualStyleBackColor = true;
             // 
+            // lblCommunityPatch
+            // 
+            this.lblCommunityPatch.AutoSize = true;
+            this.lblCommunityPatch.Location = new System.Drawing.Point(330, 35);
+            this.lblCommunityPatch.Name = "lblCommunityPatch";
+            this.lblCommunityPatch.Size = new System.Drawing.Size(122, 13);
+            this.lblCommunityPatch.TabIndex = 8;
+            this.lblCommunityPatch.Text = "Community Patch Found";
+            this.lblCommunityPatch.Visible = false;
+            // 
             // UserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblCommunityPatch);
             this.Controls.Add(this.chkUseRaceTime);
             this.Controls.Add(this.chkDebug);
             this.Controls.Add(this.chkNoPause);
@@ -150,5 +162,6 @@
         private System.Windows.Forms.CheckBox chkDebug;
         private System.Windows.Forms.CheckBox chkUseRaceTime;
         private System.Windows.Forms.ToolTip tooltips;
+        private System.Windows.Forms.Label lblCommunityPatch;
     }
 }
