@@ -129,8 +129,7 @@
             this.lblCommunityPatch.Name = "lblCommunityPatch";
             this.lblCommunityPatch.Size = new System.Drawing.Size(122, 13);
             this.lblCommunityPatch.TabIndex = 8;
-            this.lblCommunityPatch.Text = "Community Patch Found";
-            this.lblCommunityPatch.Visible = false;
+            this.lblCommunityPatch.Text = "Using Community Patch timing: ???";
             // 
             // UserSettings
             // 
