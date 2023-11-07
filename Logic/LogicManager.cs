@@ -14,6 +14,10 @@ namespace LiveSplit.OriWotW {
                     hadDebug = Memory.DebugEnabled();
                 }
                 _running = value;
+
+                if (MemoryManager.UseCommunityPatchTimer) {
+                    Memory.SetCommunityPatchGameTimeRunning(value);
+                }
             }
         }
 
@@ -76,6 +80,8 @@ namespace LiveSplit.OriWotW {
         }
         public void Update(int currentSplit) {
             Memory.PatchNoPause(Settings.NoPause);
+            Memory.DetectCommunityPatch();
+            
             if (Settings.DisableDebug && Running) {
                 Memory.EnableDebug(false);
             }
@@ -105,6 +111,7 @@ namespace LiveSplit.OriWotW {
                 ShouldReset = true;
                 raceState.RaceHasStarted = false;
             }
+            
             if (CurrentSplit < Settings.Autosplits.Count && Settings.UseRaceTime) {
                 float raceTime = Memory.RaceTime();
                 if (raceTime > 0.0f) {
@@ -141,7 +148,13 @@ namespace LiveSplit.OriWotW {
         private void CheckSplit(Split split, bool updateValues) {
             GameState state = Memory.GameState();
             ShouldSplit = false;
-            Paused = Memory.IsLoadingGame(state, Running);
+
+            if (MemoryManager.UseCommunityPatchTimer && !Settings.UseRaceTime) {
+                Paused = false;
+                GameTime = (float)Memory.CommunityPatchGameTime();
+            } else {
+                Paused = Memory.IsLoadingGame(state, Running);
+            }
 
             if (split.Type == SplitType.GameStart) {
                 Screen screen = Memory.TitleScreen();

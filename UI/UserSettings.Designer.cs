@@ -118,18 +118,18 @@
             this.chkUseRaceTime.Name = "chkUseRaceTime";
             this.chkUseRaceTime.Size = new System.Drawing.Size(100, 17);
             this.chkUseRaceTime.TabIndex = 7;
-            this.chkUseRaceTime.Text = "Use Race Time";
-            this.tooltips.SetToolTip(this.chkUseRaceTime, "Uses the in game race timers time for the game time.");
+            this.chkUseRaceTime.Text = "Use in-game Spirit Trial timer";
+            this.tooltips.SetToolTip(this.chkUseRaceTime, "Uses the in-game Spirit Trial timers time as the game time. If enabled, the Community Patch timer is ignored.");
             this.chkUseRaceTime.UseVisualStyleBackColor = true;
             // 
             // lblCommunityPatch
             // 
             this.lblCommunityPatch.AutoSize = true;
-            this.lblCommunityPatch.Location = new System.Drawing.Point(330, 35);
+            this.lblCommunityPatch.Location = new System.Drawing.Point(261, 35);
             this.lblCommunityPatch.Name = "lblCommunityPatch";
             this.lblCommunityPatch.Size = new System.Drawing.Size(122, 13);
             this.lblCommunityPatch.TabIndex = 8;
-            this.lblCommunityPatch.Text = "Using Community Patch timing: ???";
+            this.lblCommunityPatch.Text = "Using Community Patch timer: ???";
             // 
             // UserSettings
             // 

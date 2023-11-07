@@ -107,7 +107,8 @@ namespace LiveSplit.OriWotW {
         private void HandleLogic() {
             if (Model == null) { return; }
 
-            Model.CurrentState.IsGameTimePaused = logic.Paused;
+            Model.CurrentState.IsGameTimePaused = MemoryManager.UseCommunityPatchTimer || logic.Paused;
+            
             if (logic.GameTime >= 0) {
                 Model.CurrentState.SetGameTime(TimeSpan.FromSeconds(logic.GameTime));
             }

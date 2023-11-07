@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.6.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Add support for Community Patch in-game timer </change>
+            <change> Small UI improvements </change>
+        </changelog>
+    </update>
     <update version="1.5.7">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
