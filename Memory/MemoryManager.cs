@@ -160,11 +160,14 @@ namespace LiveSplit.OriWotW {
                 $"CPGTR: {CommunityPatchGameTimeRunningAccessor} "
             );
         }
-        public void DetectCommunityPatch() {
+        public bool DetectCommunityPatch() {
+            bool changed = false;
+            
             if (CommunityPatchGameTimeAccessor == null) {
                 try {
                     CommunityPatchGameTimeMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchGameTime", MemoryMappedFileRights.Read);
                     CommunityPatchGameTimeAccessor = CommunityPatchGameTimeMMF.CreateViewAccessor(0, sizeof(double), MemoryMappedFileAccess.Read);
+                    changed = true;
                 } catch {
                     CommunityPatchGameTimeMMF = null;
                     CommunityPatchGameTimeAccessor = null;
@@ -175,11 +178,14 @@ namespace LiveSplit.OriWotW {
                 try {
                     CommunityPatchGameTimeRunningMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchGameTimeRunning", MemoryMappedFileRights.Write);
                     CommunityPatchGameTimeRunningAccessor = CommunityPatchGameTimeRunningMMF.CreateViewAccessor(0, sizeof(bool), MemoryMappedFileAccess.Write);
+                    changed = true;
                 } catch {
                     CommunityPatchGameTimeRunningMMF = null;
                     CommunityPatchGameTimeRunningAccessor = null;
                 }
             }
+
+            return changed && UseCommunityPatchTimer;
         }
         public bool IsRacing() {
             //RaceSystem.Instance.m_timer.m_startedRace

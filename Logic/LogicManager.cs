@@ -80,7 +80,10 @@ namespace LiveSplit.OriWotW {
         }
         public void Update(int currentSplit) {
             Memory.PatchNoPause(Settings.NoPause);
-            Memory.DetectCommunityPatch();
+
+            if (Memory.DetectCommunityPatch() && MemoryManager.UseCommunityPatchTimer) {
+                Memory.SetCommunityPatchGameTimeRunning(Running);
+            }
             
             if (Settings.DisableDebug && Running) {
                 Memory.EnableDebug(false);
