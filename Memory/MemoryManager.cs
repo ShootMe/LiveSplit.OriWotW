@@ -110,8 +110,17 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "448975E848C745EC??000000C645F400488D4DC8E8????????488905????????4885C00F84????????FFD0C64718014889471033C9E8????????4533C08BD0488BCFE8", 0x4a, 0x0));
-        private static MemoryMappedFile CommunityPatchMMF;
-        public static MemoryMappedViewAccessor CommunityPatch;
+        
+        private static MemoryMappedFile CommunityPatchGameTimeMMF;
+        public static MemoryMappedViewAccessor CommunityPatchGameTimeAccessor;
+        private static MemoryMappedFile CommunityPatchGameTimeRunningMMF;
+        public static MemoryMappedViewAccessor CommunityPatchGameTimeRunningAccessor;
+        public static bool UseCommunityPatchTimer {
+            get {
+                return CommunityPatchGameTimeAccessor != null && CommunityPatchGameTimeRunningAccessor != null;
+            }
+        }
+        
         public static PointerVersion Version { get; set; } = PointerVersion.All;
         public Process Program { get; set; }
         public Module64 GameAssembly { get; set; }
@@ -147,8 +156,30 @@ namespace LiveSplit.OriWotW {
                 $"DC: {(ulong)DebugControls.GetPointer(Program):X} ",
                 $"RS: {(ulong)RaceSystem.GetPointer(Program):X} ",
                 $"GS: {(ulong)GameSettings.GetPointer(Program):X} ",
-                $"CP: {CommunityPatch} "
+                $"CPGT: {CommunityPatchGameTimeAccessor} ",
+                $"CPGTR: {CommunityPatchGameTimeRunningAccessor} "
             );
+        }
+        public void DetectCommunityPatch() {
+            if (CommunityPatchGameTimeAccessor == null) {
+                try {
+                    CommunityPatchGameTimeMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchGameTime", MemoryMappedFileRights.Read);
+                    CommunityPatchGameTimeAccessor = CommunityPatchGameTimeMMF.CreateViewAccessor(0, sizeof(double), MemoryMappedFileAccess.Read);
+                } catch {
+                    CommunityPatchGameTimeMMF = null;
+                    CommunityPatchGameTimeAccessor = null;
+                }
+            }
+            
+            if (CommunityPatchGameTimeRunningAccessor == null) {
+                try {
+                    CommunityPatchGameTimeRunningMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchGameTimeRunning", MemoryMappedFileRights.Write);
+                    CommunityPatchGameTimeRunningAccessor = CommunityPatchGameTimeRunningMMF.CreateViewAccessor(0, sizeof(bool), MemoryMappedFileAccess.Write);
+                } catch {
+                    CommunityPatchGameTimeRunningMMF = null;
+                    CommunityPatchGameTimeRunningAccessor = null;
+                }
+            }
         }
         public bool IsRacing() {
             //RaceSystem.Instance.m_timer.m_startedRace
@@ -161,6 +192,12 @@ namespace LiveSplit.OriWotW {
             int m_timer = Version <= PointerVersion.P2 ? 0x28 : 0x40;
             int m_elapsedTime = Version <= PointerVersion.P2 ? 0x18 : 0x30;
             return RaceSystem.Read<float>(Program, 0xb8, 0x0, m_timer, m_elapsedTime);
+        }
+        public double CommunityPatchGameTime() {
+            return CommunityPatchGameTimeAccessor.ReadDouble(0);
+        }
+        public void SetCommunityPatchGameTimeRunning(bool running) {
+            CommunityPatchGameTimeRunningAccessor.Write(0, running);
         }
         public float LastRaceTime() {
             //RaceSystem.Instance.Context.LastRaceTime
@@ -364,20 +401,6 @@ namespace LiveSplit.OriWotW {
             return CurrentFader.IsPaused();
         }
         public bool IsLoadingGame(GameState state, bool running) {
-            if (CommunityPatch == null) {
-                try {
-                    CommunityPatchMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchLoading", MemoryMappedFileRights.Read);
-                    CommunityPatch = CommunityPatchMMF.CreateViewAccessor(0, 1, MemoryMappedFileAccess.Read);
-                } catch {
-                    CommunityPatchMMF = null;
-                    CommunityPatch = null;
-                }
-            }
-
-            if (CommunityPatch != null) {
-                return CommunityPatch.ReadBoolean(0);
-            }
-
             UberState finishedIntroTopSwamp = GetUberState(21786, 48748);
             if (finishedIntroTopSwamp != null) {
                 UpdateUberState(finishedIntroTopSwamp);
@@ -773,12 +796,21 @@ namespace LiveSplit.OriWotW {
                         }
                     }
 
-                    if (CommunityPatchMMF != null) {
-                        CommunityPatchMMF.Dispose();
-                        CommunityPatch.Dispose();
+                    if (CommunityPatchGameTimeMMF != null) {
+                        CommunityPatchGameTimeMMF.Dispose();
+                        CommunityPatchGameTimeAccessor.Dispose();
                     }
-                    CommunityPatch = null;
-                    CommunityPatchMMF = null;
+                    
+                    if (CommunityPatchGameTimeRunningMMF != null) {
+                        CommunityPatchGameTimeRunningMMF.Dispose();
+                        CommunityPatchGameTimeRunningAccessor.Dispose();
+                    }
+                    
+                    CommunityPatchGameTimeAccessor = null;
+                    CommunityPatchGameTimeMMF = null;
+                    CommunityPatchGameTimeRunningAccessor = null;
+                    CommunityPatchGameTimeRunningMMF = null;
+                    
                     uberIDLookup = null;
                     noPausePatched = null;
                     debugEnabled = null;
@@ -794,9 +826,15 @@ namespace LiveSplit.OriWotW {
             if (Program != null) {
                 Program.Dispose();
             }
-            if (CommunityPatchMMF != null) {
-                CommunityPatchMMF.Dispose();
-                CommunityPatch.Dispose();
+            
+            if (CommunityPatchGameTimeMMF != null) {
+                CommunityPatchGameTimeMMF.Dispose();
+                CommunityPatchGameTimeAccessor.Dispose();
+            }
+                    
+            if (CommunityPatchGameTimeRunningMMF != null) {
+                CommunityPatchGameTimeRunningMMF.Dispose();
+                CommunityPatchGameTimeRunningAccessor.Dispose();
             }
         }
     }

@@ -95,7 +95,7 @@ namespace LiveSplit.OriWotW {
         private void Settings_Load(object sender, EventArgs e) {
             Form form = FindForm();
             form.Text = "Will of the Wisps Autosplitter v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-            lblCommunityPatch.Text = MemoryManager.CommunityPatch != null
+            lblCommunityPatch.Text = MemoryManager.UseCommunityPatchTimer
                 ? "Using Community Patch timer: Yes"
                 : "Using Community Patch timer: No";
             FixSplits();
