@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.6.1">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Fixed in-game timer not starting when the game is started after the LiveSplit timer started </change>
+        </changelog>
+    </update>
     <update version="1.6.0">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
