@@ -22,7 +22,7 @@ namespace LiveSplit.OriWotW {
         }
 
         public bool Paused { get; private set; }
-        public float GameTime { get; private set; }
+        public float GameTime { get; private set; } = -1f;
         public MemoryManager Memory { get; private set; }
         public SplitterSettings Settings { get; private set; }
         private bool lastBoolValue;
@@ -40,6 +40,10 @@ namespace LiveSplit.OriWotW {
         }
 
         public void Reset() {
+            if (MemoryManager.UseCommunityPatchTimer) {
+                Memory.SetCommunityPatchGameTimePaused(false);
+            }
+
             splitLate = DateTime.MaxValue;
             Paused = false;
             Running = false;
@@ -75,7 +79,6 @@ namespace LiveSplit.OriWotW {
             Paused = !hooked;
             ShouldSplit = false;
             ShouldReset = false;
-            GameTime = -1;
             return hooked;
         }
         public void Update(int currentSplit) {
@@ -83,6 +86,7 @@ namespace LiveSplit.OriWotW {
 
             if (Memory.DetectCommunityPatch() && MemoryManager.UseCommunityPatchTimer) {
                 Memory.SetCommunityPatchGameTimeRunning(Running);
+                Memory.SetCommunityPatchInitialGameTime(GameTime);
             }
             
             if (Settings.DisableDebug && Running) {
@@ -114,18 +118,20 @@ namespace LiveSplit.OriWotW {
                 ShouldReset = true;
                 raceState.RaceHasStarted = false;
             }
-            
-            if (CurrentSplit < Settings.Autosplits.Count && Settings.UseRaceTime) {
-                float raceTime = Memory.RaceTime();
-                if (raceTime > 0.0f) {
-                    GameTime = raceTime;
-                }
-            } else if (CurrentSplit >= Settings.Autosplits.Count && Settings.UseRaceTime) {
-                float raceTime = Memory.RaceTime();
-                if (raceTime > 0.0f) {
-                    GameTime = raceTime;
-                } else if (raceTime == 0.0f) {
-                    GameTime = Memory.LastRaceTime();
+
+            if (Settings.UseRaceTime) {
+                if (CurrentSplit < Settings.Autosplits.Count) {
+                    float raceTime = Memory.RaceTime();
+                    if (raceTime > 0.0f) {
+                        GameTime = raceTime;
+                    }
+                } else if (CurrentSplit >= Settings.Autosplits.Count) {
+                    float raceTime = Memory.RaceTime();
+                    if (raceTime > 0.0f) {
+                        GameTime = raceTime;
+                    } else if (raceTime == 0.0f) {
+                        GameTime = Memory.LastRaceTime();
+                    }
                 }
             }
         }
@@ -157,6 +163,7 @@ namespace LiveSplit.OriWotW {
                 GameTime = (float)Memory.CommunityPatchGameTime();
             } else {
                 Paused = Memory.IsLoadingGame(state, Running);
+                GameTime = -1;
             }
 
             if (split.Type == SplitType.GameStart) {

@@ -115,6 +115,10 @@ namespace LiveSplit.OriWotW {
         public static MemoryMappedViewAccessor CommunityPatchGameTimeAccessor;
         private static MemoryMappedFile CommunityPatchGameTimeRunningMMF;
         public static MemoryMappedViewAccessor CommunityPatchGameTimeRunningAccessor;
+        private static MemoryMappedFile CommunityPatchGameTimePausedMMF;
+        public static MemoryMappedViewAccessor CommunityPatchGameTimePausedAccessor;
+        private static MemoryMappedFile CommunityPatchInitialGameTimeMMF;
+        public static MemoryMappedViewAccessor CommunityPatchInitialGameTimeAccessor;
         public static bool UseCommunityPatchTimer {
             get {
                 return CommunityPatchGameTimeAccessor != null && CommunityPatchGameTimeRunningAccessor != null;
@@ -184,6 +188,28 @@ namespace LiveSplit.OriWotW {
                     CommunityPatchGameTimeRunningAccessor = null;
                 }
             }
+            
+            if (CommunityPatchGameTimePausedAccessor == null) {
+                try {
+                    CommunityPatchGameTimePausedMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchGameTimePaused", MemoryMappedFileRights.Write);
+                    CommunityPatchGameTimePausedAccessor = CommunityPatchGameTimePausedMMF.CreateViewAccessor(0, sizeof(bool), MemoryMappedFileAccess.Write);
+                    changed = true;
+                } catch {
+                    CommunityPatchGameTimePausedMMF = null;
+                    CommunityPatchGameTimePausedAccessor = null;
+                }
+            }
+            
+            if (CommunityPatchInitialGameTimeAccessor == null) {
+                try {
+                    CommunityPatchInitialGameTimeMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchInitialGameTime", MemoryMappedFileRights.Write);
+                    CommunityPatchInitialGameTimeAccessor = CommunityPatchInitialGameTimeMMF.CreateViewAccessor(0, sizeof(double), MemoryMappedFileAccess.Write);
+                    changed = true;
+                } catch {
+                    CommunityPatchInitialGameTimeMMF = null;
+                    CommunityPatchInitialGameTimeAccessor = null;
+                }
+            }
 
             return changed && UseCommunityPatchTimer;
         }
@@ -204,6 +230,12 @@ namespace LiveSplit.OriWotW {
         }
         public void SetCommunityPatchGameTimeRunning(bool running) {
             CommunityPatchGameTimeRunningAccessor.Write(0, running);
+        }
+        public void SetCommunityPatchGameTimePaused(bool paused) {
+            CommunityPatchGameTimePausedAccessor.Write(0, paused);
+        }
+        public void SetCommunityPatchInitialGameTime(double time) {
+            CommunityPatchInitialGameTimeAccessor.Write(0, time);
         }
         public float LastRaceTime() {
             //RaceSystem.Instance.Context.LastRaceTime
