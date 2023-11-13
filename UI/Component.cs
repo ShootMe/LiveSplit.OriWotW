@@ -135,9 +135,17 @@ namespace LiveSplit.OriWotW {
             }
         }
         public void OnResume(object sender, EventArgs e) {
+            if (MemoryManager.UseCommunityPatchTimer) {
+                logic.Memory.SetCommunityPatchGameTimePaused(false);
+            }
+            
             log.AddEntry(new EventLogEntry("Resumed Splits"));
         }
         public void OnPause(object sender, EventArgs e) {
+            if (MemoryManager.UseCommunityPatchTimer) {
+                logic.Memory.SetCommunityPatchGameTimePaused(true);
+            }
+            
             log.AddEntry(new EventLogEntry("Paused Splits"));
         }
         public void OnStart(object sender, EventArgs e) {
