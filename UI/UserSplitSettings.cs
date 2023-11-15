@@ -15,7 +15,7 @@ namespace LiveSplit.OriWotW {
         public void UpdateControls(bool updateType = false, bool updateValue = true) {
             if (updateType) {
                 isLoading = true;
-                cboType.DataSource = Utility.GetEnumList<SplitType>();
+                cboType.DataSource = Utility.GetSortedEnumList<SplitType>();
                 cboType.SelectedIndex = -1;
                 cboType.SelectedIndex = -1;
                 isLoading = false;
@@ -27,51 +27,51 @@ namespace LiveSplit.OriWotW {
                 switch (UserSplit.Type) {
                     case SplitType.AreaEnter:
                     case SplitType.AreaLeave:
-                        cboValue.DataSource = Utility.GetEnumList<SplitArea>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitArea>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitArea>(UserSplit.Value);
                         break;
                     case SplitType.Ability:
-                        cboValue.DataSource = Utility.GetEnumList<SplitAbility>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitAbility>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitAbility>(UserSplit.Value);
                         break;
                     case SplitType.Boss:
-                        cboValue.DataSource = Utility.GetEnumList<SplitBoss>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitBoss>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitBoss>(UserSplit.Value);
                         break;
                     case SplitType.Map:
-                        cboValue.DataSource = Utility.GetEnumList<SplitMap>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitMap>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitMap>(UserSplit.Value);
                         break;
                     case SplitType.RaceState:
-                        cboValue.DataSource = Utility.GetEnumList<SplitRace>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitRace>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitRace>(UserSplit.Value);
                         break;
                     case SplitType.Seed:
-                        cboValue.DataSource = Utility.GetEnumList<SplitSeed>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitSeed>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitSeed>(UserSplit.Value);
                         break;
                     case SplitType.Shard:
-                        cboValue.DataSource = Utility.GetEnumList<SplitShard>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitShard>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitShard>(UserSplit.Value);
                         break;
                     case SplitType.SpiritTrial:
-                        cboValue.DataSource = Utility.GetEnumList<SplitSpiritTrial>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitSpiritTrial>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitSpiritTrial>(UserSplit.Value);
                         break;
                     case SplitType.Teleporter:
-                        cboValue.DataSource = Utility.GetEnumList<SplitTeleporter>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitTeleporter>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitTeleporter>(UserSplit.Value);
                         break;
                     case SplitType.Wisp:
-                        cboValue.DataSource = Utility.GetEnumList<SplitWisp>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitWisp>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitWisp>(UserSplit.Value);
                         break;
                     case SplitType.WorldEvent:
-                        cboValue.DataSource = Utility.GetEnumList<SplitWorldEvent>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitWorldEvent>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitWorldEvent>(UserSplit.Value);
                         break;
                     case SplitType.KeystoneDoor:
-                        cboValue.DataSource = Utility.GetEnumList<SplitKeystoneDoor>();
+                        cboValue.DataSource = Utility.GetSortedEnumList<SplitKeystoneDoor>();
                         cboValue.SelectedValue = Utility.GetEnumValue<SplitKeystoneDoor>(UserSplit.Value);
                         break;
                     default:

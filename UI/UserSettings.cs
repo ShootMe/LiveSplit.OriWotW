@@ -170,12 +170,8 @@ namespace LiveSplit.OriWotW {
             e.Effect = DragDropEffects.Move;
             int oldIndex = destination.Controls.GetChildIndex(oldItem);
             if (oldIndex != newIndex) {
-                string segment = oldItem.UserSplit.Name;
-                oldItem.UserSplit.Name = newItem.UserSplit.Name;
-                newItem.UserSplit.Name = segment;
-                Split split = Settings.Autosplits[oldIndex];
-                Settings.Autosplits[oldIndex] = Settings.Autosplits[newIndex];
-                Settings.Autosplits[newIndex] = split;
+                (oldItem.UserSplit.Name, newItem.UserSplit.Name) = (newItem.UserSplit.Name, oldItem.UserSplit.Name);
+                (Settings.Autosplits[oldIndex], Settings.Autosplits[newIndex]) = (Settings.Autosplits[newIndex], Settings.Autosplits[oldIndex]);
                 oldItem.UpdateControls(false, false);
                 newItem.UpdateControls(false, false);
                 destination.Controls.SetChildIndex(oldItem, newIndex);

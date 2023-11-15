@@ -18,6 +18,11 @@ namespace LiveSplit.OriWotW {
             }
             return returnValue;
         }
+        public static List<Tuple<T, string>> GetSortedEnumList<T>() where T : struct {
+            var list = GetEnumList<T>();
+            list.Sort((a, b) => String.Compare(a.Item2, b.Item2, StringComparison.Ordinal));
+            return list;
+        }
         public static string GetEnumDescription<T>(T value) where T : struct {
             MemberInfo info = typeof(T).GetMember(value.ToString())[0];
             DescriptionAttribute[] descriptions = (DescriptionAttribute[])info.GetCustomAttributes(typeof(DescriptionAttribute), false);

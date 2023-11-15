@@ -85,7 +85,7 @@ namespace LiveSplit.OriWotW {
             lblExtra.Text = $"Debug: {debugEnabled}  NoPause: {noPuaseEnabled}";
             lblFPS.Text = $"FPS: {FPS:0.0}";
 
-            if (gameState == GameState.Game) {
+            if (gameState.IsGameOrRace()) {
                 lblHP.Text = $"HP: {stats.Health:0} / {stats.MaxHealth}";
                 lblEN.Text = $"EN: {stats.Energy:0.0} / {stats.MaxEnergy:0}";
                 lblOre.Text = $"Ore: {Memory.Ore()}";

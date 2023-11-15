@@ -178,7 +178,7 @@ namespace LiveSplit.OriWotW {
                 lastIntValue = difficulty;
                 lastScreen = screen;
             } else {
-                if (!updateValues && ((state != GameState.Game && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && state != GameState.Game))) {
+                if (!updateValues && ((!state.IsGameOrRace() && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && !state.IsGameOrRace()))) {
                     return;
                 }
 
@@ -315,7 +315,7 @@ namespace LiveSplit.OriWotW {
                         break;
                 }
 
-                if ((state != GameState.Game && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && state != GameState.Game)) {
+                if ((!state.IsGameOrRace() && split.Type != SplitType.Hitbox) || Memory.Dead() || (Paused && !state.IsGameOrRace())) {
                     ShouldSplit = false;
                 } else if (DateTime.Now > splitLate) {
                     ShouldSplit = true;
