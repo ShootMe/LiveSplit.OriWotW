@@ -9,4 +9,10 @@
         TrialEnd,
         Prologue
     }
+
+    public static class GameStateExtensions {
+        public static bool IsGameOrRace(this GameState state) {
+            return state == GameState.Game || state == GameState.MenuRace;
+        }
+    }
 }

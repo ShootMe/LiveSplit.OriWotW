@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.6.3">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Support for timing Spirit Trials started via Quick Access from the Main Menu </change>
+            <change> Sort autosplit categories and types selection UI alphabetically </change>
+        </changelog>
+    </update>
     <update version="1.6.2">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

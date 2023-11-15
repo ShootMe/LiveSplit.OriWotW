@@ -64,7 +64,7 @@
                     }
                     break;
                 case StartPauseState.StartedValueFalse:
-                    if (state == GameState.Game && uberValue) {
+                    if (state.IsGameOrRace() && uberValue) {
                         startQTMState = StartPauseState.InGameUberValueTrue;
                         startQTMStateShouldPause = true;
                     }
@@ -76,7 +76,7 @@
                     }
                     break;
                 case StartPauseState.QTMValueFalse:
-                    if (state == GameState.Game && startQTMState == StartPauseState.QTMValueFalse && uberValue) {
+                    if (state.IsGameOrRace() && startQTMState == StartPauseState.QTMValueFalse && uberValue) {
                         startQTMState = StartPauseState.ReInGameUberValueTrue;
                         startQTMStateShouldPause = false;
                     }

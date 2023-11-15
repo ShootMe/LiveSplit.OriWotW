@@ -107,8 +107,7 @@
             this.chkDebug.Size = new System.Drawing.Size(96, 17);
             this.chkDebug.TabIndex = 3;
             this.chkDebug.Text = "Disable Debug";
-            this.tooltips.SetToolTip(this.chkDebug, "Will disable Debug and controls when the timer starts and reactivates it when fin" +
-        "ished");
+            this.tooltips.SetToolTip(this.chkDebug, "Will disable Debug and controls when the timer starts and reactivates it when finished");
             this.chkDebug.UseVisualStyleBackColor = true;
             // 
             // chkUseRaceTime
