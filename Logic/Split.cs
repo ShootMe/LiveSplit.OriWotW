@@ -17,8 +17,10 @@ namespace LiveSplit.OriWotW {
         EnergyCell,
         [Description("Game Start")]
         GameStart,
-        [Description("Game End")]
-        GameEnd,
+        [Description("Game End (Crawl)")]
+        GameEndCrawl,
+        [Description("Game End (Shriek Defeated)")]
+        GameEndShriek,
         [Description("Health Cell")]
         HealthCell,
         [Description("Hitbox")]

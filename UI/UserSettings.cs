@@ -83,7 +83,13 @@ namespace LiveSplit.OriWotW {
                 string[] splitValues = splitNode.InnerText.Split('|');
                 if (splitValues.Length == 2 || splitValues.Length == 3) {
                     SplitType type = SplitType.ManualSplit;
-                    if (Enum.TryParse<SplitType>(splitValues[0], out type)) {
+
+                    // Changed in 1.7
+                    if (splitValues[0] == "GameEnd") {
+                        type = SplitType.GameEndCrawl;
+                    }
+                    
+                    if (type != SplitType.ManualSplit || Enum.TryParse<SplitType>(splitValues[0], out type)) {
                         string value = splitValues.Length == 2 ? splitValues[1] : string.Concat(splitValues[1], '|', splitValues[2]);
                         Settings.Autosplits.Add(new Split() { Type = type, Value = value });
                     }

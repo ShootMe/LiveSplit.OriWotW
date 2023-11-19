@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.7.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Fixed Autosplitter not working on the Windows Store version of the game </change>
+        </changelog>
+    </update>
     <update version="1.6.3">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>

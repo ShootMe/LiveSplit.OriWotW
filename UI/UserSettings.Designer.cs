@@ -38,7 +38,7 @@
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLog.Location = new System.Drawing.Point(329, 4);
+            this.btnLog.Location = new System.Drawing.Point(379, 4);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(69, 23);
             this.btnLog.TabIndex = 5;
@@ -58,7 +58,7 @@
             this.flowMain.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowMain.Location = new System.Drawing.Point(0, 58);
             this.flowMain.Name = "flowMain";
-            this.flowMain.Size = new System.Drawing.Size(470, 275);
+            this.flowMain.Size = new System.Drawing.Size(520, 275);
             this.flowMain.TabIndex = 0;
             this.flowMain.WrapContents = false;
             this.flowMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.flowMain_DragEnter);
@@ -67,7 +67,7 @@
             // btnClearLog
             // 
             this.btnClearLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearLog.Location = new System.Drawing.Point(404, 4);
+            this.btnClearLog.Location = new System.Drawing.Point(454, 4);
             this.btnClearLog.Name = "btnClearLog";
             this.btnClearLog.Size = new System.Drawing.Size(63, 23);
             this.btnClearLog.TabIndex = 6;
@@ -80,7 +80,7 @@
             // 
             this.chkLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkLog.AutoSize = true;
-            this.chkLog.Location = new System.Drawing.Point(261, 8);
+            this.chkLog.Location = new System.Drawing.Point(310, 8);
             this.chkLog.Name = "chkLog";
             this.chkLog.Size = new System.Drawing.Size(65, 17);
             this.chkLog.TabIndex = 4;
@@ -124,7 +124,7 @@
             // lblCommunityPatch
             // 
             this.lblCommunityPatch.AutoSize = true;
-            this.lblCommunityPatch.Location = new System.Drawing.Point(261, 35);
+            this.lblCommunityPatch.Location = new System.Drawing.Point(310, 35);
             this.lblCommunityPatch.Name = "lblCommunityPatch";
             this.lblCommunityPatch.Size = new System.Drawing.Size(122, 13);
             this.lblCommunityPatch.TabIndex = 8;
@@ -132,7 +132,7 @@
             // 
             // UserSettings
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6.75F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblCommunityPatch);
             this.Controls.Add(this.chkUseRaceTime);
@@ -144,7 +144,7 @@
             this.Controls.Add(this.btnLog);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "UserSettings";
-            this.Size = new System.Drawing.Size(470, 333);
+            this.Size = new System.Drawing.Size(520, 333);
             this.Load += new System.EventHandler(this.Settings_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -79,6 +79,7 @@ namespace LiveSplit.OriWotW {
         public static UberState savePedestalWindtornRuinsB = new UberState() { Name = "savePedestalUberState", ID = 4928, GroupName = "windtornRuinsGroup", GroupID = 10289, Type = UberStateType.SavePedestalUberState };
         public static UberState builderProjectSpiritWell = new UberState() { Name = "builderProjectSpiritWell", ID = 16825, GroupName = "hubUberStateGroup", GroupID = 42178, Type = UberStateType.SerializedByteUberState };
         public static UberState fastTravel = new UberState() { Name = "fastTravelEnabledUberState", ID = 16489, GroupName = "npcsStateGroup", GroupID = 48248, Type = UberStateType.SerializedByteUberState };
+        public static UberState gameFinished = new UberState() { Name = "gameFinished", ID = 11226, GroupName = "gameStateGroup", GroupID = 34543, Type = UberStateType.SerializedBooleanUberState };
     }
     public class UberState {
         public UberStateType Type;

@@ -5,8 +5,9 @@ using System.IO.MemoryMappedFiles;
 namespace LiveSplit.OriWotW {
     public partial class MemoryManager {
         private static ProgramPointer Characters = new ProgramPointer("GameAssembly.dll",
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x01522FF0, 0x9b),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x012FCD60, 0x15c),
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x9b),
-            new FindPointerSignature(PointerVersion.P4, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33D2488BCBE8????????488B05????????488B88B8000000C641040133C9", 0x3b, 0x0),
             new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x9b),
             new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33D2488BCBE8????????488B05????????488B88B8000000C641040133C9", 0x3b, 0x0),
             new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.Characters.SetCurrentCharacter", 0x15c),
@@ -24,17 +25,25 @@ namespace LiveSplit.OriWotW {
             new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E??498B46??4885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0x79),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B80000004C8931498B4E??498B46??4885C00F84????????4885C90F84????????4C8B05????????8B5018E8????????458BFD418BD5498B4E", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x00407370, 0x79),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x003E5350, 0x79),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameWorld.Awake", 0xa7),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4C8BDC55565741544155415641574883EC5049C743A8FEFFFFFF49895B104C8BE933ED", 0xa7, 0x0));
         private static ProgramPointer PlayerUberStateGroup = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.Seinlevel.get_PartialHealthContainers", 0x68),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "488B05????????488B88B8000000488B014885C0742C488B48184885C9741D33D2E8????????4885C07423488B40184885C074148B40384883C448C3", 0x3, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "488B05????????488B88B8000000488B014885C0742C488B48184885C9741D33D2E8????????4885C07423488B40184885C074148B40384883C448C3", 0x3, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x010229E0, 0x68),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x0080FE90, 0x68));
         private static ProgramPointer TitleScreenManager = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.TitleScreenManager.Awake", 0x97),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000488928488B05", 0x35, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000488928488B05", 0x35, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x00AF7640, 0x97),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x008D5E60, 0x97));
         private static ProgramPointer GameStateMachine = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameStateMachine.get_Instance", 0x6f),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????488B83B8000000488B004885C00F85C6000000488BCBE8????????488B43604885C074278B08E8", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????488B83B8000000488B004885C00F85C6000000488BCBE8????????488B43604885C074278B08E8", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x00403F70, 0x6f),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x003E1F60, 0x6f));
         private static ProgramPointer GameController = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc6),
             new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc6),
@@ -43,7 +52,9 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc3),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameController.Initialize", 0xc3),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "014C8975288B04244883EC20488D4C24308B0148894D20C785C0000000FFFFFFFF488B05????????F6802701000002741883B8D800000000750F488BC8", 0x45, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x0068C450, 0xc6),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x0098EAD0, 0xc3));
         private static ProgramPointer ScenesManager = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x75),
             new FindPointerSignature(PointerVersion.P4, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
@@ -54,10 +65,14 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x76),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.ScenesManager.Awake", 0x76),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488931488B1D????????488BCBE8????????488B43604885C074278B08E8????????483B05????????7517", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x00BC7120, 0x75),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x016D6390, 0x76));
         private static ProgramPointer UberStateController = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__uberSerialization.UberStateController.get_Instance", 0x90),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????F6832701000002741883BBD800000000750F488BCBE8????????488B1D????????488B83B800000048837828000F85", 0x35, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B1D????????F6832701000002741883BBD800000000750F488BCBE8????????488B1D????????488B83B800000048837828000F85", 0x35, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x01B69CB0, 0x90),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x01A7B120, 0x90));
         private static ProgramPointer UberStateCollection = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__uberSerialization.UberStateCollection.get_Instance", 0x8b),
             new FindIl2Cpp(PointerVersion.P3, AutoDeref.Single, "__uberSerialization.UberStateCollection.get_Instance", 0x8b),
@@ -66,7 +81,9 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__uberSerialization.UberStateCollection.GetGroup", 0x73),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__uberSerialization.UberStateCollection.GetGroup", 0x73),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B0D????????F6812701000002740E83B9D8000000007505E8????????33C9E8????????4885C07469488B58384885DB745A", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x01B674A0, 0x8b),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x01A78980, 0x73));
         private static ProgramPointer DifficultyController = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
             new FindPointerSignature(PointerVersion.P4, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C9747B4533C08B5338E8????????807B29007531C6432901488B05", 0x14, 0x0),
@@ -77,9 +94,13 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.ConfirmChangingDifficulty.Perform", 0xdf),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????488B88B8000000488B094885C974694533C08B5320E8????????488B05????????4885C07518", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x011E4810, 0xdf),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x00A1F880, 0xdf));
         private static ProgramPointer NoPausePatch = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.None, "__mainWisp.GameController.OnApplicationFocus", 0x1b),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.None, 0x006903A0, 0x1b),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.None, 0x009925E0, 0x1b),
             new FindPointerSignature(PointerVersion.All, AutoDeref.None, "4C8BDC565741564883EC5049C743C8FEFFFFFF49895B1049896B18??????488BF14533F6443835????????754B488B05????????4C6380C0000000488B05????????418B8C00????????418B9400????????4D8973D04D8973D84D8973E04D8D43D0E8????????9033C9FF15????????90C605????????0180BE????????000F85????????4084ED0F85????????33C9E8????????4885C00F84????????33D2488BC8E8????????84C07561", 0x1b, 0x0));
         private static ProgramPointer FrameCounter = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c5),
@@ -89,6 +110,8 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P1, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
             new FindPointerSignature(PointerVersion.P1, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.GameController.FixedUpdate", 0x1c8),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x00692380, 0x1c5),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x00994520, 0x1c8),
             new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "80780A007538488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B8000000FF0033C9", 0x2a, 0x0));
         private static ProgramPointer CheatsHandler = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.P4, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
@@ -98,12 +121,18 @@ namespace LiveSplit.OriWotW {
             new FindIl2Cpp(PointerVersion.P2, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7e),
             new FindPointerSignature(PointerVersion.P2, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.CheatsHandler.Awake", 0x7a),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B80000004C89??488B0D", 0x14, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x0131CF10, 0x7e),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x00E06A90, 0x7e));
         private static ProgramPointer DebugControls = new ProgramPointer("GameAssembly.dll",
-            new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e));
+            new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.AdvancedDebugMenuPage.DebugControlsSetter", 0x8e),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x004DCD50, 0x8e),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x0043EEE0, 0x8e));
         private static ProgramPointer RaceSystem = new ProgramPointer("GameAssembly.dll",
             new FindIl2Cpp(PointerVersion.All, AutoDeref.Single, "__mainWisp.RaceSystem.get_CurrentStateTime", 0x8f),
-            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0));
+            new FindPointerSignature(PointerVersion.All, AutoDeref.Single, "4885C00F8499000000488B80280100004885C00F849B00000048837820007675488B0D????????F6812701000002740E83B9D8000000007505E8", 0x23, 0x0),
+            new FindFromStaticRva(PointerVersion.P4, AutoDeref.Single, 0x0071EAD0, 0x8f),
+            new FindFromStaticRva(PointerVersion.P2, AutoDeref.Single, 0x00BABE90, 0x8f));
         private static ProgramPointer GameSettings = new ProgramPointer("GameAssembly.dll",
             new FindPointerSignature(PointerVersion.P4, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B800000048893833D2488BCF", 0x14, 0x0),
             new FindPointerSignature(PointerVersion.P3, AutoDeref.Single, "9033C9FF15????????90C605????????01488B05????????F6802701000002741883B8D800000000750F488BC8E8????????488B05????????488B80B800000048893833D2488BCF", 0x14, 0x0),
