@@ -34,7 +34,7 @@
             // 
             // txtValue
             // 
-            this.txtValue.Location = new System.Drawing.Point(247, 1);
+            this.txtValue.Location = new System.Drawing.Point(297, 1);
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(54, 20);
             this.txtValue.TabIndex = 2;
@@ -46,7 +46,7 @@
             this.cboType.FormattingEnabled = true;
             this.cboType.Location = new System.Drawing.Point(145, 1);
             this.cboType.Name = "cboType";
-            this.cboType.Size = new System.Drawing.Size(100, 21);
+            this.cboType.Size = new System.Drawing.Size(150, 21);
             this.cboType.TabIndex = 1;
             this.cboType.ValueMember = "Item1";
             this.cboType.SelectedIndexChanged += new System.EventHandler(this.cboType_SelectedIndexChanged);
@@ -78,7 +78,7 @@
             // 
             this.cboValue.DisplayMember = "Item2";
             this.cboValue.FormattingEnabled = true;
-            this.cboValue.Location = new System.Drawing.Point(247, 1);
+            this.cboValue.Location = new System.Drawing.Point(297, 1);
             this.cboValue.Name = "cboValue";
             this.cboValue.Size = new System.Drawing.Size(202, 21);
             this.cboValue.TabIndex = 3;
@@ -88,7 +88,7 @@
             // 
             // UserSplitSettings
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6.75F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblSegment);
             this.Controls.Add(this.txtValue);
@@ -97,7 +97,7 @@
             this.Controls.Add(this.cboValue);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "UserSplitSettings";
-            this.Size = new System.Drawing.Size(450, 23);
+            this.Size = new System.Drawing.Size(500, 23);
             ((System.ComponentModel.ISupportInitialize)(this.picHandle)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

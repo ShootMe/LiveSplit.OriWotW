@@ -184,6 +184,42 @@ namespace LiveSplit.OriWotW {
             return BasePtr + offset;
         }
     }
+    public class FindFromStaticRva : IFindPointer {
+        public PointerVersion Version { get; private set; }
+        private readonly AutoDeref AutoDeref;
+        private readonly int RVA;
+        private readonly int Offset;
+        private IntPtr BasePtr;
+        public FindFromStaticRva(PointerVersion version, AutoDeref autoDeref, int rva, int offset) {
+            Version = version;
+            AutoDeref = autoDeref;
+            RVA = rva;
+            Offset = offset;
+            BasePtr = IntPtr.Zero;
+        }
+        public bool FoundBaseAddress() {
+            return BasePtr != IntPtr.Zero;
+        }
+        public void VerifyPointer(Process program, ref IntPtr pointer) {
+        }
+        public IntPtr FindPointer(Process program, string asmName) {
+            return ProgramPointer.DerefPointer(program, GetPointer(program, asmName), AutoDeref);
+        }
+        private IntPtr GetPointer(Process program, string asmName) {
+            if (string.IsNullOrEmpty(asmName)) {
+                BasePtr = program.MainModule.BaseAddress + (int)RVA + Offset;
+            } else {
+                Tuple<IntPtr, IntPtr> range = ProgramPointer.GetAddressRange(program, asmName);
+                BasePtr = range.Item1 + (int)RVA + Offset;
+            }
+
+            int offset = 0;
+            if (AutoDeref != AutoDeref.None) {
+                offset = program.Read<int>(BasePtr) + 4;
+            }
+            return BasePtr + offset;
+        }
+    }
     public class FindPointerSignature : IFindPointer {
         public PointerVersion Version { get; private set; }
         private readonly AutoDeref AutoDeref;
@@ -215,9 +251,7 @@ namespace LiveSplit.OriWotW {
             if (isValid) {
                 int offset = CalculateRelative(program);
                 IntPtr verify = ProgramPointer.DerefPointer(program, BasePtr + offset, AutoDeref);
-                if (verify != pointer) {
-                    pointer = verify;
-                }
+                pointer = verify;
                 return;
             }
 

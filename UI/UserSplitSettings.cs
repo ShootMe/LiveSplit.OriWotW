@@ -86,7 +86,7 @@ namespace LiveSplit.OriWotW {
             if (cboType.SelectedValue == null || isLoading) { return; }
 
             SplitType nextControlType = (SplitType)cboType.SelectedValue;
-            if (nextControlType == SplitType.ManualSplit || nextControlType == SplitType.GameStart || nextControlType == SplitType.GameEnd) {
+            if (nextControlType == SplitType.ManualSplit || nextControlType == SplitType.GameStart || nextControlType == SplitType.GameEndCrawl || nextControlType == SplitType.GameEndShriek) {
                 txtValue.Visible = false;
                 cboValue.Visible = false;
                 UserSplit.Value = string.Empty;
