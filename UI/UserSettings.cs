@@ -84,9 +84,14 @@ namespace LiveSplit.OriWotW {
                 if (splitValues.Length == 2 || splitValues.Length == 3) {
                     SplitType type = SplitType.ManualSplit;
 
-                    // Changed in 1.7
-                    if (splitValues[0] == "GameEnd") {
-                        type = SplitType.GameEndCrawl;
+                    // Migrations for 1.7
+                    switch (splitValues[0]) {
+                        case "GameEnd":
+                            type = SplitType.GameEndCrawl;
+                            break;
+                        case "GameEndShriek":
+                            type = SplitType.FinalCutsceneStarted;
+                            break;
                     }
                     
                     if (type != SplitType.ManualSplit || Enum.TryParse<SplitType>(splitValues[0], out type)) {

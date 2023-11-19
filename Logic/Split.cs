@@ -19,8 +19,8 @@ namespace LiveSplit.OriWotW {
         GameStart,
         [Description("Game End (Crawl)")]
         GameEndCrawl,
-        [Description("Game End (Shriek Defeated)")]
-        GameEndShriek,
+        [Description("Final Cutscene Started")]
+        FinalCutsceneStarted,
         [Description("Health Cell")]
         HealthCell,
         [Description("Hitbox")]

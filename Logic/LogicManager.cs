@@ -238,7 +238,7 @@ namespace LiveSplit.OriWotW {
                     case SplitType.GameEndCrawl:
                         CheckHitbox(new Vector4("-4628.05,-6756,10,10"));
                         break;
-                    case SplitType.GameEndShriek:
+                    case SplitType.FinalCutsceneStarted:
                         CheckUberBoolValue(UberStateDefaults.gameFinished);
                         break;
                     case SplitType.Seed:

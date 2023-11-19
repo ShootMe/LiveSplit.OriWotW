@@ -6,6 +6,8 @@
         </files>
         <changelog>
             <change> Fixed Autosplitter not working on the Windows Store version of the game </change>
+            <change> Added a new Split "Final Cutscene Started" which splits when the Game Finished Uber State (34543|11226) is set to true </change>
+            <change> Renamed the "Game End" split to "Game End (Crawl)" </change>
         </changelog>
     </update>
     <update version="1.6.3">
