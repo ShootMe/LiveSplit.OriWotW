@@ -30,6 +30,7 @@
             this.chkLog = new System.Windows.Forms.CheckBox();
             this.chkNoPause = new System.Windows.Forms.CheckBox();
             this.chkDebug = new System.Windows.Forms.CheckBox();
+            this.chkLockCursor = new System.Windows.Forms.CheckBox();
             this.chkUseRaceTime = new System.Windows.Forms.CheckBox();
             this.tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.lblCommunityPatch = new System.Windows.Forms.Label();
@@ -110,6 +111,17 @@
             this.tooltips.SetToolTip(this.chkDebug, "Will disable Debug and controls when the timer starts and reactivates it when finished");
             this.chkDebug.UseVisualStyleBackColor = true;
             // 
+            // chkLockCursor
+            // 
+            this.chkLockCursor.AutoSize = true;
+            this.chkLockCursor.Location = new System.Drawing.Point(192, 8);
+            this.chkLockCursor.Name = "chkLockCursor";
+            this.chkLockCursor.Size = new System.Drawing.Size(90, 17);
+            this.chkLockCursor.TabIndex = 4;
+            this.chkLockCursor.Text = "Lock Cursor";
+            this.tooltips.SetToolTip(this.chkLockCursor, "Lock the Cursor to the Game Window (Community Patch only)");
+            this.chkLockCursor.UseVisualStyleBackColor = true;
+            // 
             // chkUseRaceTime
             // 
             this.chkUseRaceTime.AutoSize = true;
@@ -137,6 +149,7 @@
             this.Controls.Add(this.lblCommunityPatch);
             this.Controls.Add(this.chkUseRaceTime);
             this.Controls.Add(this.chkDebug);
+            this.Controls.Add(this.chkLockCursor);
             this.Controls.Add(this.chkNoPause);
             this.Controls.Add(this.chkLog);
             this.Controls.Add(this.btnClearLog);
@@ -148,7 +161,6 @@
             this.Load += new System.EventHandler(this.Settings_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -158,6 +170,7 @@
         private System.Windows.Forms.CheckBox chkLog;
         private System.Windows.Forms.CheckBox chkNoPause;
         private System.Windows.Forms.CheckBox chkDebug;
+        private System.Windows.Forms.CheckBox chkLockCursor;
         private System.Windows.Forms.CheckBox chkUseRaceTime;
         private System.Windows.Forms.ToolTip tooltips;
         private System.Windows.Forms.Label lblCommunityPatch;

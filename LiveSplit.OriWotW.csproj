@@ -75,13 +75,13 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="LiveSplit.Core">
-            <HintPath>..\..\Programs\LiveSplit\LiveSplit.Core.dll</HintPath>
+          <HintPath>C:\Users\Timo\Documents\LiveSplit_1.8.29\LiveSplit.Core.dll</HintPath>
         </Reference>
         <Reference Include="LiveSplit.Text">
-            <HintPath>..\..\Programs\LiveSplit\Components\LiveSplit.Text.dll</HintPath>
+          <HintPath>C:\Users\Timo\Documents\LiveSplit_1.8.29\Components\LiveSplit.Text.dll</HintPath>
         </Reference>
         <Reference Include="LiveSplit.View">
-            <HintPath>..\..\Programs\LiveSplit\LiveSplit.View.dll</HintPath>
+          <HintPath>C:\Users\Timo\Documents\LiveSplit_1.8.29\LiveSplit.View.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -90,7 +90,7 @@
         <Reference Include="System.Windows.Forms" />
         <Reference Include="System.Xml" />
         <Reference Include="UpdateManager">
-            <HintPath>..\..\Programs\LiveSplit\UpdateManager.dll</HintPath>
+          <HintPath>C:\Users\Timo\Documents\LiveSplit_1.8.29\UpdateManager.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>

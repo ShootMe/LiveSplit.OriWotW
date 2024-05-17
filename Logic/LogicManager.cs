@@ -27,6 +27,7 @@ namespace LiveSplit.OriWotW {
         public SplitterSettings Settings { get; private set; }
         private bool lastBoolValue;
         private bool hadDebug;
+        private bool lastLockCursorValue = false;
         private int lastIntValue, lastIntValue2;
         private string lastStrValue;
         private Screen lastScreen;
@@ -87,6 +88,13 @@ namespace LiveSplit.OriWotW {
             if (Memory.DetectCommunityPatch() && MemoryManager.UseCommunityPatchTimer) {
                 Memory.SetCommunityPatchGameTimeRunning(Running);
                 Memory.SetCommunityPatchInitialGameTime(GameTime);
+                Memory.SetCommunityPatchLockCursor(Settings.LockCursor);
+                lastLockCursorValue = Settings.LockCursor;
+            }
+
+            if (lastLockCursorValue != Settings.LockCursor && MemoryManager.UseCommunityPatchTimer) {
+                Memory.SetCommunityPatchLockCursor(Settings.LockCursor);
+                lastLockCursorValue = Settings.LockCursor;
             }
             
             if (Settings.DisableDebug && Running) {
