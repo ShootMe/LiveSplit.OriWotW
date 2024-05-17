@@ -44,6 +44,9 @@ namespace LiveSplit.OriWotW {
             AddXmlItem<bool>(document, xmlSettings, "DisableDebug", chkDebug.Checked);
             Settings.DisableDebug = chkDebug.Checked;
 
+            AddXmlItem<bool>(document, xmlSettings, "LockCursor", chkLockCursor.Checked);
+            Settings.LockCursor = chkLockCursor.Checked;
+
             AddXmlItem<bool>(document, xmlSettings, "UseRaceTime", chkUseRaceTime.Checked);
             Settings.UseRaceTime = chkUseRaceTime.Checked;
 
@@ -73,6 +76,10 @@ namespace LiveSplit.OriWotW {
             bool disableDebug = GetXmlBoolItem(node, ".//DisableDebug", true);
             chkDebug.Checked = disableDebug;
             Settings.DisableDebug = disableDebug;
+
+            bool lockCursor = GetXmlBoolItem(node, ".//LockCursor", false);
+            chkLockCursor.Checked = lockCursor;
+            Settings.LockCursor = lockCursor;
 
             bool useRaceTime = GetXmlBoolItem(node, ".//UseRaceTime", false);
             chkUseRaceTime.Checked = useRaceTime;

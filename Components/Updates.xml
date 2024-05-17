@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+    <update version="1.8.0">
+        <files>
+            <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
+        </files>
+        <changelog>
+            <change> Added an option to lock the cursor to the game window </change>
+        </changelog>
+    </update>
     <update version="1.7.0">
         <files>
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
