@@ -28,6 +28,7 @@ namespace LiveSplit.OriWotW {
         private bool lastBoolValue;
         private bool hadDebug;
         private bool lastLockCursorValue = false;
+        private bool lastFastTrialRetryValue = false;
         private int lastIntValue, lastIntValue2;
         private string lastStrValue;
         private Screen lastScreen;
@@ -89,12 +90,19 @@ namespace LiveSplit.OriWotW {
                 Memory.SetCommunityPatchGameTimeRunning(Running);
                 Memory.SetCommunityPatchInitialGameTime(GameTime);
                 Memory.SetCommunityPatchLockCursor(Settings.LockCursor);
+                Memory.SetCommunityPatchFastTrialRetry(Settings.UseRaceTime);
                 lastLockCursorValue = Settings.LockCursor;
+                lastFastTrialRetryValue = Settings.UseRaceTime;
             }
 
             if (lastLockCursorValue != Settings.LockCursor && MemoryManager.UseCommunityPatchTimer) {
                 Memory.SetCommunityPatchLockCursor(Settings.LockCursor);
                 lastLockCursorValue = Settings.LockCursor;
+            }
+
+            if (lastFastTrialRetryValue != Settings.UseRaceTime && MemoryManager.UseCommunityPatchTimer) {
+                Memory.SetCommunityPatchFastTrialRetry(Settings.UseRaceTime);
+                lastFastTrialRetryValue = Settings.UseRaceTime;
             }
             
             if (Settings.DisableDebug && Running) {
