@@ -150,6 +150,8 @@ namespace LiveSplit.OriWotW {
         public static MemoryMappedViewAccessor CommunityPatchInitialGameTimeAccessor;
         private static MemoryMappedFile CommunityPatchLockCursorMMF;
         public static MemoryMappedViewAccessor CommunityPatchLockCursorAccessor;
+        private static MemoryMappedFile CommunityPatchFastTrialRetryMMF;
+        public static MemoryMappedViewAccessor CommunityPatchFastTrialRetryAccessor;
         public static bool UseCommunityPatchTimer {
             get {
                 return CommunityPatchGameTimeAccessor != null && CommunityPatchGameTimeRunningAccessor != null;
@@ -252,6 +254,17 @@ namespace LiveSplit.OriWotW {
                     CommunityPatchLockCursorAccessor = null;
                 }
             }
+            
+            if (CommunityPatchFastTrialRetryAccessor == null) {
+                try {
+                    CommunityPatchFastTrialRetryMMF = MemoryMappedFile.OpenExisting("OriWotWCommunityPatchTrialFastRetry", MemoryMappedFileRights.Write);
+                    CommunityPatchFastTrialRetryAccessor = CommunityPatchFastTrialRetryMMF.CreateViewAccessor(0, sizeof(bool), MemoryMappedFileAccess.Write);
+                    changed = true;
+                } catch {
+                    CommunityPatchFastTrialRetryMMF = null;
+                    CommunityPatchFastTrialRetryAccessor = null;
+                }
+            }
 
             return changed && UseCommunityPatchTimer;
         }
@@ -281,6 +294,9 @@ namespace LiveSplit.OriWotW {
         }
         public void SetCommunityPatchLockCursor(bool lockCursor) {
             CommunityPatchLockCursorAccessor.Write(0, lockCursor);
+        }
+        public void SetCommunityPatchFastTrialRetry(bool fastRetry) {
+            CommunityPatchFastTrialRetryAccessor.Write(0, fastRetry);
         }
         public float LastRaceTime() {
             //RaceSystem.Instance.Context.LastRaceTime
