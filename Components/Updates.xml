@@ -5,7 +5,7 @@
             <file path="Components/LiveSplit.OriWotW.dll" status="changed"/>
         </files>
         <changelog>
-            <change> Combined with Community Patch 1.4.0 or higher, this version will disable the Spirit Trial preview when using the Spirit Trial timer in LiveSplit </change>
+            <change> This update only includes internal changes </change>
         </changelog>
     </update>
     <update version="1.8.0">
